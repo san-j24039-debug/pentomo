@@ -1747,29 +1747,32 @@ p {
 
 .bookCard.secret {
   overflow: hidden;
-  border-color: rgba(18, 37, 51, 0.52);
+  border-color: #9fc9e5;
   background:
-    radial-gradient(circle at 50% 40%, rgba(255,255,255,0.16), transparent 42%),
-    linear-gradient(180deg, #1a2c38, #071016);
-  box-shadow: 0 8px 18px rgba(9, 32, 48, 0.28);
+    radial-gradient(circle at 50% 30%, rgba(255,255,255,0.96), transparent 46%),
+    linear-gradient(180deg, rgba(235,248,255,0.96), rgba(211,235,247,0.92));
+  box-shadow: 0 8px 16px rgba(53, 134, 192, 0.12);
 }
 
 .bookCard.secret .secretImage {
-  width: 82px;
-  height: 82px;
-  margin: -4px auto 2px;
-  border-radius: 14px;
+  width: 74px;
+  height: 74px;
+  margin: -1px auto 3px;
+  border: 1px solid rgba(86, 142, 176, 0.26);
+  border-radius: 12px;
   object-fit: cover;
-  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.14), 0 0 18px rgba(255,255,255,0.24);
+  filter: saturate(0.72) brightness(1.28) contrast(0.82);
+  opacity: 0.88;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.5), 0 7px 14px rgba(70, 128, 160, 0.16);
 }
 
 .bookCard.secret b {
-  color: #eef8ff;
-  text-shadow: 0 1px 6px rgba(255,255,255,0.34);
+  color: #2f5f7d;
+  text-shadow: none;
 }
 
 .bookCard.secret span {
-  color: #a9c1cf;
+  color: #5f8195;
 }
 
 .miniActions {
