@@ -1126,6 +1126,38 @@ p {
   gap: 8px;
 }
 
+.embeddedEggStorage {
+  display: grid;
+  gap: 10px;
+}
+
+.eggSummary {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 12px;
+}
+
+.eggSummary b {
+  display: block;
+  color: #174d77;
+  font-size: 15px;
+}
+
+.eggSummary span {
+  display: block;
+  margin-top: 2px;
+  color: #587a92;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.eggSummary button {
+  min-height: 36px;
+  padding-inline: 12px;
+}
+
 .storedEgg {
   display: grid;
   place-items: center;
@@ -1411,13 +1443,44 @@ p {
   padding: 13px;
 }
 
+.menuAchievements {
+  display: grid;
+  gap: 10px;
+  margin-top: 12px;
+  padding: 12px;
+}
+
+.menuSectionTitle {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 10px;
+}
+
+.menuSectionTitle h2 {
+  margin: 0;
+  color: #174d77;
+  font-size: 17px;
+}
+
+.menuSectionTitle button {
+  min-height: 34px;
+  padding-inline: 11px;
+}
+
+.taskPanel.embedded {
+  padding: 0;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+}
+
 .bottomTabs {
   height: 82px;
   display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: 68px;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
   gap: 4px;
-  overflow-x: auto;
+  overflow: hidden;
   padding: 7px 9px 10px;
   border-top: 1px solid #c8e3f7;
   background: rgba(255,255,255,0.96);

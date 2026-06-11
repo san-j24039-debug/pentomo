@@ -33,13 +33,7 @@ const tabs = [
   ["care", "育成", "care"],
   ["list", "一覧", "list"],
   ["gacha", "ガチャ", "gacha"],
-  ["eggs", "卵", "egg"],
-  ["mini", "ゲーム", "play"],
   ["book", "図鑑", "book"],
-  ["outing", "おでかけ", "map"],
-  ["shop", "ショップ", "shop"],
-  ["profile", "プロフ", "user"],
-  ["achieve", "実績", "star"],
   ["menu", "メニュー", "menu"],
 ];
 
@@ -753,7 +747,8 @@ function Care({ activePenguin, careAction, game, setOutfitOpen, setEditOpen }) {
   );
 }
 
-function PenguinList({ game, setGame }) {
+function PenguinList({ game, setGame, setHatchModal, setActive }) {
+  const [tab, setTab] = useState("penguins");
   const capacity = BASE_CAPACITY + game.capacityBonus;
   const setRole = (id, role) => {
     setGame((current) => ({
@@ -766,31 +761,37 @@ function PenguinList({ game, setGame }) {
 
   return (
     <Screen className="listScreen">
-      <PageHeader title="ペンギン一覧" sub={`所持数 ${game.penguins.length} / ${capacity}`} />
-      <div className="sortBar">
-        <span>図鑑順は固定。表示だけ並び替えできます。</span>
-        <button onClick={() => setGame((g) => ({ ...g, penguins: [...g.penguins].sort((a, b) => b.level - a.level) }))}>Lv順</button>
-      </div>
-      <div className="penguinGrid">
-        {game.penguins.map((p) => (
-          <article className="penguinCard" key={p.id}>
-            <Rarity index={p.speciesId} />
-            <img src={penguin} alt="" />
-            <b>{p.name}</b>
-            <span>{p.speciesName}<br />Lv.{p.level} / 愛情{p.loveLevel}</span>
-            <div className="cardBadges">
-              {p.favorite && <em>お気に入り</em>}
-              {game.homeDisplayId === p.id && <em>ホーム</em>}
-              {game.activeCareId === p.id && <em>育成中</em>}
-            </div>
-            <div className="miniActions">
-              <button onClick={() => setRole(p.id, "home")}>ホーム</button>
-              <button onClick={() => setRole(p.id, "care")}>育成</button>
-              <button onClick={() => setRole(p.id, "profile")}>プロフ</button>
-            </div>
-          </article>
-        ))}
-      </div>
+      <PageHeader title="一覧" sub={`ペンギン ${game.penguins.length} / ${capacity} ・ 卵 ${game.eggs.length}`} />
+      <Segmented active={tab} options={{ penguins: "ペンギン", eggs: "卵" }} onChange={setTab} />
+      {tab === "penguins" && (
+        <>
+          <div className="sortBar">
+            <span>図鑑順は固定。表示だけ並び替えできます。</span>
+            <button onClick={() => setGame((g) => ({ ...g, penguins: [...g.penguins].sort((a, b) => b.level - a.level) }))}>Lv順</button>
+          </div>
+          <div className="penguinGrid">
+            {game.penguins.map((p) => (
+              <article className="penguinCard" key={p.id}>
+                <Rarity index={p.speciesId} />
+                <img src={penguin} alt="" />
+                <b>{p.name}</b>
+                <span>{p.speciesName}<br />Lv.{p.level} / 愛情{p.loveLevel}</span>
+                <div className="cardBadges">
+                  {p.favorite && <em>お気に入り</em>}
+                  {game.homeDisplayId === p.id && <em>ホーム</em>}
+                  {game.activeCareId === p.id && <em>育成中</em>}
+                </div>
+                <div className="miniActions">
+                  <button onClick={() => setRole(p.id, "home")}>ホーム</button>
+                  <button onClick={() => setRole(p.id, "care")}>育成</button>
+                  <button onClick={() => setRole(p.id, "profile")}>プロフ</button>
+                </div>
+              </article>
+            ))}
+          </div>
+        </>
+      )}
+      {tab === "eggs" && <EggStorage game={game} setHatchModal={setHatchModal} setActive={setActive} embedded />}
     </Screen>
   );
 }
@@ -851,10 +852,19 @@ function Gacha({ game, setGame, setMessage }) {
   );
 }
 
-function EggStorage({ game, setHatchModal, setActive }) {
-  return (
-    <Screen className="eggScreen">
-      <PageHeader title="卵保管庫" sub={`${game.eggs.length} / 999`} />
+function EggStorage({ game, setHatchModal, setActive, embedded = false }) {
+  const content = (
+    <>
+      {!embedded && <PageHeader title="卵保管庫" sub={`${game.eggs.length} / 999`} />}
+      {embedded && (
+        <Panel className="eggSummary">
+          <div>
+            <b>卵保管庫</b>
+            <span>ガチャで手に入れた卵をここで確認できます。</span>
+          </div>
+          <button onClick={() => setActive("gacha")}>ガチャへ</button>
+        </Panel>
+      )}
       <div className="eggStorageGrid">
         {game.eggs.map((egg) => (
           <Panel className="storedEgg" key={egg.id}>
@@ -870,6 +880,12 @@ function EggStorage({ game, setHatchModal, setActive }) {
           <button onClick={() => setActive("gacha")}>ガチャへ</button>
         </Panel>
       )}
+    </>
+  );
+  if (embedded) return <div className="embeddedEggStorage">{content}</div>;
+  return (
+    <Screen className="eggScreen">
+      {content}
     </Screen>
   );
 }
@@ -1828,10 +1844,15 @@ function Achievements({ game, setGame, setMessage }) {
   );
 }
 
-function Menu({ setMessage }) {
+function Menu({ game, setGame, setMessage }) {
+  const [achievementTab, setAchievementTab] = useState("daily");
+  const claimAll = () => {
+    setGame((current) => ({ ...current, diamonds: current.diamonds + 20, coins: current.coins + 500 }));
+    setMessage("実績報酬を受け取ったよ。");
+  };
   return (
     <Screen className="menuScreen">
-      <PageHeader title="メニュー" sub="設定・ヘルプ・データ連携" />
+      <PageHeader title="メニュー" sub="実績・設定・ヘルプ・データ連携" />
       <div className="menuGrid">
         {[
           ["持ち物", "bag"], ["称号", "star"], ["設定", "gear"], ["ヘルプ", "help"],
@@ -1842,6 +1863,18 @@ function Menu({ setMessage }) {
           </button>
         ))}
       </div>
+      <Panel className="menuAchievements">
+        <div className="menuSectionTitle">
+          <h2>実績</h2>
+          <button className="yellow" onClick={claimAll}>まとめて受け取る</button>
+        </div>
+        <Segmented active={achievementTab} options={{ daily: "デイリー", normal: "ノーマル", special: "スペシャル" }} onChange={setAchievementTab} />
+        <div className="taskPanel embedded">
+          <Task title="ログインしよう" reward="ダイヤ x10" done />
+          <Task title="ペンギンと5回お世話しよう" reward="ダイヤ x10" progress="5 / 5" done />
+          <Task title="魚キャッチで100点" reward="称号" progress={`${game.achievements[achievementTab]} / 100`} />
+        </div>
+      </Panel>
       <Panel className="noticePanel">
         <h2>動作確認メニュー</h2>
         <p>各ボタンは反応します。今後、詳細画面を追加する前提の入口です。</p>
