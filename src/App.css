@@ -1749,21 +1749,70 @@ p {
   overflow: hidden;
   border-color: #9fc9e5;
   background:
-    radial-gradient(circle at 50% 30%, rgba(255,255,255,0.96), transparent 46%),
-    linear-gradient(180deg, rgba(235,248,255,0.96), rgba(211,235,247,0.92));
+    radial-gradient(circle at 50% 36%, rgba(255,255,255,0.96), transparent 44%),
+    linear-gradient(180deg, rgba(238,250,255,0.95), rgba(216,240,251,0.9));
   box-shadow: 0 8px 16px rgba(53, 134, 192, 0.12);
 }
 
-.bookCard.secret .secretImage {
-  width: 74px;
-  height: 74px;
-  margin: -1px auto 3px;
-  border: 1px solid rgba(86, 142, 176, 0.26);
-  border-radius: 12px;
-  object-fit: cover;
-  filter: saturate(0.72) brightness(1.28) contrast(0.82);
-  opacity: 0.88;
-  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.5), 0 7px 14px rgba(70, 128, 160, 0.16);
+.secretPenguin {
+  position: relative;
+  width: 76px;
+  height: 76px;
+  display: grid;
+  place-items: center;
+  margin: -3px auto 0;
+}
+
+.secretPenguin::before {
+  content: "";
+  position: absolute;
+  inset: 12px 10px 8px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,255,255,0.82), rgba(101, 178, 213, 0.26) 55%, transparent 72%);
+  filter: blur(5px);
+}
+
+.secretPenguin::after {
+  content: "";
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 5px;
+  height: 12px;
+  border-radius: 50%;
+  background: rgba(63, 123, 154, 0.18);
+  filter: blur(2px);
+}
+
+.secretPenguin img {
+  position: relative;
+  z-index: 1;
+  width: 70px;
+  height: 70px;
+  object-fit: contain;
+  filter: brightness(0) saturate(0) opacity(0.8) drop-shadow(0 0 7px rgba(255,255,255,0.72));
+  transform: scale(1.04);
+}
+
+.secretMark {
+  position: absolute;
+  z-index: 2;
+  color: rgba(64, 110, 139, 0.28);
+  font-size: 22px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.secretMark.markA {
+  left: 0;
+  top: 11px;
+  transform: rotate(-12deg);
+}
+
+.secretMark.markB {
+  right: 2px;
+  top: 5px;
+  transform: rotate(11deg);
 }
 
 .bookCard.secret b {

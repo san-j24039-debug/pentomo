@@ -1581,7 +1581,15 @@ function Book({ game }) {
               const found = game.discoveredSpecies.includes(index);
               return (
                 <article className={`bookCard ${found ? "" : "locked secret"}`} key={name}>
-                  {found ? <img src={penguin} alt="" /> : <img className="secretImage" src="/book-secret.png" alt="" />}
+                  {found ? (
+                    <img src={penguin} alt="" />
+                  ) : (
+                    <div className="secretPenguin" aria-hidden="true">
+                      <span className="secretMark markA">?</span>
+                      <span className="secretMark markB">?</span>
+                      <img src={penguin} alt="" />
+                    </div>
+                  )}
                   <b>{found ? name : "？？？"}</b>
                   <span>{found ? "発見済み" : "未発見"}</span>
                 </article>
