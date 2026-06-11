@@ -1,0 +1,2251 @@
+import { useEffect, useState } from "react";
+import "./App.css";
+import penguin from "./assets/penguin.png";
+
+const STORAGE_KEY = "pentomo-save-v4";
+const BASE_CAPACITY = 54;
+const EXP_PER_LEVEL = 100;
+const PITY_MAX = 80;
+
+const species = [
+  "コウテイペンギン",
+  "オウサマペンギン",
+  "アデリーペンギン",
+  "ジェンツーペンギン",
+  "ヒゲペンギン",
+  "ガラパゴスペンギン",
+  "ケープペンギン",
+  "フンボルトペンギン",
+  "マゼランペンギン",
+  "フィヨルドランドペンギン",
+  "シュレーターペンギン",
+  "スネアーズペンギン",
+  "マカロニペンギン",
+  "ロイヤルペンギン",
+  "イワトビペンギン",
+  "キガシラペンギン",
+  "コガタペンギン",
+  "ハネジロペンギン",
+];
+
+const tabs = [
+  ["home", "ホーム", "home"],
+  ["care", "育成", "care"],
+  ["list", "一覧", "list"],
+  ["gacha", "ガチャ", "gacha"],
+  ["eggs", "卵", "egg"],
+  ["mini", "ゲーム", "play"],
+  ["book", "図鑑", "book"],
+  ["outing", "おでかけ", "map"],
+  ["shop", "ショップ", "shop"],
+  ["profile", "プロフ", "user"],
+  ["achieve", "実績", "star"],
+  ["menu", "メニュー", "menu"],
+];
+
+const loveThresholds = [10, 25, 45, 70, 100, 135, 180, 240, 320, 420];
+
+const feedItems = {
+  normal: { name: "魚のエサ", price: 300, hunger: 15 },
+  premium: { name: "高級魚", price: 1500, hunger: 35 },
+  special: { name: "特製魚セット", price: 3000, hunger: 60 },
+};
+
+const outfits = [
+  { id: "none", name: "なし", price: 0 },
+  { id: "red-scarf", name: "赤マフラー", price: 800 },
+  { id: "crown", name: "王冠", price: 1200 },
+  { id: "sunglasses", name: "サングラス", price: 1800 },
+  { id: "blue-ribbon", name: "青リボン", price: 1600 },
+  { id: "sailor", name: "セーラー帽", price: 2200 },
+];
+
+const furniture = [
+  { id: "soft-bed", name: "ふかふかベッド", price: 1800 },
+  { id: "ice-slide", name: "氷のすべり台", price: 3600 },
+  { id: "shell-lamp", name: "貝がらランプ", price: 900 },
+  { id: "bronze-statue", name: "名前入り銅像家具", price: null },
+];
+
+const backgrounds = [
+  { id: "near-sea", name: "近所の海", price: 2000 },
+  { id: "ice-cave", name: "氷の洞窟", price: 3200 },
+  { id: "antarctic-base", name: "南極基地", price: 4200 },
+];
+
+const outingPlans = [
+  { id: "sea", name: "近所の海", time: "1時間", coins: 80, diamonds: 5 },
+  { id: "cave", name: "氷の洞窟", time: "3時間", coins: 160, diamonds: 12 },
+  { id: "base", name: "南極基地", time: "5時間", coins: 240, diamonds: 20 },
+  { id: "expedition", name: "遠征", time: "12時間", coins: 520, diamonds: 55 },
+];
+
+function outingPlanWithDuration(plan) {
+  const durations = { sea: 60 * 60 * 1000, cave: 3 * 60 * 60 * 1000, base: 5 * 60 * 60 * 1000, expedition: 12 * 60 * 60 * 1000 };
+  return { ...plan, durationMs: durations[plan.id] };
+}
+
+function createId() {
+  if (globalThis.crypto?.randomUUID) {
+    return globalThis.crypto.randomUUID();
+  }
+  return `id-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
+}
+
+function starterPenguin(name = "コウちゃん", speciesId = 0) {
+  return {
+    id: createId(),
+    speciesId,
+    speciesName: species[speciesId],
+    name,
+    level: 1,
+    exp: 0,
+    hunger: 70,
+    mood: 70,
+    friendship: 45,
+    loveLevel: 1,
+    lovePoint: 0,
+    stage: "chick",
+    favorite: true,
+    outfit: "なし",
+    obtainedAt: new Date().toISOString(),
+    rewards: { evolved: false, lv80: false, lv100: false },
+  };
+}
+
+function createDefaultGame() {
+  const firstPenguin = starterPenguin();
+  return {
+    tutorialDone: false,
+    playerName: "",
+    coins: 12000,
+    diamonds: 850,
+    keeperLevel: 1,
+    keeperExp: 0,
+    loginDays: 1,
+    pity: PITY_MAX,
+    noticeCount: 1,
+    penguins: [firstPenguin],
+    eggs: [{ id: createId(), type: "white", speciesId: 0, source: "tutorial" }],
+    activeCareId: firstPenguin.id,
+    homeDisplayId: firstPenguin.id,
+    profileDisplayId: firstPenguin.id,
+    discoveredSpecies: [0],
+    souvenirs: 0,
+    activeOuting: null,
+    capacityBonus: 0,
+    inventory: { normal: 5, premium: 1, special: 0 },
+    ownedOutfits: ["なし", "赤マフラー"],
+    ownedFurniture: ["ふかふかベッド"],
+    ownedBackgrounds: ["近所の海"],
+    ownedTitles: ["氷海の飼育員"],
+    activeFurniture: "ふかふかベッド",
+    activeBackground: "近所の海",
+    photos: [],
+    achievements: { daily: 20, normal: 8, special: 2 },
+    miniGameExpToday: 0,
+    claimedToday: false,
+    lastMessage: "今日もペンギンたちとゆっくり過ごそう。",
+  };
+}
+
+function loadGame() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+    if (!saved || !Array.isArray(saved.penguins)) return createDefaultGame();
+    return normalizeGame({ ...createDefaultGame(), ...saved });
+  } catch {
+    return createDefaultGame();
+  }
+}
+
+function normalizeGame(game) {
+  const fallback = createDefaultGame();
+  const penguins = game.penguins.length ? game.penguins : fallback.penguins;
+  const normalizedPenguins = penguins.map((p, index) => ({
+    ...starterPenguin(p.name || `ペン${index + 1}`, clampSpecies(p.speciesId)),
+    ...p,
+    speciesId: clampSpecies(p.speciesId),
+    speciesName: species[clampSpecies(p.speciesId)],
+    outfit: validText(p.outfit, "なし"),
+    rewards: { evolved: false, lv80: false, lv100: false, ...(p.rewards || {}) },
+  }));
+  const activeId = normalizedPenguins.some((p) => p.id === game.activeCareId) ? game.activeCareId : normalizedPenguins[0].id;
+  return {
+    ...fallback,
+    ...game,
+    penguins: normalizedPenguins,
+    activeCareId: activeId,
+    homeDisplayId: normalizedPenguins.some((p) => p.id === game.homeDisplayId) ? game.homeDisplayId : activeId,
+    profileDisplayId: normalizedPenguins.some((p) => p.id === game.profileDisplayId) ? game.profileDisplayId : activeId,
+    discoveredSpecies: unique([0, ...(game.discoveredSpecies || [])].map(clampSpecies)),
+    inventory: { ...fallback.inventory, ...(game.inventory || {}) },
+    ownedOutfits: unique(["なし", ...(game.ownedOutfits || [])].map((name) => validText(name, "なし"))),
+    ownedFurniture: unique([...(game.ownedFurniture || fallback.ownedFurniture)].map((name) => validText(name, "ふかふかベッド"))),
+    ownedBackgrounds: unique([...(game.ownedBackgrounds || fallback.ownedBackgrounds)].map((name) => validText(name, "近所の海"))),
+    ownedTitles: unique([...(game.ownedTitles || fallback.ownedTitles)].map((name) => validText(name, "氷海の飼育員"))),
+    capacityBonus: Number.isFinite(game.capacityBonus) ? game.capacityBonus : 0,
+    photos: Array.isArray(game.photos) ? game.photos : [],
+  };
+}
+
+function App() {
+  const [active, setActive] = useState("home");
+  const [game, setGame] = useState(loadGame);
+  const [message, setMessage] = useState(game.lastMessage);
+  const [tutorialStep, setTutorialStep] = useState(0);
+  const [tutorialName, setTutorialName] = useState(game.playerName || "ぺんとも");
+  const [tutorialPenguinName, setTutorialPenguinName] = useState("コウちゃん");
+  const [hatchModal, setHatchModal] = useState(null);
+  const [outfitOpen, setOutfitOpen] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ ...game, lastMessage: message }));
+  }, [game, message]);
+
+  const activePenguin = getPenguin(game, game.activeCareId) || game.penguins[0];
+  const homePenguin = getPenguin(game, game.homeDisplayId) || activePenguin;
+  const profilePenguin = getPenguin(game, game.profileDisplayId) || activePenguin;
+
+  const setPenguin = (id, updater) => {
+    setGame((current) => {
+      let diamonds = current.diamonds;
+      let ownedFurniture = current.ownedFurniture;
+      let ownedTitles = current.ownedTitles;
+      const penguins = current.penguins.map((p) => {
+        if (p.id !== id) return p;
+        const patch = typeof updater === "function" ? updater(p) : updater;
+        const next = checkMilestones({ ...p, ...patch });
+        const awards = milestoneAwards(p, next);
+        diamonds += awards.diamonds;
+        ownedFurniture = unique([...ownedFurniture, ...awards.furniture]);
+        ownedTitles = unique([...ownedTitles, ...awards.titles]);
+        return next;
+      });
+      return { ...current, diamonds, ownedFurniture, ownedTitles, penguins };
+    });
+  };
+
+  const gainExp = (amount, reason = "EXPを獲得したよ。") => {
+    setGame((current) => {
+      const next = applyExpToActive(current, current.activeCareId, amount);
+      return next;
+    });
+    setMessage(reason);
+  };
+
+  const careAction = (type, feedKey = "normal") => {
+    const p = activePenguin;
+    if (!p) return;
+
+    if (type === "feed") {
+      const feed = feedItems[feedKey];
+      if (!feed || game.inventory[feedKey] <= 0) {
+        setMessage("エサが足りないよ。ショップで購入しよう。");
+        setActive("shop");
+        return;
+      }
+      setGame((current) => ({
+        ...(() => {
+          const next = applyExpToActive(current, p.id, p.hunger < 95 ? 5 : 0);
+          return {
+            ...next,
+            inventory: { ...next.inventory, [feedKey]: next.inventory[feedKey] - 1 },
+            penguins: next.penguins.map((penguinData) =>
+              penguinData.id === p.id
+                ? { ...penguinData, hunger: clamp(penguinData.hunger + feed.hunger), mood: clamp(penguinData.mood + 2) }
+                : penguinData,
+            ),
+          };
+        })(),
+      }));
+      setMessage(`${feed.name}をあげたよ。満腹度が上がった！`);
+      return;
+    }
+
+    if (type === "pet") {
+      const gain = loveGain(p.friendship);
+      setPenguin(p.id, (current) => ({
+        mood: clamp(current.mood + 5),
+        friendship: clamp(current.friendship + 10),
+        lovePoint: current.lovePoint + gain,
+        loveLevel: nextLoveLevel(current.lovePoint + gain),
+      }));
+      gainExp(5, "なでられてごきげん。仲良し度も上がったよ。");
+      return;
+    }
+
+    if (type === "photo") {
+      const photo = {
+        id: createId(),
+        penguinName: p.name,
+        speciesName: p.speciesName,
+        outfit: p.outfit,
+        background: game.activeBackground,
+        date: new Date().toLocaleDateString("ja-JP"),
+      };
+      setGame((current) => ({
+        ...(() => {
+          const next = applyExpToActive(current, p.id, 5);
+          let diamonds = next.diamonds;
+          let ownedFurniture = next.ownedFurniture;
+          let ownedTitles = next.ownedTitles;
+          const penguins = next.penguins.map((penguinData) => {
+            if (penguinData.id !== p.id) return penguinData;
+            const updated = checkMilestones({
+              ...penguinData,
+              friendship: clamp(penguinData.friendship + 5),
+              lovePoint: penguinData.lovePoint + 1,
+              loveLevel: nextLoveLevel(penguinData.lovePoint + 1),
+            });
+            const awards = milestoneAwards(p, updated);
+            diamonds += awards.diamonds;
+            ownedFurniture = unique([...ownedFurniture, ...awards.furniture]);
+            ownedTitles = unique([...ownedTitles, ...awards.titles]);
+            return updated;
+          });
+          return {
+            ...next,
+            diamonds,
+            ownedFurniture,
+            ownedTitles,
+            photos: [photo, ...next.photos].slice(0, 30),
+            penguins,
+          };
+        })(),
+      }));
+      setMessage("かわいい写真を撮ったよ。アルバムに保存した。");
+      return;
+    }
+
+    if (type === "clean") {
+      setPenguin(p.id, (current) => ({
+        mood: clamp(current.mood + 15),
+        lovePoint: current.lovePoint + 1,
+        loveLevel: nextLoveLevel(current.lovePoint + 1),
+      }));
+      gainExp(5, "お部屋がぴかぴかになったよ。");
+    }
+  };
+
+  const addPenguinFromEgg = (egg, name) => {
+    const capacity = BASE_CAPACITY + game.capacityBonus;
+    if (game.penguins.length >= capacity) {
+      setMessage("飼育施設がいっぱいです。ショップで拡張しよう。");
+      setHatchModal(null);
+      return;
+    }
+    const speciesId = clampSpecies(egg.speciesId);
+    const newPenguin = { ...starterPenguin(name, speciesId), favorite: false };
+    setGame((current) => ({
+      ...current,
+      eggs: current.eggs.filter((item) => item.id !== egg.id),
+      penguins: [...current.penguins, newPenguin],
+      discoveredSpecies: unique([...current.discoveredSpecies, speciesId]),
+    }));
+    setHatchModal(null);
+    setMessage(`${name}が仲間になったよ。`);
+  };
+
+  const finishTutorial = () => {
+    const penguinData = starterPenguin(tutorialPenguinName.trim() || "コウちゃん", 0);
+    setGame((current) => ({
+      ...current,
+      tutorialDone: true,
+      playerName: tutorialName.trim() || "ぺんとも",
+      eggs: [],
+      penguins: [penguinData],
+      activeCareId: penguinData.id,
+      homeDisplayId: penguinData.id,
+      profileDisplayId: penguinData.id,
+      discoveredSpecies: [0],
+    }));
+    setMessage(`${penguinData.name}、これからよろしくね。`);
+  };
+
+  const context = {
+    activePenguin,
+    addPenguinFromEgg,
+    careAction,
+    editOpen,
+    game,
+    gainExp,
+    hatchModal,
+    homePenguin,
+    message,
+    outfitOpen,
+    profilePenguin,
+    setActive,
+    setEditOpen,
+    setGame,
+    setHatchModal,
+    setMessage,
+    setOutfitOpen,
+    setPenguin,
+  };
+
+  return (
+    <div className="app">
+      <div className="device">
+        <div className="deviceCamera" />
+        <TopStatus game={game} onProfile={() => setActive("profile")} />
+        <main className="viewport">
+          {active === "home" && <Home {...context} />}
+          {active === "care" && <Care {...context} />}
+          {active === "list" && <PenguinList {...context} />}
+          {active === "gacha" && <Gacha {...context} />}
+          {active === "eggs" && <EggStorage {...context} />}
+          {active === "mini" && <MiniGames {...context} />}
+          {active === "book" && <Book {...context} />}
+          {active === "outing" && <OutingV2 {...context} />}
+          {active === "shop" && <Shop {...context} />}
+          {active === "profile" && <Profile {...context} />}
+          {active === "achieve" && <Achievements {...context} />}
+          {active === "menu" && <Menu {...context} />}
+        </main>
+        <BottomTabs active={active} onChange={setActive} />
+        {!game.tutorialDone && (
+          <Tutorial
+            step={tutorialStep}
+            setStep={setTutorialStep}
+            playerName={tutorialName}
+            setPlayerName={setTutorialName}
+            penguinName={tutorialPenguinName}
+            setPenguinName={setTutorialPenguinName}
+            finishTutorial={finishTutorial}
+          />
+        )}
+        {hatchModal && <HatchModal egg={hatchModal} onClose={() => setHatchModal(null)} onHatch={addPenguinFromEgg} />}
+        {outfitOpen && <OutfitModal game={game} penguin={activePenguin} setPenguin={setPenguin} onClose={() => setOutfitOpen(false)} />}
+        {editOpen && <EditRoomModal game={game} setGame={setGame} onClose={() => setEditOpen(false)} />}
+      </div>
+    </div>
+  );
+}
+
+function TopStatus({ game, onProfile }) {
+  return (
+    <header className="topStatus">
+      <button className="playerChip profileButton" onClick={onProfile} aria-label="Profile">
+        <img src={penguin} alt="" />
+        <div>
+          <b>{game.playerName || "ぺんとも"}</b>
+          <span>飼育員Lv.{game.keeperLevel}</span>
+        </div>
+      </button>
+      <div className="currencies">
+        <Currency type="coin" value={game.coins} />
+        <Currency type="diamond" value={game.diamonds} />
+      </div>
+    </header>
+  );
+}
+
+function Home({ game, homePenguin, message, setActive, setMessage, setGame }) {
+  const claimGift = () => {
+    if (game.claimedToday) {
+      setMessage("今日のプレゼントは受け取り済みだよ。");
+      return;
+    }
+    setGame((current) => ({
+      ...current,
+      claimedToday: true,
+      coins: current.coins + 300,
+      diamonds: current.diamonds + 10,
+      inventory: { ...current.inventory, normal: current.inventory.normal + 1 },
+    }));
+    setMessage("今日のプレゼントを受け取ったよ。魚のエサ、コイン、ダイヤをゲット！");
+  };
+
+  return (
+    <Screen className="homeScreen">
+      <div className="homeHud">
+        <div className="levelPanel">
+          <b>Lv.{homePenguin.level}</b>
+          <Meter value={homePenguin.exp} compact />
+          <span>{homePenguin.name} / {homePenguin.speciesName}</span>
+        </div>
+        <button className="noticeRound" onClick={() => setMessage(statusMessage(homePenguin))} aria-label="様子を見る">
+          <HomeIcon name="look" />
+          <span>様子</span>
+          <i>{game.noticeCount}</i>
+        </button>
+      </div>
+      <SideDock
+        items={[
+          ["ショップ", "shop", () => setActive("shop")],
+          [game.claimedToday ? "受取済み" : "プレゼント", "gift", claimGift],
+        ]}
+      />
+      <div className="homeScene">
+        <div className="shootingStar" />
+        <div className="igloo left" />
+        <div className="igloo right" />
+        <div className="iceberg one" />
+        <div className="iceberg two" />
+        <PenguinFigure penguin={homePenguin} size="hero" />
+      </div>
+      <Speech>{message}</Speech>
+      <div className="primaryActions">
+        <button className="roundAction blue" onClick={() => setActive("mini")}>
+          <HomeIcon name="game" />
+          <span>ゲーム</span>
+        </button>
+        <button className="roundAction yellow" onClick={() => setActive("care")}>
+          <HomeIcon name="care" />
+          <span>育成</span>
+        </button>
+        <button className="roundAction green" onClick={() => setActive("outing")}>
+          <HomeIcon name="outing" />
+          <span>おでかけ</span>
+        </button>
+      </div>
+    </Screen>
+  );
+}
+
+function Care({ activePenguin, careAction, game, setOutfitOpen, setEditOpen }) {
+  const [petMode, setPetMode] = useState(false);
+  const [petting, setPetting] = useState(false);
+  const [petHand, setPetHand] = useState({ x: 190, y: 130 });
+  const [cleanMode, setCleanMode] = useState(false);
+  const [cleaning, setCleaning] = useState(false);
+  const [cleanTool, setCleanTool] = useState({ x: 190, y: 210 });
+  const [photoMode, setPhotoMode] = useState(false);
+  const [photoFlash, setPhotoFlash] = useState(false);
+  const [photoReview, setPhotoReview] = useState(false);
+  const [photoZoom, setPhotoZoom] = useState(1);
+  const [photoPan, setPhotoPan] = useState({ x: 0, y: 0 });
+  const [photoDragging, setPhotoDragging] = useState(false);
+  const [photoDragStart, setPhotoDragStart] = useState({ x: 0, y: 0, panX: 0, panY: 0 });
+  const [capturedPhoto, setCapturedPhoto] = useState({ zoom: 1, pan: { x: 0, y: 0 } });
+  const displayZoom = photoZoom <= 1 ? photoZoom : 1 + (photoZoom - 1) * 0.42;
+
+  const pointerPosition = (event) => {
+    const rect = event.currentTarget.getBoundingClientRect();
+    return { x: event.clientX - rect.left, y: event.clientY - rect.top };
+  };
+
+  const startPetStroke = (event) => {
+    if (photoMode) {
+      const position = pointerPosition(event);
+      event.currentTarget.setPointerCapture(event.pointerId);
+      setPhotoDragging(true);
+      setPhotoDragStart({ x: position.x, y: position.y, panX: photoPan.x, panY: photoPan.y });
+      return;
+    }
+    if (!petMode && !cleanMode) return;
+    const position = pointerPosition(event);
+    event.currentTarget.setPointerCapture(event.pointerId);
+    if (petMode) {
+      setPetHand(position);
+      setPetting(true);
+    }
+    if (cleanMode) {
+      setCleanTool(position);
+      setCleaning(true);
+    }
+  };
+
+  const dragPetStroke = (event) => {
+    if (photoMode) {
+      if (!photoDragging) return;
+      const position = pointerPosition(event);
+      const limitX = photoZoom >= 2 ? 44 : 80;
+      const limitY = photoZoom >= 2 ? 54 : 90;
+      setPhotoPan({
+        x: Math.max(-limitX, Math.min(limitX, photoDragStart.panX + position.x - photoDragStart.x)),
+        y: Math.max(-limitY, Math.min(limitY, photoDragStart.panY + position.y - photoDragStart.y)),
+      });
+      return;
+    }
+    const position = pointerPosition(event);
+    if (petMode && petting) setPetHand(position);
+    if (cleanMode && cleaning) setCleanTool(position);
+  };
+
+  const finishPetStroke = () => {
+    if (photoMode) {
+      setPhotoDragging(false);
+      return;
+    }
+    if (petMode) {
+      if (petting) careAction("pet");
+      setPetting(false);
+      setPetMode(false);
+    }
+    if (cleanMode) {
+      if (cleaning) careAction("clean");
+      setCleaning(false);
+      setCleanMode(false);
+    }
+  };
+
+  const takePhoto = () => {
+    setCapturedPhoto({ zoom: displayZoom, pan: photoPan });
+    setPhotoFlash(true);
+    careAction("photo");
+    setTimeout(() => {
+      setPhotoFlash(false);
+      setPhotoReview(true);
+    }, 760);
+  };
+
+  const openPhotoMode = () => {
+    setPetMode(false);
+    setCleanMode(false);
+    setPhotoPan({ x: 0, y: 0 });
+    setPhotoZoom(1);
+    setPhotoReview(false);
+    setPhotoMode(true);
+  };
+
+  return (
+    <Screen className={`careScreen ${photoMode || photoFlash ? "photoModeScreen" : ""}`}>
+      <div className={`careHero ${petMode ? "petMode" : ""} ${petting ? "petting" : ""} ${cleanMode ? "cleanMode" : ""} ${cleaning ? "cleaning" : ""} ${photoMode ? "photoMode" : ""} ${photoFlash ? "photoFlash" : ""}`}>
+        <div className="careHeader">
+          <div className="avatarBadge">
+            <img src={penguin} alt="" />
+          </div>
+          <div>
+            <div className="careNameLine">
+              <h1>{activePenguin.name}</h1>
+              <span>Lv.{activePenguin.level}</span>
+            </div>
+            <p>{activePenguin.speciesName} / {activePenguin.stage === "adult" ? "大人" : "ヒナ"}</p>
+          </div>
+          <button className="circleButton" onClick={() => setEditOpen(true)}><Icon name="edit" /></button>
+        </div>
+        <div
+          className="roomScene"
+          onPointerDown={startPetStroke}
+          onPointerMove={dragPetStroke}
+          onPointerUp={finishPetStroke}
+          onPointerCancel={finishPetStroke}
+        >
+          <div
+            className="photoSubject"
+            style={{ "--photo-x": `${photoPan.x}px`, "--photo-y": `${photoPan.y}px`, "--photo-zoom": displayZoom }}
+          >
+            <PenguinFigure penguin={activePenguin} size="large" />
+          </div>
+          <div className="petModeHint">ペンギンをドラッグしてなでよう</div>
+          <div className="cleanModeHint">床をドラッグして掃除しよう</div>
+          <svg className="pettingHand" viewBox="0 0 80 80" style={{ left: petHand.x, top: petHand.y }} aria-hidden="true">
+            <path className="handShadow" d="M20 36c-5 1-8 6-7 11 2 12 12 24 27 24h6c13 0 22-9 22-22V29c0-4-3-7-7-7-2 0-4 1-5 2v-3c0-4-3-7-7-7-3 0-5 1-6 4-1-3-4-5-7-5-4 0-7 3-7 7v2c-1-2-4-3-6-3-4 0-7 3-7 7v16Z" />
+            <path className="handPalm" d="M20 36c-5 1-8 6-7 11 2 12 12 24 27 24h6c13 0 22-9 22-22V29c0-4-3-7-7-7-2 0-4 1-5 2v-3c0-4-3-7-7-7-3 0-5 1-6 4-1-3-4-5-7-5-4 0-7 3-7 7v2c-1-2-4-3-6-3-4 0-7 3-7 7v20l-3-5c-2-4-6-6-10-5Z" />
+            <path className="handLines" d="M29 22v23M43 19v25M56 25v23M19 43c7 1 11 7 12 15" />
+            <path className="handThumb" d="M18 44c7 0 13 5 16 13" />
+          </svg>
+          <div className="cleaningBroom" style={{ left: cleanTool.x, top: cleanTool.y }}><span /><b /><em /><i /></div>
+          <div className="cameraFrame"><span>PHOTO</span></div>
+          <div className="apertureOverlay" />
+          {photoMode && <div className="photoHud"><b>{activePenguin.name}</b><span>Lv.{activePenguin.level} / 愛情Lv.{activePenguin.loveLevel}</span></div>}
+          {photoReview && (
+            <div className="photoReview" onPointerDown={(event) => event.stopPropagation()} onPointerMove={(event) => event.stopPropagation()} onPointerUp={(event) => event.stopPropagation()}>
+              <button className="whiteButton" onClick={() => {
+                setPhotoReview(false);
+                setPhotoMode(false);
+              }}>×</button>
+              <button className="retakeButton" onClick={() => setPhotoReview(false)}>撮り直す</button>
+              <div className="photoPrint" style={{ "--photo-x": `${capturedPhoto.pan.x}px`, "--photo-y": `${capturedPhoto.pan.y}px`, "--photo-zoom": capturedPhoto.zoom }}>
+                <div className="photoPrintScene">
+                  <div className="photoPrintSubject">
+                    <PenguinFigure penguin={activePenguin} size="large" />
+                  </div>
+                </div>
+                <span>{activePenguin.name} / Lv.{activePenguin.level}</span>
+              </div>
+            </div>
+          )}
+          {photoMode && !photoReview && (
+            <div className="photoControls" onPointerDown={(event) => event.stopPropagation()} onPointerMove={(event) => event.stopPropagation()} onPointerUp={(event) => event.stopPropagation()}>
+              <button className="whiteButton" onClick={() => setPhotoMode(false)}>×</button>
+              <div className="zoomControls">
+                {[0.5, 1, 2].map((zoom) => (
+                  <button className={photoZoom === zoom ? "active" : ""} key={zoom} onClick={() => setPhotoZoom(zoom)}>{zoom}x</button>
+                ))}
+              </div>
+              {photoZoom >= 2 && (
+                <div className="manualZoom">
+                  <span>{photoZoom.toFixed(1)}x</span>
+                  <input
+                    type="range"
+                    min="2"
+                    max="3"
+                    step="0.1"
+                    value={photoZoom}
+                    onChange={(event) => setPhotoZoom(Number(event.target.value))}
+                  />
+                </div>
+              )}
+              <button className="photoShutter" onClick={takePhoto} aria-label="写真を撮る" />
+            </div>
+          )}
+        </div>
+      </div>
+      <div className="careActions quickCareActions">
+        <CareButton
+          label="なでる"
+          icon="heart"
+          className={petMode ? "activeCareTool" : ""}
+          onClick={() => {
+            setPhotoMode(false);
+            setCleanMode(false);
+            setPetMode((value) => !value);
+          }}
+        />
+        <CareButton
+          label="写真"
+          icon="camera"
+          className={photoMode ? "activeCareTool" : ""}
+          onClick={openPhotoMode}
+        />
+        <CareButton
+          label="掃除"
+          icon="broom"
+          className={cleanMode ? "activeCareTool" : ""}
+          onClick={() => {
+            setPhotoMode(false);
+            setPetMode(false);
+            setCleanMode((value) => !value);
+          }}
+        />
+        <CareButton label="着替え" icon="shirt" onClick={() => setOutfitOpen(true)} />
+        <CareButton label="模様替え" icon="edit" onClick={() => setEditOpen(true)} />
+      </div>
+      <div className="inventoryChips">
+        {Object.entries(feedItems).map(([key, item]) => (
+          <button className="whiteButton" key={key} onClick={() => careAction("feed", key)}>
+            {item.name} x{game.inventory[key]}
+          </button>
+        ))}
+      </div>
+      <div className="careInfoGrid">
+        <Panel className="statPanel">
+          <div className="levelLine">
+            <b>Lv.{activePenguin.level}</b>
+            <span>衣装 {activePenguin.outfit}</span>
+          </div>
+          <Meter label="EXP" value={activePenguin.exp} />
+          <Meter label="満腹度" value={activePenguin.hunger} tone="yellow" />
+          <Meter label="機嫌" value={activePenguin.mood} tone="pink" />
+          <Meter label="仲良し度" value={activePenguin.friendship} tone="mint" />
+          <div className="compactLove">
+            <span>愛情Lv.{activePenguin.loveLevel}</span>
+            <b>{activePenguin.lovePoint} / {loveThresholds[9]} pt</b>
+          </div>
+        </Panel>
+        <Panel className="lovePanel">
+          <div>
+            <b>愛情Lv.{activePenguin.loveLevel}</b>
+            <span>{activePenguin.lovePoint} pt</span>
+          </div>
+          <div className="hearts">
+            {Array.from({ length: 10 }).map((_, index) => (
+              <span className={index < activePenguin.loveLevel ? "filled" : ""} key={index} />
+            ))}
+          </div>
+        </Panel>
+      </div>
+    </Screen>
+  );
+}
+
+function PenguinList({ game, setGame }) {
+  const capacity = BASE_CAPACITY + game.capacityBonus;
+  const setRole = (id, role) => {
+    setGame((current) => ({
+      ...current,
+      activeCareId: role === "care" ? id : current.activeCareId,
+      homeDisplayId: role === "home" ? id : current.homeDisplayId,
+      profileDisplayId: role === "profile" ? id : current.profileDisplayId,
+    }));
+  };
+
+  return (
+    <Screen className="listScreen">
+      <PageHeader title="ペンギン一覧" sub={`所持数 ${game.penguins.length} / ${capacity}`} />
+      <div className="sortBar">
+        <span>図鑑順は固定。表示だけ並び替えできます。</span>
+        <button onClick={() => setGame((g) => ({ ...g, penguins: [...g.penguins].sort((a, b) => b.level - a.level) }))}>Lv順</button>
+      </div>
+      <div className="penguinGrid">
+        {game.penguins.map((p) => (
+          <article className="penguinCard" key={p.id}>
+            <Rarity index={p.speciesId} />
+            <img src={penguin} alt="" />
+            <b>{p.name}</b>
+            <span>{p.speciesName}<br />Lv.{p.level} / 愛情{p.loveLevel}</span>
+            <div className="cardBadges">
+              {p.favorite && <em>お気に入り</em>}
+              {game.homeDisplayId === p.id && <em>ホーム</em>}
+              {game.activeCareId === p.id && <em>育成中</em>}
+            </div>
+            <div className="miniActions">
+              <button onClick={() => setRole(p.id, "home")}>ホーム</button>
+              <button onClick={() => setRole(p.id, "care")}>育成</button>
+              <button onClick={() => setRole(p.id, "profile")}>プロフ</button>
+            </div>
+          </article>
+        ))}
+      </div>
+    </Screen>
+  );
+}
+
+function Gacha({ game, setGame, setMessage }) {
+  const [results, setResults] = useState([]);
+
+  const pull = (count) => {
+    const cost = count === 10 ? 1000 : 100;
+    if (game.diamonds < cost) {
+      setMessage("ダイヤが足りません。おでかけや実績で集めよう。");
+      return;
+    }
+    const next = makeGachaEggs(count, game.pity);
+    const gotSsr = next.some((item) => item.prizeType === "ssrEgg");
+    setResults(next);
+    setGame((current) => ({
+      ...current,
+      diamonds: current.diamonds - cost,
+      pity: gotSsr ? PITY_MAX : Math.max(1, current.pity - count),
+      eggs: [
+        ...current.eggs,
+        ...next.filter((item) => item.prizeType === "ssrEgg").map((item) => ({ id: createId(), type: "rainbow", speciesId: item.speciesId, source: "gacha" })),
+      ],
+      inventory: addFeedRewards(current.inventory, next),
+    }));
+    setMessage(gotSsr ? "SSRペンギン卵を入手！卵画面で孵化しよう。" : "ガチャ報酬を受け取ったよ。");
+  };
+
+  return (
+    <Screen className="gachaScreen">
+      <PageHeader title="ペンギン卵ガチャ" sub={`SSR確定まであと ${game.pity} 回`} />
+      <div className="gachaVisual">
+        <div className="sparkleCard">
+          <div className="eggPreview">
+            <Egg type="white" />
+            <Egg type="gold" />
+            <Egg type="rainbow" />
+          </div>
+          <h2>SSRはペンギン卵</h2>
+          <p>N 魚のエサ60% / R 高級魚30% / SR 特製魚セット8% / SSR 卵2%</p>
+        </div>
+      </div>
+      <div className={`openEggs ${results.length > 1 ? "ten" : ""}`}>
+        {results.length === 0 && <p>ガチャを引くとここに結果が表示されます。</p>}
+        {results.map((result) => (
+          <button className={`openEgg ${result.type} opened`} key={result.id}>
+            <span>{result.reward}</span>
+          </button>
+        ))}
+      </div>
+      <div className="gachaButtons">
+        <button className="yellow" onClick={() => pull(1)}>1回 100ダイヤ</button>
+        <button className="pink" onClick={() => pull(10)}>10連 1000ダイヤ</button>
+        <button className="whiteButton" onClick={() => setResults([])}>結果をしまう</button>
+      </div>
+    </Screen>
+  );
+}
+
+function EggStorage({ game, setHatchModal, setActive }) {
+  return (
+    <Screen className="eggScreen">
+      <PageHeader title="卵保管庫" sub={`${game.eggs.length} / 999`} />
+      <div className="eggStorageGrid">
+        {game.eggs.map((egg) => (
+          <Panel className="storedEgg" key={egg.id}>
+            <Egg type={egg.type} small />
+            <b>{species[clampSpecies(egg.speciesId)]}</b>
+            <button onClick={() => setHatchModal(egg)}>孵化</button>
+          </Panel>
+        ))}
+      </div>
+      {game.eggs.length === 0 && (
+        <Panel className="storageNote">
+          <p>卵はありません。ガチャでSSR卵を入手できます。</p>
+          <button onClick={() => setActive("gacha")}>ガチャへ</button>
+        </Panel>
+      )}
+    </Screen>
+  );
+}
+
+function MiniGames({ game, setGame, gainExp, setMessage }) {
+  const [mode, setMode] = useState("select");
+  const [intro, setIntro] = useState(null);
+  const chooseMode = (nextMode) => {
+    if (nextMode === "select") {
+      setIntro(null);
+      setMode("select");
+      return;
+    }
+    setIntro(nextMode);
+    setMode("intro");
+  };
+  const startIntroGame = () => {
+    if (intro) setMode(intro);
+  };
+  return (
+    <Screen className="miniScreen">
+      <PageHeader title="ミニゲーム" sub="3種類すべて遊べます" />
+      <Segmented active={mode === "intro" ? intro : mode} options={{ select: "選択", fish: "魚キャッチ", slide: "氷スライド", memory: "記憶ゲーム" }} onChange={chooseMode} />
+      {mode === "select" && (
+        <>
+          <div className="miniHero">
+            <span>遊んで育成素材とEXPを集めよう</span>
+            <div className="floes"><i /><i /><i /><i /></div>
+            <PenguinFigure penguin={getPenguin(game, game.activeCareId)} size="mini" />
+          </div>
+          <div className="miniCards">
+            <Panel className="miniCard"><h2>魚キャッチ</h2><p>泳ぐ魚を10回タップしてスコアを伸ばす。</p><button onClick={() => chooseMode("fish")}>遊ぶ</button></Panel>
+            <Panel className="miniCard"><h2>氷スライド</h2><p>矢印でペンギンをゴールまで滑らせる。</p><button onClick={() => chooseMode("slide")}>遊ぶ</button></Panel>
+            <Panel className="miniCard"><h2>記憶ゲーム</h2><p>光った順番を覚えて同じ順に押す。</p><button onClick={() => chooseMode("memory")}>遊ぶ</button></Panel>
+          </div>
+        </>
+      )}
+      {mode === "intro" && <MiniGameIntro type={intro} onBack={() => chooseMode("select")} onStart={startIntroGame} />}
+      {mode === "fish" && <FishCatchV2 setGame={setGame} gainExp={gainExp} setMessage={setMessage} />}
+      {mode === "slide" && <IceSlideV2 setGame={setGame} gainExp={gainExp} setMessage={setMessage} />}
+      {mode === "memory" && <MemoryGameV2 setGame={setGame} gainExp={gainExp} />}
+    </Screen>
+  );
+}
+
+function MiniGameIntro({ type, onBack, onStart }) {
+  const data = {
+    fish: { title: "魚キャッチ", text: "光った魚を追いかけよう。氷は減点、連続成功でコンボ加点。", icon: "fish" },
+    slide: { title: "氷スライド", text: "岩と穴を避けて、1マスずつ湖底のゴールへ進もう。", icon: "slide" },
+    memory: { title: "記憶ゲーム", text: "色の順番を覚えて、カウント後に同じ順番で押そう。", icon: "memory" },
+  }[type] || { title: "ミニゲーム", text: "準備してから始めよう。", icon: "fish" };
+
+  return (
+    <Panel className={`miniIntro miniIntro-${data.icon}`}>
+      <div className="miniIntroArt">
+        <span className="introIce one" />
+        <span className="introIce two" />
+        <span className="introFish" />
+        <span className="introGoal">GOAL</span>
+        <PenguinFigure size="mini" />
+      </div>
+      <h2>{data.title}</h2>
+      <p>{data.text}</p>
+      <div className="modalActions">
+        <button className="whiteButton" onClick={onBack}>選択へ戻る</button>
+        <button className="yellow" onClick={onStart}>スタート</button>
+      </div>
+    </Panel>
+  );
+}
+
+// eslint-disable-next-line no-unused-vars
+function FishCatch({ setGame, gainExp, setMessage }) {
+  const [score, setScore] = useState(0);
+  const [moves, setMoves] = useState(0);
+  const [claimed, setClaimed] = useState(false);
+  const finished = moves >= 10;
+  const reward = score >= 100 ? 500 : score >= 80 ? 340 : score >= 60 ? 180 : score >= 40 ? 120 : score >= 20 ? 60 : 0;
+  const fish = [10, 15, 8, 12, 20];
+
+  const catchFish = (points) => {
+    if (finished) return;
+    setScore((value) => value + points);
+    setMoves((value) => value + 1);
+  };
+
+  const claim = () => {
+    if (!finished || claimed) return;
+    setGame((current) => ({ ...current, coins: current.coins + reward }));
+    gainExp(10, `魚キャッチ成功！コイン${reward}とEXPを獲得したよ。`);
+    setClaimed(true);
+  };
+
+  return (
+    <Panel className="fishGame">
+      <div className="fishScore"><b>{score}点</b><span>{moves}/10</span></div>
+      <div className="fishPond">
+        {fish.map((points, index) => (
+          <button className={`fishTarget fish-${index}`} key={index} onClick={() => catchFish(points)}>
+            +{points}
+          </button>
+        ))}
+      </div>
+      <p>報酬: コイン +{reward}</p>
+      <button className={finished ? "yellow" : "whiteButton"} disabled={!finished || claimed} onClick={claim}>
+        {claimed ? "受け取り済み" : finished ? "報酬を受け取る" : "魚を10回キャッチ"}
+      </button>
+      <button className="whiteButton" onClick={() => { setScore(0); setMoves(0); setClaimed(false); setMessage("魚キャッチをやり直すよ。"); }}>リトライ</button>
+    </Panel>
+  );
+}
+
+// eslint-disable-next-line no-unused-vars
+function IceSlide({ setGame, gainExp, setMessage }) {
+  const start = { x: 0, y: 0 };
+  const goal = { x: 3, y: 3 };
+  const holes = ["1-1", "2-2"];
+  const [pos, setPos] = useState(start);
+  const [moves, setMoves] = useState(0);
+  const [claimed, setClaimed] = useState(false);
+  const won = pos.x === goal.x && pos.y === goal.y;
+
+  const move = (dx, dy) => {
+    if (won) return;
+    const next = { x: clampRange(pos.x + dx, 0, 3), y: clampRange(pos.y + dy, 0, 3) };
+    if (holes.includes(`${next.x}-${next.y}`)) {
+      setPos(start);
+      setMoves((value) => value + 1);
+      setMessage("穴をよけてもう一度。スタートに戻ったよ。");
+      return;
+    }
+    setPos(next);
+    setMoves((value) => value + 1);
+  };
+
+  const claim = () => {
+    if (!won || claimed) return;
+    const reward = Math.max(120, 500 - moves * 25);
+    setGame((current) => ({ ...current, coins: current.coins + reward, inventory: { ...current.inventory, normal: current.inventory.normal + 1 } }));
+    gainExp(10, `氷スライドクリア！コイン${reward}と魚のエサを獲得したよ。`);
+    setClaimed(true);
+  };
+
+  return (
+    <Panel className="slideGame">
+      <div className="fishScore"><b>氷スライド</b><span>{moves}手</span></div>
+      <div className="slideBoard">
+        {Array.from({ length: 16 }).map((_, index) => {
+          const x = index % 4;
+          const y = Math.floor(index / 4);
+          const key = `${x}-${y}`;
+          return (
+            <div className={`slideCell ${holes.includes(key) ? "hole" : ""} ${goal.x === x && goal.y === y ? "goal" : ""}`} key={key}>
+              {pos.x === x && pos.y === y && <PenguinFigure size="collection" />}
+              {goal.x === x && goal.y === y && "GOAL"}
+            </div>
+          );
+        })}
+      </div>
+      <div className="directionPad">
+        <button onClick={() => move(0, -1)}>↑</button>
+        <button onClick={() => move(-1, 0)}>←</button>
+        <button onClick={() => move(1, 0)}>→</button>
+        <button onClick={() => move(0, 1)}>↓</button>
+      </div>
+      <button className={won ? "yellow" : "whiteButton"} disabled={!won || claimed} onClick={claim}>{claimed ? "受け取り済み" : won ? "報酬を受け取る" : "ゴールを目指そう"}</button>
+      <button className="whiteButton" onClick={() => { setPos(start); setMoves(0); setClaimed(false); }}>リトライ</button>
+    </Panel>
+  );
+}
+
+// eslint-disable-next-line no-unused-vars
+function MemoryGame({ setGame, gainExp, setMessage }) {
+  const colors = ["青", "黄", "桃", "緑"];
+  const [sequence, setSequence] = useState([0, 2, 1]);
+  const [input, setInput] = useState([]);
+  const [round, setRound] = useState(1);
+  const [claimed, setClaimed] = useState(false);
+  const success = input.length === sequence.length && input.every((value, index) => value === sequence[index]);
+  const failed = input.some((value, index) => value !== sequence[index]);
+
+  const press = (index) => {
+    if (success || failed) return;
+    setInput((values) => [...values, index]);
+  };
+
+  const next = () => {
+    const nextValue = Math.floor(Math.random() * colors.length);
+    setSequence((values) => [...values, nextValue]);
+    setInput([]);
+    setRound((value) => value + 1);
+    setClaimed(false);
+  };
+
+  const claim = () => {
+    if (!success || claimed) return;
+    const reward = 120 + round * 80;
+    setGame((current) => ({ ...current, coins: current.coins + reward, inventory: { ...current.inventory, premium: current.inventory.premium + (round >= 3 ? 1 : 0) } }));
+    gainExp(10, `記憶ゲーム成功！コイン${reward}を獲得したよ。`);
+    setClaimed(true);
+  };
+
+  return (
+    <Panel className="memoryGame">
+      <div className="fishScore"><b>ラウンド {round}</b><span>{input.length}/{sequence.length}</span></div>
+      <div className="memorySequence">
+        {sequence.map((value, index) => <span className={`memoryDot dot-${value}`} key={`${value}-${index}`}>{colors[value]}</span>)}
+      </div>
+      <div className="memoryButtons">
+        {colors.map((label, index) => <button className={`memoryButton dot-${index}`} key={label} onClick={() => press(index)}>{label}</button>)}
+      </div>
+      {failed && <p>順番が違ったよ。リトライしてね。</p>}
+      {success && <p>成功！報酬を受け取るか、次のラウンドへ進めます。</p>}
+      <button className={success ? "yellow" : "whiteButton"} disabled={!success || claimed} onClick={claim}>{claimed ? "受け取り済み" : "報酬を受け取る"}</button>
+      <div className="gachaButtons">
+        <button className="whiteButton" onClick={() => { setInput([]); setClaimed(false); setMessage("記憶ゲームをやり直すよ。"); }}>リトライ</button>
+        <button disabled={!success} onClick={next}>次のラウンド</button>
+      </div>
+    </Panel>
+  );
+}
+
+// eslint-disable-next-line no-unused-vars
+function EnhancedFishCatch({ setGame, gainExp, setMessage }) {
+  const makeTarget = () => ({
+    slot: Math.floor(Math.random() * 9),
+    points: [8, 10, 12, 15, 20][Math.floor(Math.random() * 5)],
+    danger: Math.random() < 0.26,
+  });
+  const [score, setScore] = useState(0);
+  const [catches, setCatches] = useState(0);
+  const [combo, setCombo] = useState(0);
+  const [timeLeft, setTimeLeft] = useState(12);
+  const [target, setTarget] = useState(makeTarget);
+  const [claimed, setClaimed] = useState(false);
+  const finished = timeLeft <= 0;
+  const rankBonus = score >= 180 ? 260 : score >= 130 ? 180 : score >= 90 ? 100 : 40;
+  const reward = Math.max(80, score * 3 + rankBonus);
+
+  useEffect(() => {
+    if (finished) return undefined;
+    const timer = setTimeout(() => setTimeLeft((value) => value - 1), 1000);
+    return () => clearTimeout(timer);
+  }, [finished, timeLeft]);
+
+  useEffect(() => {
+    if (finished || claimed) return undefined;
+    const timer = setTimeout(() => setTarget(makeTarget()), target.danger ? 900 : 1250);
+    return () => clearTimeout(timer);
+  }, [claimed, finished, target]);
+
+  const tapSlot = (slot) => {
+    if (finished || slot !== target.slot) return;
+    if (target.danger) {
+      setScore((value) => Math.max(0, value - 18));
+      setCombo(0);
+      setMessage("氷を叩いた！魚だけを狙おう。");
+    } else {
+      const nextCombo = combo + 1;
+      setScore((value) => value + target.points + nextCombo * 2);
+      setCombo(nextCombo);
+      setCatches((value) => value + 1);
+    }
+    setTarget(makeTarget());
+  };
+
+  const claim = () => {
+    if (!finished || claimed) return;
+    setGame((current) => ({ ...current, coins: current.coins + reward }));
+    gainExp(12, `魚キャッチ終了！コイン${reward}とEXPを獲得したよ。`);
+    setClaimed(true);
+  };
+
+  return (
+    <Panel className="fishGame">
+      <div className="fishScore"><b>{score}点</b><span>残り{timeLeft}秒 / {catches}匹</span></div>
+      <p>ルール: 光った魚だけを素早くタップ。氷を叩くと減点、連続成功でコンボ加点。</p>
+      <div className="fishPond arcadePond">
+        {Array.from({ length: 9 }).map((_, slot) => (
+          <button
+            className={`fishSlot ${slot === target.slot ? (target.danger ? "danger" : "active") : ""}`}
+            key={slot}
+            onClick={() => tapSlot(slot)}
+          >
+            {slot === target.slot ? (target.danger ? "ICE" : `+${target.points}`) : ""}
+          </button>
+        ))}
+      </div>
+      <div className="miniRuleLine"><span>コンボ {combo}</span><span>報酬 コイン+{reward}</span></div>
+      <button className={finished ? "yellow" : "whiteButton"} disabled={!finished || claimed} onClick={claim}>
+        {claimed ? "受け取り済み" : finished ? "報酬を受け取る" : "制限時間内に魚を追おう"}
+      </button>
+    </Panel>
+  );
+}
+
+// eslint-disable-next-line no-unused-vars
+function EnhancedIceSlide({ setGame, gainExp, setMessage }) {
+  const courses = [
+    { start: { x: 0, y: 0 }, goal: { x: 4, y: 4 }, rocks: ["2-0", "2-1", "1-3", "3-3"], holes: ["0-3", "4-1"], par: 8 },
+    { start: { x: 4, y: 0 }, goal: { x: 0, y: 4 }, rocks: ["1-0", "3-1", "1-2", "3-3", "2-4"], holes: ["2-1", "4-3"], par: 9 },
+    { start: { x: 0, y: 4 }, goal: { x: 4, y: 0 }, rocks: ["1-1", "2-1", "3-2", "1-3", "3-4"], holes: ["0-2", "2-3"], par: 10 },
+  ];
+  const [courseIndex, setCourseIndex] = useState(0);
+  const course = courses[courseIndex % courses.length];
+  const [pos, setPos] = useState(course.start);
+  const [moves, setMoves] = useState(0);
+  const [claimed, setClaimed] = useState(false);
+  const won = pos.x === course.goal.x && pos.y === course.goal.y;
+
+  const loadCourse = (nextIndex) => {
+    const nextCourse = courses[nextIndex % courses.length];
+    setCourseIndex(nextIndex);
+    setPos(nextCourse.start);
+    setMoves(0);
+    setClaimed(false);
+  };
+
+  const move = (dx, dy) => {
+    if (won) return;
+    let next = { ...pos };
+    let slipped = false;
+    while (true) {
+      const candidate = { x: next.x + dx, y: next.y + dy };
+      const key = `${candidate.x}-${candidate.y}`;
+      if (candidate.x < 0 || candidate.x > 4 || candidate.y < 0 || candidate.y > 4 || course.rocks.includes(key)) break;
+      next = candidate;
+      slipped = true;
+      if (course.holes.includes(key)) {
+        setPos(course.start);
+        setMoves((value) => value + 1);
+        setMessage("割れた氷に落ちた！スタート地点へ戻ったよ。");
+        return;
+      }
+      if (candidate.x === course.goal.x && candidate.y === course.goal.y) break;
+    }
+    if (!slipped) return;
+    setPos(next);
+    setMoves((value) => value + 1);
+  };
+
+  const claim = () => {
+    if (!won || claimed) return;
+    const reward = Math.max(160, 620 - Math.max(0, moves - course.par) * 45);
+    setGame((current) => ({ ...current, coins: current.coins + reward, inventory: { ...current.inventory, normal: current.inventory.normal + 1 } }));
+    gainExp(12, `氷スライドクリア！コイン${reward}と魚のエサを獲得したよ。`);
+    setClaimed(true);
+  };
+
+  return (
+    <Panel className="slideGame">
+      <div className="fishScore"><b>氷スライド コース{courseIndex + 1}</b><span>{moves}手 / 目標{course.par}手</span></div>
+      <p>ルール: 一度滑ると岩か端まで止まれません。穴を避けてゴールへ。</p>
+      <div className="slideBoard hardBoard">
+        {Array.from({ length: 25 }).map((_, index) => {
+          const x = index % 5;
+          const y = Math.floor(index / 5);
+          const key = `${x}-${y}`;
+          return (
+            <div className={`slideCell ${course.rocks.includes(key) ? "rock" : ""} ${course.holes.includes(key) ? "hole" : ""} ${course.goal.x === x && course.goal.y === y ? "goal" : ""}`} key={key}>
+              {pos.x === x && pos.y === y && <PenguinFigure size="collection" />}
+              {course.goal.x === x && course.goal.y === y && "GOAL"}
+            </div>
+          );
+        })}
+      </div>
+      <div className="directionPad">
+        <button onClick={() => move(0, -1)}>↑</button>
+        <button onClick={() => move(-1, 0)}>←</button>
+        <button onClick={() => move(1, 0)}>→</button>
+        <button onClick={() => move(0, 1)}>↓</button>
+      </div>
+      <button className={won ? "yellow" : "whiteButton"} disabled={!won || claimed} onClick={claim}>{claimed ? "受け取り済み" : won ? "報酬を受け取る" : "ルートを読んで滑ろう"}</button>
+      <button disabled={!claimed} onClick={() => loadCourse(courseIndex + 1)}>次の挑戦</button>
+    </Panel>
+  );
+}
+
+// eslint-disable-next-line no-unused-vars
+function EnhancedMemoryGame({ setGame, gainExp }) {
+  const colors = ["青", "桃", "黄", "緑"];
+  const makeSequence = (length) => Array.from({ length }, () => Math.floor(Math.random() * colors.length));
+  const [round, setRound] = useState(1);
+  const [sequence, setSequence] = useState(() => makeSequence(4));
+  const [input, setInput] = useState([]);
+  const [phase, setPhase] = useState("preview");
+  const [timeLeft, setTimeLeft] = useState(6);
+  const [claimed, setClaimed] = useState(false);
+  const success = input.length === sequence.length && input.every((value, index) => value === sequence[index]);
+  const failed = timeLeft <= 0 || input.some((value, index) => value !== sequence[index]);
+
+  useEffect(() => {
+    const preview = setTimeout(() => setPhase("input"), Math.max(1200, 2600 - round * 180));
+    return () => clearTimeout(preview);
+  }, [round, sequence]);
+
+  useEffect(() => {
+    if (phase !== "input" || success || failed) return undefined;
+    const timer = setTimeout(() => setTimeLeft((value) => value - 1), 1000);
+    return () => clearTimeout(timer);
+  }, [failed, phase, success, timeLeft]);
+
+  const press = (index) => {
+    if (phase !== "input" || success || failed) return;
+    setInput((values) => [...values, index]);
+  };
+
+  const next = () => {
+    const nextRound = failed ? 1 : round + 1;
+    setRound(nextRound);
+    setSequence(makeSequence(Math.min(8, 3 + nextRound)));
+    setInput([]);
+    setPhase("preview");
+    setTimeLeft(6);
+    setClaimed(false);
+  };
+
+  const claim = () => {
+    if (!success || claimed) return;
+    const reward = 160 + round * 100 + timeLeft * 20;
+    setGame((current) => ({ ...current, coins: current.coins + reward, inventory: { ...current.inventory, premium: current.inventory.premium + (round >= 3 ? 1 : 0) } }));
+    gainExp(12, `記憶ゲーム成功！コイン${reward}を獲得したよ。`);
+    setClaimed(true);
+  };
+
+  return (
+    <Panel className="memoryGame">
+      <div className="fishScore"><b>ラウンド {round}</b><span>{phase === "preview" ? "覚える時間" : `残り${timeLeft}秒`}</span></div>
+      <p>ルール: 最初に光る順番を覚えて、表示が消えたら制限時間内に同じ順番で押す。</p>
+      <div className="memorySequence">
+        {sequence.map((value, index) => <span className={`memoryDot dot-${value} ${phase !== "preview" ? "hiddenDot" : ""}`} key={`${value}-${index}`}>{phase === "preview" ? colors[value] : "?"}</span>)}
+      </div>
+      <div className="memoryButtons">
+        {colors.map((label, index) => <button className={`memoryButton dot-${index}`} key={label} onClick={() => press(index)}>{label}</button>)}
+      </div>
+      <div className="miniRuleLine"><span>入力 {input.length}/{sequence.length}</span><span>{failed ? "失敗" : success ? "成功" : "挑戦中"}</span></div>
+      {success && <button className="yellow" disabled={claimed} onClick={claim}>{claimed ? "受け取り済み" : "報酬を受け取る"}</button>}
+      <button disabled={phase === "preview" || (!success && !failed)} onClick={next}>{failed ? "新しい挑戦" : "次のラウンド"}</button>
+    </Panel>
+  );
+}
+
+function FishCatchV2({ setGame, gainExp, setMessage }) {
+  const makeTarget = () => ({
+    slot: Math.floor(Math.random() * 9),
+    points: [8, 10, 12, 15, 20][Math.floor(Math.random() * 5)],
+    danger: Math.random() < 0.25,
+  });
+  const [score, setScore] = useState(0);
+  const [catches, setCatches] = useState(0);
+  const [combo, setCombo] = useState(0);
+  const [timeLeft, setTimeLeft] = useState(12);
+  const [target, setTarget] = useState(makeTarget);
+  const [claimed, setClaimed] = useState(false);
+  const finished = timeLeft <= 0;
+  const reward = Math.max(80, score * 3 + (score >= 150 ? 240 : score >= 100 ? 150 : 60));
+
+  useEffect(() => {
+    if (finished) return undefined;
+    const timer = setTimeout(() => setTimeLeft((value) => value - 1), 1000);
+    return () => clearTimeout(timer);
+  }, [finished, timeLeft]);
+
+  useEffect(() => {
+    if (finished || claimed) return undefined;
+    const timer = setTimeout(() => setTarget(makeTarget()), target.danger ? 900 : 1250);
+    return () => clearTimeout(timer);
+  }, [claimed, finished, target]);
+
+  const startNextRun = () => {
+    setScore(0);
+    setCatches(0);
+    setCombo(0);
+    setTimeLeft(12);
+    setTarget(makeTarget());
+    setClaimed(false);
+  };
+
+  const tapSlot = (slot) => {
+    if (finished || slot !== target.slot) return;
+    if (target.danger) {
+      setScore((value) => Math.max(0, value - 18));
+      setCombo(0);
+      setMessage("氷を叩いた！魚だけを狙おう。");
+    } else {
+      const nextCombo = combo + 1;
+      setScore((value) => value + target.points + nextCombo * 2);
+      setCombo(nextCombo);
+      setCatches((value) => value + 1);
+    }
+    setTarget(makeTarget());
+  };
+
+  const claim = () => {
+    if (!finished || claimed) return;
+    setGame((current) => ({ ...current, coins: current.coins + reward }));
+    gainExp(12, `魚キャッチ終了！コイン${reward}とEXPを獲得したよ。`);
+    setClaimed(true);
+  };
+
+  return (
+    <Panel className="fishGame">
+      <div className="fishScore"><b>{score}点</b><span>残り{timeLeft}秒 / {catches}匹</span></div>
+      <p>ルール: 光った魚だけを素早くタップ。氷を叩くと減点、連続成功でコンボ加点。</p>
+      <div className="fishPond arcadePond">
+        {Array.from({ length: 9 }).map((_, slot) => (
+          <button
+            className={`fishSlot ${slot === target.slot ? (target.danger ? "danger" : "active") : ""}`}
+            key={slot}
+            onClick={() => tapSlot(slot)}
+          >
+            {slot === target.slot ? (target.danger ? "ICE" : `+${target.points}`) : ""}
+          </button>
+        ))}
+      </div>
+      <div className="miniRuleLine"><span>コンボ {combo}</span><span>報酬 コイン+{reward}</span></div>
+      {!claimed && (
+        <button className={finished ? "yellow" : "whiteButton"} disabled={!finished} onClick={claim}>
+          {finished ? "報酬を受け取る" : "制限時間内に魚を追おう"}
+        </button>
+      )}
+      {claimed && <button onClick={startNextRun}>次の挑戦</button>}
+    </Panel>
+  );
+}
+
+function IceSlideV2({ setGame, gainExp, setMessage }) {
+  const courses = [
+    { start: { x: 0, y: 0 }, goal: { x: 4, y: 4 }, rocks: ["1-2", "2-2", "3-2", "1-4", "3-3"], holes: ["0-3", "2-1", "3-4"], par: 8 },
+    { start: { x: 4, y: 0 }, goal: { x: 0, y: 4 }, rocks: ["3-0", "1-1", "3-2", "2-3", "4-3"], holes: ["0-1", "1-4", "3-4"], par: 9 },
+    { start: { x: 0, y: 4 }, goal: { x: 4, y: 0 }, rocks: ["1-3", "0-2", "2-2", "3-1", "1-1"], holes: ["0-3", "3-4", "4-3"], par: 8 },
+    { start: { x: 2, y: 4 }, goal: { x: 4, y: 0 }, rocks: ["0-3", "3-0", "2-3", "0-0", "0-4"], holes: ["4-4", "3-4", "2-0"], par: 8 },
+    { start: { x: 4, y: 4 }, goal: { x: 0, y: 0 }, rocks: ["2-2", "4-0", "3-0", "3-3", "2-3"], holes: ["3-4", "2-0", "4-1"], par: 8 },
+    { start: { x: 0, y: 2 }, goal: { x: 4, y: 2 }, rocks: ["2-2", "3-3", "1-4", "1-2", "2-1"], holes: ["4-4", "3-4", "0-4"], par: 8 },
+    { start: { x: 3, y: 4 }, goal: { x: 0, y: 1 }, rocks: ["1-0", "0-2", "2-2", "2-3", "0-0"], holes: ["3-1", "2-4", "3-2"], par: 10 },
+    { start: { x: 1, y: 4 }, goal: { x: 3, y: 0 }, rocks: ["4-4", "4-3", "3-1", "1-3", "3-4"], holes: ["0-4", "4-2", "2-1"], par: 8 },
+    { start: { x: 0, y: 0 }, goal: { x: 2, y: 4 }, rocks: ["4-2", "4-1", "0-2", "2-1", "0-4"], holes: ["1-2", "4-4", "0-1"], par: 8 },
+    { start: { x: 4, y: 1 }, goal: { x: 0, y: 3 }, rocks: ["3-2", "1-2", "3-4", "4-2", "0-0"], holes: ["2-1", "4-4", "2-3"], par: 8 },
+  ];
+  const [courseIndex, setCourseIndex] = useState(0);
+  const course = courses[courseIndex % courses.length];
+  const [pos, setPos] = useState(course.start);
+  const [moves, setMoves] = useState(0);
+  const [claimed, setClaimed] = useState(false);
+  const won = pos.x === course.goal.x && pos.y === course.goal.y;
+
+  const loadCourse = (nextIndex) => {
+    const nextCourse = courses[nextIndex % courses.length];
+    setCourseIndex(nextIndex);
+    setPos(nextCourse.start);
+    setMoves(0);
+    setClaimed(false);
+  };
+
+  const move = (dx, dy) => {
+    if (won) return;
+    const next = { x: pos.x + dx, y: pos.y + dy };
+    const key = `${next.x}-${next.y}`;
+    if (next.x < 0 || next.x > 4 || next.y < 0 || next.y > 4 || course.rocks.includes(key)) {
+      setMessage("岩か湖底の端で進めないよ。別ルートを試そう。");
+      return;
+    }
+    setMoves((value) => value + 1);
+    if (course.holes.includes(key)) {
+      setPos(course.start);
+      setMessage("割れた氷に落ちた！スタート地点へ戻ったよ。");
+      return;
+    }
+    setPos(next);
+  };
+
+  const claim = () => {
+    if (!won || claimed) return;
+    const reward = Math.max(160, 620 - Math.max(0, moves - course.par) * 35);
+    setGame((current) => ({ ...current, coins: current.coins + reward, inventory: { ...current.inventory, normal: current.inventory.normal + 1 } }));
+    gainExp(12, `氷スライドクリア！コイン${reward}と魚のエサを獲得したよ。`);
+    setClaimed(true);
+  };
+
+  return (
+    <Panel className="slideGame">
+      <div className="fishScore"><b>氷スライド コース{courseIndex + 1}</b><span>{moves}手 / 目標{course.par}手</span></div>
+      <p>ルール: 1回押すと1マス移動。岩と穴を避けて、湖底のゴールへ。</p>
+      <div className="slideBoard hardBoard">
+        {Array.from({ length: 25 }).map((_, index) => {
+          const x = index % 5;
+          const y = Math.floor(index / 5);
+          const key = `${x}-${y}`;
+          return (
+            <div className={`slideCell ${course.rocks.includes(key) ? "rock" : ""} ${course.holes.includes(key) ? "hole" : ""} ${course.goal.x === x && course.goal.y === y ? "goal" : ""}`} key={key}>
+              {pos.x === x && pos.y === y && <PenguinFigure size="collection" />}
+              {course.goal.x === x && course.goal.y === y && "GOAL"}
+            </div>
+          );
+        })}
+      </div>
+      <div className="directionPad">
+        <button onClick={() => move(0, -1)}>↑</button>
+        <button onClick={() => move(-1, 0)}>←</button>
+        <button onClick={() => move(1, 0)}>→</button>
+        <button onClick={() => move(0, 1)}>↓</button>
+      </div>
+      <button className={won ? "yellow" : "whiteButton"} disabled={!won || claimed} onClick={claim}>{claimed ? "受け取り済み" : won ? "報酬を受け取る" : "1マスずつ進もう"}</button>
+      <button disabled={!claimed} onClick={() => loadCourse(courseIndex + 1)}>次のコース</button>
+    </Panel>
+  );
+}
+
+function MemoryGameV2({ setGame, gainExp }) {
+  const colors = ["青", "黄", "桃", "緑"];
+  const makeSequence = (length) => Array.from({ length }, () => Math.floor(Math.random() * colors.length));
+  const [round, setRound] = useState(1);
+  const [sequence, setSequence] = useState(() => makeSequence(4));
+  const [input, setInput] = useState([]);
+  const [phase, setPhase] = useState("preview");
+  const [countdown, setCountdown] = useState(4);
+  const [timeLeft, setTimeLeft] = useState(6);
+  const [claimed, setClaimed] = useState(false);
+  const success = input.length === sequence.length && input.every((value, index) => value === sequence[index]);
+  const failed = timeLeft <= 0 || input.some((value, index) => value !== sequence[index]);
+
+  useEffect(() => {
+    if (phase !== "preview") return undefined;
+    const timer = setTimeout(() => {
+      if (countdown <= 1) setPhase("input");
+      else setCountdown((value) => value - 1);
+    }, 1100);
+    return () => clearTimeout(timer);
+  }, [countdown, phase]);
+
+  useEffect(() => {
+    if (phase !== "input" || success || failed) return undefined;
+    const timer = setTimeout(() => setTimeLeft((value) => value - 1), 1000);
+    return () => clearTimeout(timer);
+  }, [failed, phase, success, timeLeft]);
+
+  const press = (index) => {
+    if (phase !== "input" || success || failed) return;
+    setInput((values) => [...values, index]);
+  };
+
+  const next = () => {
+    const nextRound = failed ? 1 : round + 1;
+    setRound(nextRound);
+    setSequence(makeSequence(Math.min(8, 3 + nextRound)));
+    setInput([]);
+    setPhase("preview");
+    setCountdown(4);
+    setTimeLeft(6);
+    setClaimed(false);
+  };
+
+  const claim = () => {
+    if (!success || claimed) return;
+    const reward = 160 + round * 100 + timeLeft * 20;
+    setGame((current) => ({ ...current, coins: current.coins + reward, inventory: { ...current.inventory, premium: current.inventory.premium + (round >= 3 ? 1 : 0) } }));
+    gainExp(12, `記憶ゲーム成功！コイン${reward}を獲得したよ。`);
+    setClaimed(true);
+  };
+
+  return (
+    <Panel className="memoryGame">
+      <div className="fishScore"><b>ラウンド {round}</b><span>{phase === "preview" ? "覚える時間" : `残り${timeLeft}秒`}</span></div>
+      <p>ルール: 最初に光る順番を覚えて、表示が消えたら制限時間内に同じ順番で押す。</p>
+      <div className="memorySequence">
+        {sequence.map((value, index) => <span className={`memoryDot dot-${value} ${phase !== "preview" ? "hiddenDot" : ""}`} key={`${value}-${index}`}>{phase === "preview" ? colors[value] : "?"}</span>)}
+      </div>
+      <div className="memoryCountdown">{phase === "preview" ? `覚えてください ${countdown}` : "スタート！"}</div>
+      <div className="memoryButtons">
+        {colors.map((label, index) => <button className={`memoryButton dot-${index}`} key={label} onClick={() => press(index)}>{label}</button>)}
+      </div>
+      <div className="memoryInputTrail">
+        {input.length === 0 ? <span>まだ入力していません</span> : input.map((value, index) => <b className={`dot-${value}`} key={`${value}-${index}`}>{colors[value]}</b>)}
+      </div>
+      {(success || failed) && <div className={`memoryResult ${success ? "success" : "failed"}`}>{success ? "成功！" : "失敗..."}</div>}
+      <div className="miniRuleLine"><span>入力 {input.length}/{sequence.length}</span><span>{failed ? "失敗" : success ? "成功" : "挑戦中"}</span></div>
+      {success && <button className="yellow" disabled={claimed} onClick={claim}>{claimed ? "受け取り済み" : "報酬を受け取る"}</button>}
+      <button disabled={phase === "preview" || (!success && !failed) || (success && !claimed)} onClick={next}>{failed ? "新しい挑戦" : "次の挑戦"}</button>
+    </Panel>
+  );
+}
+
+function Book({ game }) {
+  const [mode, setMode] = useState("penguin");
+  return (
+    <Screen className="bookScreen">
+      <Segmented active={mode} options={{ penguin: "ペンギン図鑑", souvenir: "おみやげ図鑑", collection: "コレクション", photo: "写真" }} onChange={setMode} />
+      {mode === "penguin" && (
+        <>
+          <PageHeader title="ペンギン図鑑" sub={`${game.discoveredSpecies.length} / 18 種類`} />
+          <div className="bookGrid">
+            {species.map((name, index) => {
+              const found = game.discoveredSpecies.includes(index);
+              return (
+                <article className={`bookCard ${found ? "" : "locked"}`} key={name}>
+                  <img src={penguin} alt="" />
+                  <b>{found ? name : "？？？"}</b>
+                  <span>{found ? "発見済み" : "未発見"}</span>
+                </article>
+              );
+            })}
+          </div>
+        </>
+      )}
+      {mode === "souvenir" && <CollectionPanel title="おみやげ図鑑" value={`${game.souvenirs} / 150`} text="おでかけでおみやげを集めよう。" />}
+      {mode === "collection" && (
+        <div className="collectionList">
+          <CollectionPanel title="衣装" value={`${game.ownedOutfits.length} / ${outfits.length}`} text="ショップで購入して着替えに使えます。" />
+          <CollectionPanel title="家具" value={`${game.ownedFurniture.length} / ${furniture.length}`} text="模様替えで育成部屋に配置できます。" />
+          <CollectionPanel title="背景" value={`${game.ownedBackgrounds.length} / ${backgrounds.length}`} text="ホームと写真の背景として使えます。" />
+        </div>
+      )}
+      {mode === "photo" && (
+        <div className="collectionList">
+          {game.photos.length === 0 && <CollectionPanel title="写真アルバム" value="0 / 30" text="育成画面で写真を撮ると保存されます。" />}
+          {game.photos.map((photo) => <CollectionPanel key={photo.id} title={photo.penguinName} value={photo.date} text={`${photo.speciesName} / ${photo.outfit} / ${photo.background}`} />)}
+        </div>
+      )}
+    </Screen>
+  );
+}
+
+// eslint-disable-next-line no-unused-vars
+function Outing({ setGame, gainExp, setMessage }) {
+  const goOut = (plan) => {
+    setGame((current) => ({
+      ...current,
+      coins: current.coins + plan.coins,
+      diamonds: current.diamonds + plan.diamonds,
+      souvenirs: current.souvenirs + 1,
+    }));
+    gainExp(10, `${plan.name}から帰ってきたよ。`);
+    setMessage(`おみやげ、コイン${plan.coins}、ダイヤ${plan.diamonds}を受け取ったよ。`);
+  };
+
+  return (
+    <Screen className="outingScreen">
+      <PageHeader title="おでかけ" sub="既存報酬量を維持" />
+      <div className="outingHero">
+        <PenguinFigure size="outing" />
+      </div>
+      <div className="outingCards">
+        {outingPlans.map((plan) => (
+          <Panel className="outingCard" key={plan.id}>
+            <div>
+              <h2>{plan.name}</h2>
+              <p>{plan.time} / コイン{plan.coins} / ダイヤ{plan.diamonds} / EXP / おみやげ</p>
+            </div>
+            <button onClick={() => goOut(plan)}>出発</button>
+          </Panel>
+        ))}
+      </div>
+    </Screen>
+  );
+}
+
+function OutingV2({ game, setActive, setGame, gainExp, setMessage }) {
+  // eslint-disable-next-line react-hooks/purity
+  const [now, setNow] = useState(Date.now());
+  const activeOuting = game.activeOuting;
+  const activePlan = activeOuting ? outingPlanWithDuration(outingPlans.find((plan) => plan.id === activeOuting.planId) || outingPlans[0]) : null;
+  const remainingMs = activeOuting ? Math.max(0, activeOuting.endAt - now) : 0;
+  const completed = Boolean(activeOuting && remainingMs <= 0);
+
+  useEffect(() => {
+    if (!activeOuting || completed) return undefined;
+    const timer = setTimeout(() => setNow(Date.now()), 1000);
+    return () => clearTimeout(timer);
+  }, [activeOuting, completed, now]);
+
+  const startOuting = (rawPlan) => {
+    if (activeOuting) {
+      setMessage("すでにおでかけ中です。帰ってくるまで待とう。");
+      return;
+    }
+    const plan = outingPlanWithDuration(rawPlan);
+    // eslint-disable-next-line react-hooks/purity
+    const startedAt = Date.now();
+    setGame((current) => ({ ...current, activeOuting: { planId: plan.id, startedAt, endAt: startedAt + plan.durationMs } }));
+    setMessage(`${plan.name}へ出発したよ。${plan.time}後に帰ってきます。`);
+    setNow(startedAt);
+  };
+
+  const claimOuting = () => {
+    if (!activePlan || !completed) return;
+    setGame((current) => ({
+      ...current,
+      activeOuting: null,
+      coins: current.coins + activePlan.coins,
+      diamonds: current.diamonds + activePlan.diamonds,
+      souvenirs: current.souvenirs + 1,
+    }));
+    gainExp(10, `${activePlan.name}から帰ってきたよ。`);
+    setMessage(`おみやげ、コイン${activePlan.coins}、ダイヤ${activePlan.diamonds}を受け取ったよ。`);
+  };
+
+  return (
+    <Screen className="outingScreen">
+      <PageHeader title="おでかけ" sub={activeOuting ? "帰還待ち" : "既存報酬量を維持"} />
+      <button className="profileCloseButton" onClick={() => setActive("home")} aria-label="Close">×</button>
+      <div className="outingHero">
+        <PenguinFigure size="outing" />
+        {activeOuting && (
+          <Panel className="outingProgress">
+            <b>{activePlan.name}</b>
+            <span>{completed ? "帰ってきました" : `残り ${formatDuration(remainingMs)}`}</span>
+            <button className={completed ? "yellow" : "whiteButton"} disabled={!completed} onClick={claimOuting}>
+              {completed ? "報酬を受け取る" : "おでかけ中"}
+            </button>
+          </Panel>
+        )}
+      </div>
+      <div className="outingCards">
+        {outingPlans.map((rawPlan) => {
+          const plan = outingPlanWithDuration(rawPlan);
+          return (
+            <Panel className="outingCard" key={plan.id}>
+              <div>
+                <h2>{plan.name}</h2>
+                <p>{plan.time} / コイン{plan.coins} / ダイヤ{plan.diamonds} / EXP / おみやげ</p>
+              </div>
+              <button disabled={Boolean(activeOuting)} onClick={() => startOuting(plan)}>出発</button>
+            </Panel>
+          );
+        })}
+      </div>
+    </Screen>
+  );
+}
+
+function Shop({ game, setGame, setMessage }) {
+  const [tab, setTab] = useState("feed");
+  const capacity = BASE_CAPACITY + game.capacityBonus;
+
+  const buyFeed = (key) => {
+    const item = feedItems[key];
+    if (!spendCoins(game, setGame, item.price, setMessage)) return;
+    setGame((current) => ({ ...current, inventory: { ...current.inventory, [key]: current.inventory[key] + 1 } }));
+    setMessage(`${item.name}を購入したよ。`);
+  };
+
+  const buyCollection = (kind, item) => {
+    const field = kind === "outfit" ? "ownedOutfits" : kind === "furniture" ? "ownedFurniture" : "ownedBackgrounds";
+    if (game[field].includes(item.name)) {
+      setMessage("すでに持っています。");
+      return;
+    }
+    if (!spendCoins(game, setGame, item.price, setMessage)) return;
+    setGame((current) => ({ ...current, [field]: unique([...current[field], item.name]) }));
+    setMessage(`${item.name}を購入したよ。`);
+  };
+
+  const buyExpand = () => {
+    if (!spendCoins(game, setGame, 5000, setMessage)) return;
+    setGame((current) => ({ ...current, capacityBonus: current.capacityBonus + 10 }));
+    setMessage("飼育施設を+10枠拡張したよ。");
+  };
+
+  return (
+    <Screen className="shopScreen">
+      <PageHeader title="ショップ" sub="エサ・衣装・家具・背景・拡張" />
+      <Segmented active={tab} options={{ feed: "エサ", outfit: "衣装", furniture: "家具", background: "背景", expand: "拡張" }} onChange={setTab} />
+      <Panel className="recommendPanel">
+        <div>
+          <span>所持コイン {game.coins.toLocaleString()}</span>
+          <h2>育成に使うものを購入</h2>
+          <p>買ったエサは育成画面で使えます。衣装と家具は編集画面で反映できます。</p>
+        </div>
+        <PenguinFigure size="shop" />
+      </Panel>
+      <div className="shopItems">
+        {tab === "feed" && Object.entries(feedItems).map(([key, item]) => (
+          <Panel className="shopItem" key={key}>
+            <div className="itemGem">F</div>
+            <div><b>{item.name}</b><p>満腹度 +{item.hunger} / 所持 {game.inventory[key]}</p></div>
+            <strong>{item.price.toLocaleString()}<small>コイン</small></strong>
+            <button onClick={() => buyFeed(key)}>購入</button>
+          </Panel>
+        ))}
+        {tab === "outfit" && outfits.slice(1).map((item) => (
+          <ShopCollectionItem key={item.id} item={item} owned={game.ownedOutfits.includes(item.name)} onBuy={() => buyCollection("outfit", item)} />
+        ))}
+        {tab === "furniture" && furniture.filter((item) => item.price !== null).map((item) => (
+          <ShopCollectionItem key={item.id} item={item} owned={game.ownedFurniture.includes(item.name)} onBuy={() => buyCollection("furniture", item)} />
+        ))}
+        {tab === "background" && backgrounds.map((item) => (
+          <ShopCollectionItem key={item.id} item={item} owned={game.ownedBackgrounds.includes(item.name)} onBuy={() => buyCollection("background", item)} />
+        ))}
+        {tab === "expand" && (
+          <Panel className="shopItem">
+            <div className="itemGem">+</div>
+            <div><b>飼育施設拡張 +10枠</b><p>現在 {game.penguins.length} / {capacity}</p></div>
+            <strong>5,000<small>コイン</small></strong>
+            <button onClick={buyExpand}>購入</button>
+          </Panel>
+        )}
+      </div>
+    </Screen>
+  );
+}
+
+function ShopCollectionItem({ item, owned, onBuy }) {
+  return (
+    <Panel className="shopItem">
+      <div className="itemGem">C</div>
+      <div><b>{item.name}</b><p>{owned ? "所持済み" : "購入すると編集で使えます"}</p></div>
+      <strong>{item.price.toLocaleString()}<small>コイン</small></strong>
+      <button className={owned ? "whiteButton" : ""} disabled={owned} onClick={onBuy}>{owned ? "所持中" : "購入"}</button>
+    </Panel>
+  );
+}
+
+function Profile({ game, profilePenguin, setActive }) {
+  const capacity = BASE_CAPACITY + game.capacityBonus;
+  const rows = [
+    ["称号", "氷海の飼育員"],
+    ["飼育員Lv", game.keeperLevel],
+    ["ログイン日数", `${game.loginDays}日`],
+    ["Lv100達成数", game.penguins.filter((p) => p.level >= 100).length],
+    ["所有ペンギン数", `${game.penguins.length} / ${capacity}`],
+    ["図鑑達成率", `${Math.round((game.discoveredSpecies.length / 18) * 100)}%`],
+    ["おみやげ", `${game.souvenirs} / 150`],
+  ];
+  return (
+    <Screen className="profileScreen">
+      <PageHeader title="プロフィール" sub={game.playerName || "ぺんとも"} />
+      <button className="profileCloseButton" onClick={() => setActive("home")} aria-label="Close">×</button>
+      <Panel className="profileTop">
+        <PenguinFigure penguin={profilePenguin} size="profile" />
+        <div><h1>{profilePenguin.name}</h1><p>{profilePenguin.speciesName} / Lv.{profilePenguin.level} / 愛情Lv.{profilePenguin.loveLevel}</p></div>
+      </Panel>
+      <div className="profileRows">
+        {rows.map(([label, value]) => <Panel className="profileRow" key={label}><span>{label}</span><b>{value}</b></Panel>)}
+      </div>
+    </Screen>
+  );
+}
+
+function Achievements({ game, setGame, setMessage }) {
+  const [tab, setTab] = useState("daily");
+  const claimAll = () => {
+    setGame((current) => ({ ...current, diamonds: current.diamonds + 20, coins: current.coins + 500 }));
+    setMessage("実績報酬を受け取ったよ。");
+  };
+  return (
+    <Screen className="achieveScreen">
+      <PageHeader title="実績" sub="デイリー / ノーマル / スペシャル" />
+      <Segmented active={tab} options={{ daily: "デイリー", normal: "ノーマル", special: "スペシャル" }} onChange={setTab} />
+      <Panel className="taskPanel">
+        <Task title="ログインしよう" reward="ダイヤ x10" done />
+        <Task title="ペンギンを5回お世話しよう" reward="ダイヤ x10" progress="5 / 5" done />
+        <Task title="魚キャッチで100点" reward="称号" progress={`${game.achievements[tab]} / 100`} />
+        <button className="yellow" onClick={claimAll}>まとめて受け取る</button>
+      </Panel>
+    </Screen>
+  );
+}
+
+function Menu({ setMessage }) {
+  return (
+    <Screen className="menuScreen">
+      <PageHeader title="メニュー" sub="設定・ヘルプ・データ連携" />
+      <div className="menuGrid">
+        {[
+          ["持ち物", "bag"], ["称号", "star"], ["設定", "gear"], ["ヘルプ", "help"],
+          ["お問い合わせ", "mail"], ["利用規約", "doc"], ["データ連携", "link"],
+        ].map(([label, icon]) => (
+          <button className="menuButton" key={label} onClick={() => setMessage(`${label}を開きました。`)}>
+            <Icon name={icon} /><span>{label}</span>
+          </button>
+        ))}
+      </div>
+      <Panel className="noticePanel">
+        <h2>動作確認メニュー</h2>
+        <p>各ボタンは反応します。今後、詳細画面を追加する前提の入口です。</p>
+      </Panel>
+    </Screen>
+  );
+}
+
+function Tutorial({ step, setStep, playerName, setPlayerName, penguinName, setPenguinName, finishTutorial }) {
+  const pages = [
+    ["ようこそ", "まずはプレイヤー名を入力してください。"],
+    ["卵を受け取ろう", "コウテイペンギンの卵を受け取りました。"],
+    ["孵化", "卵が光って、ヒナが生まれます。"],
+    ["名前をつけよう", "この子の名前を決めてください。"],
+    ["確認", "この名前でゲームを始めます。"],
+  ];
+  return (
+    <div className="modalOverlay">
+      <div className="tutorialCard">
+        <h2>{pages[step][0]}</h2>
+        <p>{pages[step][1]}</p>
+        <div className="tutorialVisual">
+          {step < 2 ? <Egg type="white" /> : <PenguinFigure size="book" />}
+        </div>
+        {step === 0 && <input value={playerName} onChange={(e) => setPlayerName(e.target.value)} placeholder="プレイヤー名" />}
+        {step === 3 && <input value={penguinName} onChange={(e) => setPenguinName(e.target.value)} placeholder="ペンギンの名前" />}
+        {step === 4 && <Panel className="confirmBox"><b>{penguinName}</b><p>あとから変更できません。</p></Panel>}
+        <div className="modalActions">
+          {step > 0 && <button className="whiteButton" onClick={() => setStep(step - 1)}>戻る</button>}
+          {step < 4 ? <button onClick={() => setStep(step + 1)}>次へ</button> : <button className="yellow" onClick={finishTutorial}>ゲームへ</button>}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function HatchModal({ egg, onClose, onHatch }) {
+  const [name, setName] = useState(`${species[clampSpecies(egg.speciesId)].slice(0, 3)}ちゃん`);
+  return (
+    <div className="modalOverlay">
+      <div className="tutorialCard">
+        <h2>卵を孵化する</h2>
+        <p>名前は一度決めると変更できません。</p>
+        <div className="tutorialVisual"><Egg type={egg.type} /></div>
+        <input value={name} onChange={(e) => setName(e.target.value)} />
+        <div className="modalActions">
+          <button className="whiteButton" onClick={onClose}>キャンセル</button>
+          <button className="yellow" onClick={() => onHatch(egg, name.trim() || "ペンギン")}>孵化する</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function OutfitModal({ game, penguin, setPenguin, onClose }) {
+  return (
+    <div className="modalOverlay">
+      <div className="tutorialCard">
+        <h2>着替え</h2>
+        <p>選んだ衣装は育成中ペンギンに保存されます。</p>
+        <div className="choiceGrid">
+          {game.ownedOutfits.map((name) => (
+            <button className={penguin.outfit === name ? "yellow" : "whiteButton"} key={name} onClick={() => setPenguin(penguin.id, { outfit: name })}>{name}</button>
+          ))}
+        </div>
+        <button onClick={onClose}>閉じる</button>
+      </div>
+    </div>
+  );
+}
+
+function EditRoomModal({ game, setGame, onClose }) {
+  const setActive = (field, value) => setGame((current) => ({ ...current, [field]: value }));
+  return (
+    <div className="modalOverlay">
+      <div className="tutorialCard">
+        <h2>模様替え</h2>
+        <p>家具と背景を選ぶとホームや写真の設定に反映されます。</p>
+        <b>家具</b>
+        <div className="choiceGrid">
+          {game.ownedFurniture.map((name) => <button className={game.activeFurniture === name ? "yellow" : "whiteButton"} key={name} onClick={() => setActive("activeFurniture", name)}>{name}</button>)}
+        </div>
+        <b>背景</b>
+        <div className="choiceGrid">
+          {game.ownedBackgrounds.map((name) => <button className={game.activeBackground === name ? "yellow" : "whiteButton"} key={name} onClick={() => setActive("activeBackground", name)}>{name}</button>)}
+        </div>
+        <button onClick={onClose}>閉じる</button>
+      </div>
+    </div>
+  );
+}
+
+function Screen({ className, children }) {
+  return <section className={`screen ${className}`}>{children}</section>;
+}
+
+function PageHeader({ title, sub }) {
+  return <div className="pageHeader"><h1>{title}</h1><span>{sub}</span></div>;
+}
+
+function Panel({ children, className = "" }) {
+  return <div className={`panel ${className}`}>{children}</div>;
+}
+
+function Currency({ type, value }) {
+  return <span className={`currency ${type}`}><i />{value.toLocaleString()}</span>;
+}
+
+function PenguinFigure({ penguin: p, size = "medium" }) {
+  return (
+    <div className={`penguinFigure ${size} outfit-${slug(p?.outfit || "なし")}`}>
+      <div className="shadow" />
+      <img src={penguin} alt="ペンギン" draggable="false" />
+    </div>
+  );
+}
+
+function Speech({ children }) {
+  return <div className="speechBubble"><span />{children}</div>;
+}
+
+function Meter({ label, value, tone = "blue", compact = false }) {
+  return (
+    <div className={`meter ${compact ? "compact" : ""}`}>
+      {label && <div className="meterTop"><span>{label}</span><b>{value} / 100</b></div>}
+      <div className="meterTrack"><i className={tone} style={{ width: `${clamp(value)}%` }} /></div>
+    </div>
+  );
+}
+
+function SideDock({ items }) {
+  return <div className="sideDock">{items.map(([label, icon, onClick]) => <button key={label} onClick={onClick}><HomeIcon name={icon} /><span>{label}</span></button>)}</div>;
+}
+
+function CareButton({ label, icon, className = "", ...buttonProps }) {
+  return <button className={`careButton ${className}`} {...buttonProps}><CareIcon name={icon} /><span>{label}</span></button>;
+}
+
+function Segmented({ active, options, onChange }) {
+  return <div className="segmented">{Object.entries(options).map(([key, label]) => <button className={active === key ? "active" : ""} key={key} onClick={() => onChange(key)}>{label}</button>)}</div>;
+}
+
+function BottomTabs({ active, onChange }) {
+  return (
+    <nav className="bottomTabs">
+      {tabs.map(([id, label, icon]) => (
+        <button className={active === id ? "active" : ""} key={id} onClick={() => onChange(id)}>
+          <Icon name={icon} /><span>{label}</span>
+        </button>
+      ))}
+    </nav>
+  );
+}
+
+function Icon({ name }) {
+  return <i className={`icon icon-${name}`} aria-hidden="true" />;
+}
+
+function HomeIcon({ name }) {
+  const icons = {
+    game: (
+      <>
+        <path d="M7 13.5C7 9.9 9.7 8 13 8h14c3.3 0 6 1.9 6 5.5v6.2c0 3.5-2.4 5.8-5.3 5.8-1.8 0-3.1-.8-4.2-2.2h-7c-1.1 1.4-2.4 2.2-4.2 2.2-2.9 0-5.3-2.3-5.3-5.8v-6.2Z" fill="#fff" />
+        <path d="M14 13v8M10 17h8" stroke="#4aa8ec" strokeWidth="3" strokeLinecap="round" />
+        <circle cx="25" cy="15" r="2.4" fill="#4aa8ec" />
+        <circle cx="29" cy="19" r="2.4" fill="#4aa8ec" />
+      </>
+    ),
+    care: (
+      <>
+        <path d="M4 18c4-7 16.2-7.8 24.2-2.1L35 11v14l-6.8-4.9C20.2 25.8 8 25 4 18Z" fill="#6c4a14" />
+        <circle cx="13" cy="17" r="2.2" fill="#fff0a2" />
+      </>
+    ),
+    outing: (
+      <>
+        <path d="M7 21h24c-1.1 4.2-4.1 6.3-9.1 6.3h-5.8C11.1 27.3 8.1 25.2 7 21Z" fill="#fff" />
+        <path d="M18 7v13h12L18 7Z" fill="#fff" />
+        <path d="M17 7v13" stroke="#fff" strokeWidth="2.6" strokeLinecap="round" />
+      </>
+    ),
+    shop: (
+      <>
+        <path d="M9 14h22v15H9V14Z" rx="4" fill="#2f729b" />
+        <path d="M14 15v-3.2C14 8.6 16.5 6 20 6s6 2.6 6 5.8V15" fill="none" stroke="#2f729b" strokeWidth="3" strokeLinecap="round" />
+      </>
+    ),
+    gift: (
+      <>
+        <path d="M8 14h24v5H8v-5ZM10 19h20v12H10V19Z" fill="#2f729b" />
+        <path d="M20 14v17M8 19h24" stroke="#eaf8ff" strokeWidth="3" />
+        <path d="M20 13c-5-6-10-2-8 1 2.1 2.9 6.5 1.2 8-1Zm0 0c5-6 10-2 8 1-2.1 2.9-6.5 1.2-8-1Z" fill="none" stroke="#2f729b" strokeWidth="2.4" strokeLinecap="round" />
+      </>
+    ),
+    look: (
+      <>
+        <path d="M4 18s5.5-8 16-8 16 8 16 8-5.5 8-16 8S4 18 4 18Z" fill="#2f729b" />
+        <circle cx="20" cy="18" r="5" fill="#eaf8ff" />
+        <circle cx="20" cy="18" r="2.4" fill="#2f729b" />
+      </>
+    ),
+  };
+
+  return (
+    <svg className={`homeIcon homeIcon-${name}`} viewBox="0 0 40 36" aria-hidden="true" focusable="false">
+      {icons[name] || icons.look}
+    </svg>
+  );
+}
+
+function CareIcon({ name }) {
+  const icons = {
+    heart: (
+      <path d="M20 31C11 23 6 18 6 12c0-4 3-7 7-7 3 0 6 2 7 5 1-3 4-5 7-5 4 0 7 3 7 7 0 6-5 11-14 19Z" />
+    ),
+    camera: (
+      <>
+        <path d="M8 13h6l2-4h8l2 4h6v18H8V13Z" />
+        <circle cx="20" cy="22" r="6" fill="#fff" />
+        <circle cx="20" cy="22" r="3.5" />
+      </>
+    ),
+    broom: (
+      <>
+        <path d="M23 6l3 2-9 16-3-2 9-16Z" />
+        <path d="M11 22h12l3 9H8l3-9Z" />
+        <path d="M12 26h12" stroke="#fff" strokeWidth="2" strokeLinecap="round" />
+      </>
+    ),
+    shirt: (
+      <path d="M13 8l4 3h6l4-3 6 6-4 5-3-2v15H14V17l-3 2-4-5 6-6Z" />
+    ),
+    edit: (
+      <>
+        <path d="M9 13l11-6 11 6v15H9V13Z" />
+        <path d="M15 19h10M15 24h10" stroke="#fff" strokeWidth="2" strokeLinecap="round" />
+      </>
+    ),
+  };
+
+  return (
+    <svg className={`careIcon careIcon-${name}`} viewBox="0 0 40 40" aria-hidden="true" focusable="false">
+      {icons[name] || icons.heart}
+    </svg>
+  );
+}
+
+function Egg({ type, small = false }) {
+  return <div className={`egg ${type} ${small ? "small" : ""}`} />;
+}
+
+function Rarity({ index }) {
+  const rarity = index < 2 ? "SSR" : index < 5 ? "SR" : index < 10 ? "R" : "N";
+  return <span className={`rarity ${rarity.toLowerCase()}`}>{rarity}</span>;
+}
+
+function CollectionPanel({ title, value, text }) {
+  return <Panel className="collectionPanel"><PenguinFigure size="collection" /><div><h2>{title}</h2><b>{value}</b><p>{text}</p></div></Panel>;
+}
+
+function Task({ title, reward, progress, done = false }) {
+  return <div className="task"><div><b>{title}</b>{progress && <p>{progress}</p>}</div><span>{reward}</span><button className={done ? "yellow" : "whiteButton"}>{done ? "受け取る" : "進行中"}</button></div>;
+}
+
+function getPenguin(game, id) {
+  return game.penguins.find((p) => p.id === id);
+}
+
+function applyExp(penguinData, amount) {
+  let exp = penguinData.exp + amount;
+  let level = penguinData.level;
+  while (exp >= EXP_PER_LEVEL && level < 100) {
+    exp -= EXP_PER_LEVEL;
+    level += 1;
+  }
+  if (level >= 100) exp = 0;
+  const canEvolve = level >= 65 && penguinData.loveLevel >= 6;
+  return checkMilestones({ ...penguinData, exp, level, stage: canEvolve ? "adult" : penguinData.stage });
+}
+
+function checkMilestones(p) {
+  const stage = p.level >= 65 && p.loveLevel >= 6 ? "adult" : p.stage;
+  return {
+    ...p,
+    stage,
+    rewards: {
+      evolved: stage === "adult" || p.rewards?.evolved || false,
+      lv80: p.level >= 80 || p.rewards?.lv80 || false,
+      lv100: p.level >= 100 || p.rewards?.lv100 || false,
+    },
+  };
+}
+
+function applyExpToActive(current, id, amount) {
+  let diamonds = current.diamonds;
+  let ownedFurniture = current.ownedFurniture;
+  let ownedTitles = current.ownedTitles;
+  const penguins = current.penguins.map((p) => {
+    if (p.id !== id) return p;
+    const next = applyExp(p, amount);
+    const awards = milestoneAwards(p, next);
+    diamonds += awards.diamonds;
+    ownedFurniture = unique([...ownedFurniture, ...awards.furniture]);
+    ownedTitles = unique([...ownedTitles, ...awards.titles]);
+    return next;
+  });
+  const keeperExp = current.keeperExp + amount;
+  return { ...current, diamonds, ownedFurniture, ownedTitles, penguins, keeperExp, keeperLevel: keeperLevelFromExp(keeperExp) };
+}
+
+function milestoneAwards(before, after) {
+  const beforeRewards = before.rewards || {};
+  const awards = { diamonds: 0, furniture: [], titles: [] };
+  if (after.stage === "adult" && !beforeRewards.evolved) awards.diamonds += 100;
+  if (after.level >= 80 && !beforeRewards.lv80) awards.furniture.push(`${after.name}の銅像`);
+  if (after.level >= 100 && !beforeRewards.lv100) awards.titles.push(`${after.name}と歩む者`);
+  return awards;
+}
+
+function makeGachaEggs(count, pity) {
+  let gotSsr = false;
+  return Array.from({ length: count }, (_, index) => {
+    const forceSsr = pity - index <= 1 && !gotSsr;
+    const roll = Math.random() * 100;
+    if (forceSsr || roll < 2) {
+      gotSsr = true;
+      const speciesId = Math.floor(Math.random() * species.length);
+      return { id: createId(), type: "rainbow", reward: `${species[speciesId]}の卵`, prizeType: "ssrEgg", speciesId };
+    }
+    if (roll < 10) return { id: createId(), type: "gold", reward: "特製魚セット", prizeType: "feed", feedKey: "special" };
+    if (roll < 40) return { id: createId(), type: "white", reward: "高級魚", prizeType: "feed", feedKey: "premium" };
+    return { id: createId(), type: "white", reward: "魚のエサ", prizeType: "feed", feedKey: "normal" };
+  });
+}
+
+function addFeedRewards(inventory, rewards) {
+  return rewards.reduce((next, reward) => {
+    if (reward.prizeType !== "feed") return next;
+    return { ...next, [reward.feedKey]: next[reward.feedKey] + 1 };
+  }, inventory);
+}
+
+function nextLoveLevel(point) {
+  return loveThresholds.reduce((level, need, index) => (point >= need ? index + 1 : level), 1);
+}
+
+function loveGain(friendship) {
+  if (friendship >= 80) return 2;
+  if (friendship >= 40) return 1;
+  return 0;
+}
+
+function keeperLevelFromExp(exp) {
+  return Math.min(999, Math.max(1, Math.floor(exp / 120) + 1));
+}
+
+function formatDuration(ms) {
+  const totalSeconds = Math.max(0, Math.ceil(ms / 1000));
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+  if (hours > 0) return `${hours}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+  return `${minutes}:${String(seconds).padStart(2, "0")}`;
+}
+
+function statusMessage(p) {
+  if (p.hunger < 30) return "おなかがすいたみたい。ごはんをあげよう。";
+  if (p.mood < 30) return "少しさみしそう。なでたり写真を撮ったりしよう。";
+  if (p.stage === "adult") return "大人のペンギンに進化したよ。頼もしいね。";
+  return "元気いっぱい。今日は何をして遊ぶ？";
+}
+
+function spendCoins(game, setGame, price, setMessage) {
+  if (game.coins < price) {
+    setMessage("コインが足りません。ミニゲームやおでかけで集めよう。");
+    return false;
+  }
+  setGame((current) => ({ ...current, coins: current.coins - price }));
+  return true;
+}
+
+function clamp(value) {
+  return Math.max(0, Math.min(100, value));
+}
+
+function clampRange(value, min, max) {
+  return Math.max(min, Math.min(max, value));
+}
+
+function clampSpecies(value) {
+  const numeric = Number.isFinite(value) ? value : Number(value);
+  return clampRange(Number.isFinite(numeric) ? numeric : 0, 0, species.length - 1);
+}
+
+function unique(values) {
+  return [...new Set(values)];
+}
+
+function validText(value, fallback) {
+  return typeof value === "string" && value.trim() ? value : fallback;
+}
+
+function slug(value) {
+  return value.replace(/\s/g, "-");
+}
+
+export default App;

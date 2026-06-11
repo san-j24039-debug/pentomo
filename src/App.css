@@ -1,0 +1,5522 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at 18% 14%, rgba(255, 216, 231, 0.62), transparent 26%),
+    radial-gradient(circle at 82% 12%, rgba(255, 230, 137, 0.48), transparent 24%),
+    linear-gradient(135deg, #e4f8ff 0%, #ffffff 50%, #e9f8ff 100%);
+  color: #173a56;
+  font-family: "Hiragino Maru Gothic ProN", "Yu Gothic", "Meiryo", system-ui, sans-serif;
+}
+
+button {
+  border: 0;
+  min-height: 40px;
+  border-radius: 14px;
+  padding: 9px 12px;
+  background: linear-gradient(#72c6ff, #3197e8);
+  box-shadow: 0 5px 0 #1d78bd, 0 12px 22px rgba(38, 126, 190, 0.24);
+  color: #fff;
+  cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0;
+}
+
+button:active {
+  transform: translateY(3px);
+  box-shadow: 0 2px 0 #1d78bd, 0 8px 14px rgba(38, 126, 190, 0.18);
+}
+
+button:disabled {
+  cursor: default;
+  opacity: 0.58;
+  transform: none;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}
+
+h1 {
+  color: #173a56;
+  font-size: 19px;
+  line-height: 1.2;
+}
+
+h2 {
+  color: #204f78;
+  font-size: 16px;
+}
+
+p {
+  color: #5e7890;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.45;
+}
+
+#root {
+  width: 100%;
+  min-height: 100vh;
+  border: 0;
+  text-align: initial;
+}
+
+.app {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 18px;
+}
+
+.device {
+  position: relative;
+  width: min(402px, 100%);
+  height: min(832px, calc(100vh - 36px));
+  min-height: 720px;
+  overflow: hidden;
+  border: 7px solid #151a20;
+  border-radius: 38px;
+  background: #fff;
+  box-shadow: 0 30px 80px rgba(52, 116, 160, 0.36);
+}
+
+.deviceCamera {
+  position: absolute;
+  z-index: 6;
+  top: 10px;
+  left: 50%;
+  width: 76px;
+  height: 8px;
+  border-radius: 999px;
+  background: #151a20;
+  transform: translateX(-50%);
+}
+
+.topStatus {
+  height: 82px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 22px 14px 10px;
+  border-bottom: 1px solid #c8e3f7;
+  background: rgba(255, 255, 255, 0.94);
+}
+
+.playerChip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.playerChip img {
+  width: 46px;
+  height: 46px;
+  padding: 3px;
+  border: 2px solid #bde7ff;
+  border-radius: 16px;
+  background: linear-gradient(#fff, #e6f8ff);
+  object-fit: contain;
+}
+
+.playerChip b,
+.playerChip span {
+  display: block;
+  white-space: nowrap;
+}
+
+.playerChip b {
+  font-size: 14px;
+}
+
+.playerChip span {
+  color: #5d85a3;
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.currencies {
+  display: grid;
+  gap: 5px;
+}
+
+.currency {
+  min-width: 122px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 7px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: #fff;
+  color: #254962;
+  font-size: 12px;
+  font-weight: 900;
+  box-shadow: inset 0 0 0 1px #cce5f8;
+}
+
+.currency i {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+}
+
+.currency.coin i {
+  background: radial-gradient(circle at 35% 30%, #fff7a8, #ffc535 62%, #e29314);
+  box-shadow: inset 0 0 0 2px #e8a61e;
+}
+
+.currency.diamond i {
+  border-radius: 5px;
+  background: linear-gradient(135deg, #e5ffff, #4bc8ff 55%, #347be5);
+  transform: rotate(45deg);
+}
+
+.viewport {
+  height: calc(100% - 164px);
+  overflow: hidden auto;
+  background: #eaf8ff;
+}
+
+.viewport::-webkit-scrollbar,
+.bottomTabs::-webkit-scrollbar,
+.segmented::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
+.screen {
+  position: relative;
+  min-height: 100%;
+  padding: 12px;
+  background:
+    linear-gradient(180deg, rgba(188, 233, 255, 0.92), rgba(255, 255, 255, 0.95) 66%),
+    radial-gradient(circle at 20% 28%, rgba(255, 255, 255, 0.8), transparent 14%);
+}
+
+.pageHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 42px;
+  margin-bottom: 10px;
+}
+
+.pageHeader span {
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.78);
+  color: #35617f;
+  font-size: 11px;
+  font-weight: 900;
+  white-space: nowrap;
+  box-shadow: inset 0 0 0 1px #cce7f8;
+}
+
+.panel {
+  border: 1px solid #bddcf2;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.86);
+  box-shadow: 0 12px 26px rgba(53, 134, 192, 0.14);
+}
+
+.whiteButton {
+  border: 1px solid #bddcf2;
+  background: #fff;
+  box-shadow: 0 5px 0 #d3e9f8, 0 10px 18px rgba(43, 121, 179, 0.12);
+  color: #25658f;
+}
+
+.yellow {
+  background: linear-gradient(#fff0a2, #ffc645);
+  box-shadow: 0 5px 0 #db9e24, 0 12px 20px rgba(218, 163, 39, 0.22);
+  color: #654a15;
+}
+
+.pink {
+  background: linear-gradient(#ffabc8, #ff6f9e);
+  box-shadow: 0 5px 0 #d65380, 0 12px 20px rgba(214, 83, 128, 0.22);
+}
+
+.green {
+  background: linear-gradient(#8de8df, #3fc3b5);
+  box-shadow: 0 5px 0 #2fa397, 0 12px 20px rgba(63, 195, 181, 0.2);
+}
+
+.circleButton {
+  width: 42px;
+  min-width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  padding: 0;
+}
+
+.homeScreen {
+  overflow: hidden;
+  background:
+    linear-gradient(180deg, rgba(207, 239, 255, 0.3), rgba(255, 255, 255, 0.12)),
+    linear-gradient(160deg, #aee3ff 0%, #e7f9ff 46%, #fff 100%);
+}
+
+.homeScreen::before,
+.outingScreen::before,
+.miniHero::before {
+  content: "";
+  position: absolute;
+  inset: 72px -30px auto;
+  height: 178px;
+  background:
+    linear-gradient(135deg, transparent 0 42%, rgba(122, 194, 225, 0.34) 43% 48%, transparent 49%),
+    linear-gradient(45deg, transparent 0 48%, rgba(96, 177, 214, 0.28) 49% 54%, transparent 55%);
+  opacity: 0.85;
+}
+
+.homeHud {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+}
+
+.levelPanel {
+  width: 188px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.78);
+  box-shadow: 0 8px 20px rgba(42, 124, 184, 0.14);
+}
+
+.levelPanel b {
+  display: block;
+  font-size: 21px;
+}
+
+.levelPanel span {
+  display: block;
+  margin-top: 4px;
+  color: #456c85;
+  font-size: 10px;
+  font-weight: 900;
+  text-align: right;
+}
+
+.noticeRound {
+  position: relative;
+  width: 46px;
+  min-width: 46px;
+  height: 46px;
+  display: grid;
+  place-items: center;
+  border-radius: 16px;
+  padding: 0;
+}
+
+.noticeRound > i:not(.homeIcon) {
+  position: absolute;
+  top: -6px;
+  right: -5px;
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #ff5e86;
+  color: #fff;
+  font-size: 11px;
+  font-style: normal;
+}
+
+.homeScene {
+  position: relative;
+  height: 370px;
+  display: grid;
+  place-items: end center;
+  margin-top: -2px;
+}
+
+.iceberg {
+  position: absolute;
+  border-radius: 55% 45% 45% 55%;
+  background: rgba(255, 255, 255, 0.76);
+  box-shadow: inset 0 -10px 20px rgba(115, 188, 222, 0.24);
+}
+
+.iceberg.one {
+  width: 116px;
+  height: 48px;
+  left: 16px;
+  bottom: 66px;
+}
+
+.iceberg.two {
+  width: 132px;
+  height: 54px;
+  right: 20px;
+  bottom: 46px;
+}
+
+.sideDock {
+  position: absolute;
+  z-index: 4;
+  top: 100px;
+  right: 12px;
+  display: grid;
+  gap: 10px;
+}
+
+.sideDock button {
+  width: 70px;
+  min-height: 64px;
+  display: grid;
+  place-items: center;
+  gap: 3px;
+  padding: 8px 4px;
+  border: 1px solid #bdddf3;
+  background: rgba(255, 255, 255, 0.88);
+  box-shadow: 0 5px 0 #d1e8f8, 0 12px 20px rgba(57, 131, 184, 0.16);
+  color: #2b6d99;
+  font-size: 11px;
+}
+
+.speechBubble {
+  position: absolute;
+  z-index: 4;
+  left: 44px;
+  bottom: 126px;
+  max-width: 214px;
+  padding: 12px 14px 12px 36px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.92);
+  color: #49677b;
+  font-size: 12px;
+  font-weight: 900;
+  line-height: 1.5;
+  box-shadow: 0 8px 20px rgba(56, 130, 184, 0.16);
+}
+
+.speechBubble span {
+  position: absolute;
+  left: 13px;
+  top: 14px;
+  width: 14px;
+  height: 14px;
+  background: #ff7ca7;
+  transform: rotate(45deg);
+}
+
+.speechBubble span::before,
+.speechBubble span::after {
+  content: "";
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #ff7ca7;
+}
+
+.speechBubble span::before {
+  left: -7px;
+}
+
+.speechBubble span::after {
+  top: -7px;
+}
+
+.primaryActions {
+  position: absolute;
+  z-index: 5;
+  right: 18px;
+  bottom: 16px;
+  left: 18px;
+  display: grid;
+  grid-template-columns: 82px 1fr 82px;
+  align-items: end;
+  gap: 12px;
+}
+
+.roundAction {
+  height: 82px;
+  display: grid;
+  place-items: center;
+  gap: 2px;
+  border-radius: 50%;
+  padding: 0;
+}
+
+.roundAction.yellow {
+  width: 104px;
+  height: 104px;
+  margin-inline: auto;
+}
+
+.roundAction > span {
+  font-size: 11px;
+}
+
+.penguinFigure {
+  position: relative;
+  display: grid;
+  place-items: center;
+}
+
+.penguinFigure img {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 14px 13px rgba(26, 77, 109, 0.22));
+  -webkit-user-drag: none;
+  user-select: none;
+}
+
+.penguinFigure .shadow {
+  position: absolute;
+  right: 11%;
+  bottom: 4%;
+  left: 11%;
+  height: 18%;
+  border-radius: 50%;
+  background: rgba(66, 123, 158, 0.18);
+}
+
+.penguinFigure.hero {
+  width: 240px;
+  height: 278px;
+  margin-bottom: 16px;
+}
+
+.penguinFigure.large {
+  width: 204px;
+  height: 228px;
+}
+
+.penguinFigure.shop {
+  width: 110px;
+  height: 118px;
+}
+
+.penguinFigure.book,
+.penguinFigure.profile {
+  width: 96px;
+  height: 102px;
+}
+
+.penguinFigure.collection {
+  width: 72px;
+  height: 76px;
+}
+
+.penguinFigure.outing,
+.penguinFigure.mini {
+  width: 150px;
+  height: 170px;
+}
+
+.careScreen {
+  background: linear-gradient(180deg, #d9f4ff 0%, #fff 70%);
+}
+
+.careHero {
+  position: relative;
+  min-height: 316px;
+  overflow: hidden;
+  border: 1px solid #b7ddf5;
+  border-radius: 8px;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.84), rgba(255,255,255,0.5)),
+    linear-gradient(135deg, #e7f8ff, #fff4f7);
+}
+
+.careHeader {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 12px;
+}
+
+.careHeader p {
+  font-size: 11px;
+}
+
+.avatarBadge {
+  position: relative;
+  width: 56px;
+  height: 56px;
+}
+
+.avatarBadge img {
+  width: 100%;
+  height: 100%;
+  padding: 3px;
+  border: 2px solid #b9e3fb;
+  border-radius: 16px;
+  background: #fff;
+  object-fit: contain;
+}
+
+.avatarBadge span {
+  position: absolute;
+  right: -6px;
+  bottom: -6px;
+  padding: 2px 6px;
+  border-radius: 999px;
+  background: #2c80c2;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 900;
+}
+
+.roomScene {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 246px;
+}
+
+.roomScene::after {
+  content: "";
+  position: absolute;
+  right: 58px;
+  bottom: 25px;
+  left: 58px;
+  height: 52px;
+  border-radius: 50%;
+  background: repeating-radial-gradient(circle, #fff4b8 0 13px, #d6f3e9 14px 25px);
+}
+
+.window {
+  position: absolute;
+  top: 12px;
+  right: 28px;
+  width: 76px;
+  height: 62px;
+  border: 6px solid #fff;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #a9e6ff, #fff0a8);
+}
+
+.shelf {
+  position: absolute;
+  left: 18px;
+  top: 74px;
+  width: 90px;
+  height: 16px;
+  border-radius: 8px;
+  background: #ffd8a3;
+  box-shadow: 0 28px 0 #ffc4d7, 0 56px 0 #c1eeff;
+}
+
+.plant {
+  position: absolute;
+  right: 24px;
+  bottom: 30px;
+  width: 32px;
+  height: 52px;
+  border-radius: 0 0 15px 15px;
+  background: #ffd3a3;
+}
+
+.plant::before {
+  content: "";
+  position: absolute;
+  left: -16px;
+  top: -24px;
+  width: 58px;
+  height: 42px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 70%, #8bd98f 0 18px, transparent 19px), radial-gradient(circle at 70% 70%, #77cf84 0 18px, transparent 19px);
+}
+
+.statPanel,
+.lovePanel {
+  margin-top: 10px;
+  padding: 12px;
+}
+
+.levelLine,
+.lovePanel > div:first-child {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  color: #315d78;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.lovePanel {
+  display: grid;
+  gap: 8px;
+}
+
+.hearts {
+  display: flex;
+  gap: 7px;
+}
+
+.hearts span {
+  width: 22px;
+  height: 22px;
+  background: #d8e2ea;
+  clip-path: path("M11 20 C4 14 0 10 0 5 C0 2 2 0 5 0 C8 0 10 2 11 4 C12 2 14 0 17 0 C20 0 22 2 22 5 C22 10 18 14 11 20 Z");
+}
+
+.hearts span.filled {
+  background: linear-gradient(#ff9ab8, #ff5c8a);
+}
+
+.careActions {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 9px;
+  margin-top: 10px;
+}
+
+.inventoryChips {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 7px;
+  margin-top: 10px;
+}
+
+.inventoryChips button {
+  min-height: 38px;
+  padding: 6px 7px;
+  border-radius: 8px;
+  font-size: 10px;
+}
+
+.careButton {
+  min-height: 64px;
+  display: grid;
+  place-items: center;
+  gap: 4px;
+  border: 1px solid #bddcf2;
+  background: rgba(255,255,255,0.96);
+  box-shadow: 0 5px 0 #d3e9f8, 0 10px 18px rgba(43, 121, 179, 0.12);
+  color: #245e89;
+}
+
+.meter {
+  display: grid;
+  gap: 5px;
+  margin-top: 8px;
+}
+
+.meter.compact {
+  margin-top: 5px;
+}
+
+.meterTop {
+  display: flex;
+  justify-content: space-between;
+  color: #466d86;
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.meterTrack {
+  height: 10px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #dceaf3;
+}
+
+.meter.compact .meterTrack {
+  height: 7px;
+}
+
+.meterTrack i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+}
+
+.meterTrack .blue {
+  background: linear-gradient(90deg, #4fb8ff, #2b75d9);
+}
+
+.meterTrack .yellow {
+  background: linear-gradient(90deg, #ffe88f, #ffba3b);
+}
+
+.meterTrack .pink {
+  background: linear-gradient(90deg, #ff9abb, #ff668f);
+}
+
+.meterTrack .mint {
+  background: linear-gradient(90deg, #7ce2d6, #3bb9ac);
+}
+
+.sortBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  padding: 8px 10px;
+  border: 1px solid #bddcf2;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.86);
+}
+
+.sortBar span {
+  color: #365f7b;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.sortBar button {
+  min-height: 32px;
+  padding: 6px 12px;
+}
+
+.penguinGrid,
+.bookGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.penguinCard,
+.bookCard {
+  position: relative;
+  min-height: 142px;
+  padding: 8px 6px 7px;
+  border: 1px solid #bddcf2;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.88);
+  box-shadow: 0 8px 16px rgba(53, 134, 192, 0.12);
+  text-align: center;
+}
+
+.penguinCard img,
+.bookCard img {
+  width: 68px;
+  height: 68px;
+  object-fit: contain;
+}
+
+.penguinCard b,
+.bookCard b {
+  display: block;
+  min-height: 30px;
+  color: #243f54;
+  font-size: 11px;
+  line-height: 1.25;
+}
+
+.penguinCard span,
+.bookCard span {
+  color: #375d76;
+  font-size: 10px;
+  font-weight: 900;
+}
+
+.rarity {
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  padding: 2px 5px;
+  border-radius: 6px;
+  background: #e9f4fb;
+  color: #2e6f9d;
+  font-size: 9px;
+  font-weight: 900;
+}
+
+.rarity.ssr {
+  background: #fff0a5;
+  color: #a56c00;
+}
+
+.rarity.sr {
+  background: #e7dfff;
+  color: #6847bb;
+}
+
+.cardBadges {
+  min-height: 17px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 3px;
+  margin-top: 3px;
+}
+
+.cardBadges em {
+  padding: 2px 4px;
+  border-radius: 999px;
+  background: #ffedf4;
+  color: #d95783;
+  font-size: 8px;
+  font-style: normal;
+  font-weight: 900;
+}
+
+.gachaVisual {
+  min-height: 176px;
+  margin-bottom: 10px;
+}
+
+.sparkleCard {
+  height: 176px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #bddcf2;
+  border-radius: 8px;
+  background:
+    radial-gradient(circle at 16% 18%, rgba(255,255,255,0.9), transparent 10%),
+    radial-gradient(circle at 78% 30%, rgba(255,255,255,0.8), transparent 12%),
+    linear-gradient(160deg, #d8f3ff, #fff 65%);
+}
+
+.eggPreview {
+  display: flex;
+  align-items: end;
+  justify-content: center;
+  gap: 14px;
+}
+
+.egg {
+  width: 52px;
+  height: 70px;
+  border: 2px solid rgba(255,255,255,0.92);
+  border-radius: 50% 50% 44% 44%;
+  box-shadow: inset -9px -14px 18px rgba(59, 108, 143, 0.16), 0 8px 14px rgba(45, 117, 170, 0.16);
+}
+
+.egg.small {
+  width: 48px;
+  height: 62px;
+}
+
+.egg.white {
+  background: linear-gradient(135deg, #fff, #edf7ff);
+}
+
+.egg.gold {
+  background: linear-gradient(135deg, #fff3a6, #ffc13a);
+}
+
+.egg.rainbow {
+  background: linear-gradient(135deg, #fff, #9eeeff 30%, #ff9dd2 62%, #ffe36d);
+}
+
+.ratePanel {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px;
+  padding: 9px;
+  margin-bottom: 10px;
+}
+
+.ratePanel span {
+  padding: 7px;
+  border-radius: 7px;
+  background: #f3fbff;
+  color: #41667e;
+  font-size: 10px;
+  font-weight: 900;
+}
+
+.openEggs {
+  min-height: 106px;
+  display: grid;
+  place-items: center;
+  margin-bottom: 10px;
+  padding: 10px;
+  border: 1px dashed #93cdec;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.62);
+}
+
+.openEggs.ten {
+  grid-template-columns: repeat(5, 1fr);
+  gap: 7px;
+}
+
+.openEgg {
+  width: 56px;
+  height: 74px;
+  min-height: 74px;
+  display: grid;
+  place-items: end center;
+  padding: 0 3px 7px;
+  border-radius: 50% 50% 44% 44%;
+  color: #325672;
+  font-size: 9px;
+}
+
+.openEgg.opened {
+  border-radius: 8px;
+  background: #fff;
+}
+
+.gachaButtons {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.segmented {
+  display: flex;
+  gap: 5px;
+  margin-bottom: 10px;
+  padding: 4px;
+  overflow-x: auto;
+  border: 1px solid #bddcf2;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.74);
+}
+
+.segmented.small {
+  margin-top: -4px;
+}
+
+.segmented button {
+  flex: 1 0 auto;
+  min-height: 34px;
+  padding: 7px 11px;
+  background: transparent;
+  box-shadow: none;
+  color: #315e7f;
+}
+
+.segmented button.active {
+  background: linear-gradient(#438fd6, #246fb5);
+  box-shadow: none;
+  color: #fff;
+}
+
+.recommendPanel {
+  min-height: 130px;
+  display: grid;
+  grid-template-columns: 1fr 116px;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  margin-bottom: 10px;
+  background: linear-gradient(135deg, rgba(188,229,255,0.96), rgba(255,255,255,0.92));
+}
+
+.recommendPanel span {
+  display: inline-block;
+  margin-bottom: 4px;
+  color: #2d76ae;
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.recommendPanel button {
+  min-height: 34px;
+  margin-top: 9px;
+  background: linear-gradient(#85eadf, #33bda9);
+  box-shadow: 0 5px 0 #269988;
+}
+
+.shopItems,
+.collectionList,
+.profileRows,
+.outingCards,
+.miniCards {
+  display: grid;
+  gap: 8px;
+}
+
+.shopItem {
+  display: grid;
+  grid-template-columns: 48px 1fr auto;
+  align-items: center;
+  gap: 9px;
+  padding: 10px;
+}
+
+.itemGem {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  background: #e2f8ff;
+  color: #2385c4;
+  font-weight: 900;
+}
+
+.shopItem b {
+  font-size: 13px;
+}
+
+.shopItem strong {
+  color: #d28522;
+  font-size: 13px;
+  text-align: right;
+}
+
+.shopItem small {
+  display: block;
+  color: #7190a5;
+  font-size: 9px;
+}
+
+.bookLead,
+.collectionPanel,
+.profileTop {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 13px;
+  padding: 12px;
+  margin-bottom: 10px;
+}
+
+.collectionPanel b {
+  display: block;
+  margin: 4px 0;
+  color: #234d70;
+  font-size: 22px;
+}
+
+.profileTop {
+  grid-template-columns: auto 1fr auto;
+}
+
+.profileRows {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.profileRow {
+  padding: 10px;
+}
+
+.profileRow span {
+  display: block;
+  min-height: 30px;
+  color: #66849a;
+  font-size: 10px;
+  font-weight: 900;
+}
+
+.profileRow b {
+  color: #214a66;
+  font-size: 15px;
+}
+
+.eggStorageGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.storedEgg {
+  display: grid;
+  place-items: center;
+  gap: 5px;
+  min-height: 110px;
+  padding: 9px;
+}
+
+.storedEgg b {
+  color: #234e6b;
+  font-size: 13px;
+}
+
+.storageNote {
+  display: grid;
+  gap: 12px;
+  margin-top: 12px;
+  padding: 13px;
+}
+
+.outingHero {
+  position: relative;
+  min-height: 250px;
+  display: grid;
+  place-items: end center;
+  overflow: hidden;
+  margin-bottom: 10px;
+  border: 1px solid #bddcf2;
+  border-radius: 8px;
+  background: linear-gradient(180deg, #c9efff, #effbff);
+}
+
+.outingHero button {
+  position: relative;
+  z-index: 2;
+  width: 72%;
+  margin-bottom: 12px;
+}
+
+.outingCard {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 8px;
+  padding: 10px;
+}
+
+.miniHero {
+  position: relative;
+  min-height: 250px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  margin-bottom: 10px;
+  border: 1px solid #bddcf2;
+  border-radius: 8px;
+  background: linear-gradient(180deg, #aee4ff, #eaf9ff);
+}
+
+.miniHero > span {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  z-index: 2;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: #fff;
+  color: #204968;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.floes i {
+  position: absolute;
+  width: 70px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.84);
+  box-shadow: inset 0 -8px 14px rgba(90, 176, 217, 0.2);
+}
+
+.floes i:nth-child(1) { left: 28px; bottom: 45px; }
+.floes i:nth-child(2) { right: 32px; bottom: 76px; }
+.floes i:nth-child(3) { left: 118px; bottom: 20px; }
+.floes i:nth-child(4) { right: 105px; top: 70px; }
+
+.miniCard {
+  padding: 11px;
+}
+
+.miniCard button {
+  width: 100%;
+  margin-top: 8px;
+}
+
+.miniIntro {
+  display: grid;
+  gap: 12px;
+  padding: 14px;
+  text-align: center;
+  animation: miniIntroFade 0.55s ease both;
+}
+
+.miniIntroArt {
+  position: relative;
+  min-height: 286px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border: 1px solid #bddcf2;
+  border-radius: 10px;
+  background:
+    radial-gradient(circle at 24% 20%, rgba(255,255,255,0.74), transparent 13%),
+    linear-gradient(#bfeeff, #effbff);
+}
+
+.miniIntroArt::before {
+  content: "";
+  position: absolute;
+  inset: auto -20px 24px;
+  height: 92px;
+  background:
+    radial-gradient(ellipse at 22% 64%, rgba(255,255,255,0.95) 0 18%, transparent 19%),
+    radial-gradient(ellipse at 72% 58%, rgba(212,240,250,0.95) 0 20%, transparent 21%);
+}
+
+.introIce,
+.introFish,
+.introGoal {
+  position: absolute;
+  z-index: 1;
+}
+
+.introIce {
+  width: 84px;
+  height: 48px;
+  border-radius: 12px;
+  background: linear-gradient(#effbff, #bdeafe);
+  box-shadow: inset 0 0 0 1px rgba(79, 151, 190, 0.2);
+}
+
+.introIce.one {
+  left: 34px;
+  top: 40px;
+}
+
+.introIce.two {
+  right: 40px;
+  bottom: 58px;
+}
+
+.introFish {
+  left: 44px;
+  bottom: 78px;
+  width: 70px;
+  height: 42px;
+  border-radius: 50%;
+  background: linear-gradient(#ffcf79, #ff9554);
+  opacity: 0;
+}
+
+.introFish::after {
+  content: "";
+  position: absolute;
+  right: -14px;
+  top: 12px;
+  border: 9px solid transparent;
+  border-left-color: #ff9554;
+}
+
+.introGoal {
+  right: 28px;
+  top: 38px;
+  display: none;
+  padding: 16px 12px;
+  border-radius: 10px;
+  background: linear-gradient(#fff5b4, #ffd85d);
+  color: #7a5517;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.miniIntro-fish .introFish {
+  opacity: 1;
+  animation: swimPreview 1.6s ease-in-out infinite alternate;
+}
+
+.miniIntro-slide .introGoal {
+  display: block;
+}
+
+.miniIntro-memory .introIce {
+  width: 76px;
+  height: 52px;
+}
+
+.miniIntro-memory .introIce.one {
+  background: linear-gradient(#5cc9ff, #2a7ed6);
+}
+
+.miniIntro-memory .introIce.two {
+  background: linear-gradient(#ff9abb, #e94e83);
+}
+
+.miniIntro h2 {
+  font-size: 20px;
+}
+
+@keyframes miniIntroFade {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes swimPreview {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(170px) translateY(-24px);
+  }
+}
+
+.taskPanel {
+  display: grid;
+  gap: 8px;
+  padding: 10px;
+}
+
+.task {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: 7px;
+  padding: 8px;
+  border-radius: 8px;
+  background: #f7fcff;
+}
+
+.task b {
+  color: #274f6e;
+  font-size: 12px;
+}
+
+.task span {
+  color: #2383bd;
+  font-size: 10px;
+  font-weight: 900;
+}
+
+.task button {
+  min-height: 30px;
+  padding: 5px 8px;
+  font-size: 10px;
+}
+
+.menuGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 9px;
+}
+
+.menuButton {
+  min-height: 86px;
+  display: grid;
+  place-items: center;
+  gap: 6px;
+  border: 1px solid #bddcf2;
+  background: rgba(255,255,255,0.92);
+  box-shadow: 0 5px 0 #d3e9f8, 0 10px 18px rgba(43, 121, 179, 0.12);
+  color: #245e89;
+}
+
+.noticePanel {
+  display: grid;
+  gap: 9px;
+  margin-top: 12px;
+  padding: 13px;
+}
+
+.bottomTabs {
+  height: 82px;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 68px;
+  gap: 4px;
+  overflow-x: auto;
+  padding: 7px 9px 10px;
+  border-top: 1px solid #c8e3f7;
+  background: rgba(255,255,255,0.96);
+}
+
+.bottomTabs button {
+  min-height: 62px;
+  display: grid;
+  place-items: center;
+  gap: 3px;
+  padding: 5px 3px;
+  border-radius: 14px;
+  background: transparent;
+  box-shadow: none;
+  color: #738da2;
+}
+
+.bottomTabs button.active {
+  background: #eaf7ff;
+  color: #2275b6;
+  box-shadow: inset 0 0 0 1px #bddcf2;
+}
+
+.bottomTabs span {
+  font-size: 10px;
+}
+
+.icon {
+  position: relative;
+  display: inline-block;
+  width: 22px;
+  height: 22px;
+}
+
+.icon::before,
+.icon::after {
+  content: "";
+  position: absolute;
+  display: block;
+}
+
+.icon-home::before {
+  left: 3px;
+  top: 8px;
+  width: 16px;
+  height: 11px;
+  border-radius: 3px;
+  background: currentColor;
+}
+
+.icon-home::after {
+  left: 4px;
+  top: 2px;
+  width: 14px;
+  height: 14px;
+  background: currentColor;
+  transform: rotate(45deg);
+}
+
+.icon-care::before,
+.icon-heart::before {
+  left: 2px;
+  top: 5px;
+  width: 18px;
+  height: 15px;
+  background: currentColor;
+  clip-path: path("M9 15 C3 10 0 7 0 4 C0 1 2 0 4 0 C6 0 8 2 9 4 C10 2 12 0 14 0 C16 0 18 1 18 4 C18 7 15 10 9 15 Z");
+}
+
+.icon-list::before,
+.icon-menu::before {
+  left: 3px;
+  top: 5px;
+  width: 16px;
+  height: 3px;
+  border-radius: 4px;
+  background: currentColor;
+  box-shadow: 0 6px 0 currentColor, 0 12px 0 currentColor;
+}
+
+.icon-gacha::before,
+.icon-egg::before {
+  left: 5px;
+  top: 2px;
+  width: 12px;
+  height: 18px;
+  border-radius: 50% 50% 44% 44%;
+  background: currentColor;
+}
+
+.icon-shop::before,
+.icon-bag::before {
+  left: 3px;
+  top: 7px;
+  width: 16px;
+  height: 12px;
+  border-radius: 4px;
+  background: currentColor;
+}
+
+.icon-shop::after,
+.icon-bag::after {
+  left: 7px;
+  top: 3px;
+  width: 8px;
+  height: 8px;
+  border: 2px solid currentColor;
+  border-bottom: 0;
+  border-radius: 8px 8px 0 0;
+}
+
+.icon-book::before,
+.icon-doc::before {
+  left: 4px;
+  top: 3px;
+  width: 14px;
+  height: 17px;
+  border: 2px solid currentColor;
+  border-radius: 3px;
+}
+
+.icon-user::before {
+  left: 7px;
+  top: 3px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.icon-user::after {
+  left: 4px;
+  top: 12px;
+  width: 14px;
+  height: 8px;
+  border-radius: 8px 8px 3px 3px;
+  background: currentColor;
+}
+
+.icon-map::before,
+.icon-boat::before {
+  left: 3px;
+  top: 11px;
+  width: 16px;
+  height: 7px;
+  border-radius: 0 0 12px 12px;
+  background: currentColor;
+}
+
+.icon-map::after,
+.icon-boat::after {
+  left: 9px;
+  top: 3px;
+  width: 8px;
+  height: 9px;
+  background: currentColor;
+  clip-path: polygon(0 0, 100% 50%, 0 100%);
+}
+
+.icon-play::before,
+.icon-pad::before {
+  left: 3px;
+  top: 7px;
+  width: 16px;
+  height: 10px;
+  border-radius: 8px;
+  background: currentColor;
+}
+
+.icon-star::before {
+  left: 2px;
+  top: 2px;
+  width: 18px;
+  height: 18px;
+  background: currentColor;
+  clip-path: polygon(50% 0, 61% 35%, 98% 35%, 68% 56%, 80% 92%, 50% 70%, 20% 92%, 32% 56%, 2% 35%, 39% 35%);
+}
+
+.icon-bell::before {
+  left: 5px;
+  top: 3px;
+  width: 12px;
+  height: 15px;
+  border-radius: 8px 8px 4px 4px;
+  background: currentColor;
+}
+
+.icon-gift::before {
+  left: 3px;
+  top: 8px;
+  width: 16px;
+  height: 11px;
+  border-radius: 2px;
+  background: currentColor;
+}
+
+.icon-fish::before {
+  left: 3px;
+  top: 7px;
+  width: 14px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.icon-fish::after {
+  right: 1px;
+  top: 7px;
+  border: 4px solid transparent;
+  border-left-color: currentColor;
+}
+
+.icon-camera::before {
+  left: 3px;
+  top: 7px;
+  width: 16px;
+  height: 12px;
+  border-radius: 4px;
+  background: currentColor;
+}
+
+.icon-broom::before,
+.icon-shirt::before,
+.icon-edit::before,
+.icon-gear::before,
+.icon-help::before,
+.icon-mail::before,
+.icon-link::before {
+  inset: 4px;
+  border: 2px solid currentColor;
+  border-radius: 4px;
+}
+
+@media (max-width: 440px) {
+  .app {
+    padding: 0;
+  }
+
+  .device {
+    width: 100%;
+    height: 100vh;
+    min-height: 100vh;
+    border: 0;
+    border-radius: 0;
+  }
+
+  .deviceCamera {
+    display: none;
+  }
+}
+
+.shopItem {
+  grid-template-columns: 42px 1fr auto;
+}
+
+.shopItem button {
+  grid-column: 1 / -1;
+  min-height: 32px;
+}
+
+.bookCard.locked {
+  filter: grayscale(1);
+  opacity: 0.54;
+}
+
+.miniActions {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 3px;
+  margin-top: 5px;
+}
+
+.miniActions button {
+  min-height: 24px;
+  padding: 3px;
+  border-radius: 7px;
+  font-size: 8px;
+  box-shadow: none;
+}
+
+.storedEgg button {
+  min-height: 28px;
+  padding: 4px 7px;
+  font-size: 10px;
+}
+
+.fishGame {
+  display: grid;
+  gap: 12px;
+  padding: 14px;
+}
+
+.slideGame,
+.memoryGame {
+  display: grid;
+  gap: 12px;
+  padding: 14px;
+}
+
+.fishScore {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: #e7f7ff;
+  color: #1d5f93;
+  font-weight: 900;
+}
+
+.fishPond {
+  position: relative;
+  min-height: 320px;
+  overflow: hidden;
+  border: 1px solid #bddcf2;
+  border-radius: 10px;
+  background:
+    radial-gradient(circle at 24% 20%, rgba(255, 255, 255, 0.7), transparent 10%),
+    linear-gradient(#bdeaff, #eaf9ff);
+}
+
+.fishTarget {
+  position: absolute;
+  width: 62px;
+  height: 36px;
+  min-height: 36px;
+  border-radius: 50%;
+  padding: 0;
+  background: linear-gradient(#ffca78, #ff8d4f);
+  box-shadow: 0 4px 0 #d06533;
+}
+
+.fishTarget::after {
+  content: "";
+  position: absolute;
+  right: -11px;
+  top: 10px;
+  border: 8px solid transparent;
+  border-left-color: #ff8d4f;
+}
+
+.fish-0 { left: 20px; top: 34px; }
+.fish-1 { right: 28px; top: 78px; }
+.fish-2 { left: 92px; top: 150px; }
+.fish-3 { right: 78px; bottom: 54px; }
+.fish-4 { left: 34px; bottom: 38px; }
+
+.slideBoard {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+}
+
+.slideCell {
+  min-height: 68px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #bddcf2;
+  border-radius: 8px;
+  background: linear-gradient(#effbff, #cdefff);
+  color: #2b6d99;
+  font-size: 10px;
+  font-weight: 900;
+}
+
+.slideCell.hole {
+  background: linear-gradient(#63849b, #25415a);
+}
+
+.slideCell.goal {
+  background: linear-gradient(#fff3a5, #ffcf53);
+  color: #775315;
+}
+
+.directionPad {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.memorySequence,
+.memoryButtons {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.memoryDot,
+.memoryButton {
+  min-height: 54px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.memoryDot {
+  min-height: 42px;
+  box-shadow: inset 0 0 0 2px rgba(255,255,255,0.5);
+}
+
+.dot-0 {
+  background: linear-gradient(#5cc9ff, #2a7ed6);
+}
+
+.dot-1 {
+  background: linear-gradient(#ffe88f, #e5a91f);
+}
+
+.dot-2 {
+  background: linear-gradient(#ff9abb, #e94e83);
+}
+
+.dot-3 {
+  background: linear-gradient(#85eadf, #2eb3a4);
+}
+
+.modalOverlay {
+  position: absolute;
+  z-index: 20;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 18px;
+  background: rgba(19, 54, 78, 0.36);
+  backdrop-filter: blur(8px);
+}
+
+.tutorialCard {
+  width: min(330px, 100%);
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid #b8dcf3;
+  border-radius: 18px;
+  background: linear-gradient(#ffffff, #effbff);
+  box-shadow: 0 22px 60px rgba(31, 93, 138, 0.3);
+  text-align: center;
+}
+
+.tutorialCard input {
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid #b8dcf3;
+  border-radius: 12px;
+  background: #fff;
+  color: #173a56;
+  font: inherit;
+  font-weight: 800;
+  text-align: center;
+}
+
+.tutorialVisual {
+  min-height: 124px;
+  display: grid;
+  place-items: center;
+  border-radius: 14px;
+  background:
+    radial-gradient(circle at 50% 78%, rgba(255, 255, 255, 0.95) 0 30%, transparent 31%),
+    linear-gradient(#c9efff, #fff);
+}
+
+.modalActions {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 9px;
+}
+
+.modalActions button:only-child {
+  grid-column: 1 / -1;
+}
+
+.confirmBox {
+  padding: 10px;
+}
+
+.choiceGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.outfitLabel {
+  position: absolute;
+  z-index: 2;
+  left: 50%;
+  bottom: 3%;
+  transform: translateX(-50%);
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.86);
+  color: #285b82;
+  font-size: 10px;
+  font-weight: 900;
+  white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(32, 92, 132, 0.14);
+}
+
+/* Antarctic theme additions */
+body {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.72) 0 9%, transparent 10%),
+    radial-gradient(ellipse at 18% 82%, rgba(255, 255, 255, 0.95) 0 13%, transparent 14%),
+    radial-gradient(ellipse at 78% 84%, rgba(224, 246, 255, 0.98) 0 19%, transparent 20%),
+    linear-gradient(160deg, #d8f5ff 0%, #eefcff 42%, #b8e7f7 100%);
+}
+
+.app::before,
+.app::after {
+  content: "";
+  position: fixed;
+  z-index: -1;
+  left: 0;
+  right: 0;
+  pointer-events: none;
+}
+
+.app::before {
+  bottom: 0;
+  height: 28vh;
+  background:
+    linear-gradient(135deg, transparent 0 36%, rgba(255, 255, 255, 0.78) 37% 46%, transparent 47%),
+    linear-gradient(45deg, transparent 0 42%, rgba(219, 245, 255, 0.9) 43% 52%, transparent 53%),
+    linear-gradient(#f7fdff, #d4f1fb);
+}
+
+.app::after {
+  top: 0;
+  height: 48vh;
+  background:
+    radial-gradient(circle at 22% 22%, rgba(255,255,255,0.95) 0 5px, transparent 6px),
+    radial-gradient(circle at 54% 18%, rgba(255,255,255,0.8) 0 4px, transparent 5px),
+    radial-gradient(circle at 84% 28%, rgba(255,255,255,0.82) 0 6px, transparent 7px);
+}
+
+.profileButton {
+  border: 0;
+  min-height: 0;
+  padding: 0;
+  border-radius: 16px;
+  background: transparent;
+  box-shadow: none;
+  color: inherit;
+  text-align: left;
+}
+
+.profileButton:active {
+  transform: translateY(1px);
+  box-shadow: none;
+}
+
+.profileButton::after {
+  content: "PROFILE";
+  margin-left: 2px;
+  padding: 2px 6px;
+  border-radius: 999px;
+  background: #e4f7ff;
+  color: #2b78a5;
+  font-size: 8px;
+  font-weight: 900;
+}
+
+.homeScreen,
+.outingScreen,
+.miniScreen,
+.shopScreen {
+  background:
+    linear-gradient(180deg, rgba(226, 248, 255, 0.92), rgba(255,255,255,0.88) 62%),
+    radial-gradient(ellipse at 50% 104%, #ffffff 0 34%, transparent 35%),
+    linear-gradient(160deg, #9edfff 0%, #dff8ff 48%, #f8feff 100%);
+}
+
+.homeScreen::after {
+  content: "";
+  position: absolute;
+  left: -20px;
+  right: -20px;
+  bottom: 88px;
+  height: 92px;
+  background:
+    linear-gradient(135deg, transparent 0 31%, rgba(255,255,255,0.86) 32% 43%, transparent 44%),
+    linear-gradient(45deg, transparent 0 40%, rgba(206,239,250,0.92) 41% 52%, transparent 53%);
+  opacity: 0.9;
+}
+
+.sideDock {
+  top: 88px;
+}
+
+.sideDock button {
+  min-height: 58px;
+}
+
+.careScreen {
+  background:
+    linear-gradient(180deg, #d9f5ff 0%, #f8fdff 56%, #eef9fd 100%),
+    linear-gradient(90deg, rgba(255,255,255,0.5), transparent);
+}
+
+.careHero {
+  background:
+    linear-gradient(180deg, rgba(231, 248, 255, 0.96), rgba(255,255,255,0.78)),
+    linear-gradient(90deg, #d8eef8 0 12px, transparent 12px calc(100% - 12px), #d8eef8 calc(100% - 12px)),
+    repeating-linear-gradient(90deg, rgba(73, 132, 168, 0.12) 0 2px, transparent 2px 42px),
+    linear-gradient(135deg, #e9f9ff, #ffffff);
+}
+
+.careHero::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  left: 14px;
+  right: 14px;
+  bottom: 14px;
+  height: 66px;
+  border-radius: 10px;
+  background:
+    repeating-linear-gradient(90deg, rgba(70, 139, 174, 0.16) 0 1px, transparent 1px 28px),
+    linear-gradient(#dff5fb, #c9e8f2);
+  box-shadow: inset 0 0 0 1px rgba(83, 147, 181, 0.24);
+}
+
+.careHero::after {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  top: 82px;
+  left: 18px;
+  width: 82px;
+  height: 104px;
+  border-radius: 8px;
+  background:
+    linear-gradient(#f8fdff, #d8eef8),
+    linear-gradient(90deg, transparent 48%, rgba(69, 132, 169, 0.22) 49% 51%, transparent 52%);
+  box-shadow:
+    inset 0 0 0 2px rgba(110, 172, 204, 0.35),
+    0 12px 20px rgba(53, 134, 192, 0.1);
+}
+
+.careHeader {
+  padding: 11px 12px;
+  border-bottom: 1px solid rgba(105, 165, 198, 0.22);
+  background: rgba(255, 255, 255, 0.42);
+}
+
+.roomScene {
+  min-height: 250px;
+  background:
+    linear-gradient(180deg, transparent 0 68%, rgba(193, 226, 238, 0.54) 69%),
+    repeating-linear-gradient(0deg, transparent 0 31px, rgba(82, 142, 176, 0.08) 32px 33px);
+}
+
+.roomScene::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  right: 20px;
+  top: 88px;
+  width: 76px;
+  height: 88px;
+  border-radius: 12px;
+  background:
+    radial-gradient(circle at 50% 58%, rgba(104, 205, 255, 0.5) 0 18px, transparent 19px),
+    linear-gradient(#f9fdff, #d2ecf6);
+  box-shadow: inset 0 0 0 2px rgba(98, 162, 196, 0.35);
+}
+
+.roomScene::after {
+  right: 44px;
+  bottom: 22px;
+  left: 44px;
+  height: 54px;
+  border-radius: 50%;
+  background:
+    repeating-radial-gradient(circle, #f8fdff 0 13px, #c8ecf5 14px 25px);
+}
+
+.window {
+  top: 18px;
+  right: 24px;
+  width: 86px;
+  height: 58px;
+  border-color: #f8fdff;
+  background:
+    linear-gradient(135deg, #89d7f3 0 48%, #ffffff 49% 56%, #bdefff 57%),
+    linear-gradient(#b9edff, #f7fdff);
+  box-shadow: inset 0 0 0 1px rgba(80, 146, 181, 0.18);
+}
+
+.shelf {
+  left: 18px;
+  top: 194px;
+  width: 122px;
+  height: 18px;
+  border-radius: 4px;
+  background: #9fc5d8;
+  box-shadow:
+    0 -34px 0 #c3dcea,
+    0 -68px 0 #e7f5fb;
+}
+
+.plant {
+  right: 28px;
+  bottom: 30px;
+  width: 36px;
+  height: 58px;
+  border-radius: 12px;
+  background: linear-gradient(#a9e2f5, #5ea9c7);
+  box-shadow: inset 0 0 0 2px rgba(255,255,255,0.56);
+}
+
+.plant::before {
+  left: -14px;
+  top: -20px;
+  width: 64px;
+  height: 34px;
+  border-radius: 12px;
+  background:
+    linear-gradient(90deg, #e9fbff 0 16px, #bdeefd 16px 18px, #e9fbff 18px 34px, #bdeefd 34px 36px, #e9fbff 36px);
+}
+
+/* Requested playability and Antarctica polish */
+.profileScreen {
+  position: relative;
+}
+
+.profileCloseButton {
+  position: absolute;
+  z-index: 5;
+  top: 14px;
+  right: 12px;
+  width: 38px;
+  min-width: 38px;
+  height: 38px;
+  min-height: 38px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border-radius: 50%;
+  background: linear-gradient(#ffffff, #e7f7ff);
+  box-shadow: 0 4px 0 #c6e4f5, 0 10px 18px rgba(36, 112, 166, 0.14);
+  color: #24638f;
+  font-size: 20px;
+  line-height: 1;
+}
+
+.homeScreen {
+  background:
+    radial-gradient(ellipse at 50% 86%, rgba(255,255,255,0.98) 0 19%, transparent 20%),
+    linear-gradient(150deg, transparent 0 38%, rgba(122, 194, 225, 0.18) 39% 43%, transparent 44%),
+    linear-gradient(30deg, transparent 0 45%, rgba(87, 166, 205, 0.18) 46% 50%, transparent 51%),
+    linear-gradient(180deg, #bdeeff 0%, #eafaff 48%, #ffffff 100%);
+}
+
+.homeScene::before {
+  content: "";
+  position: absolute;
+  left: -30px;
+  right: -30px;
+  bottom: 124px;
+  height: 180px;
+  background:
+    linear-gradient(135deg, transparent 0 36%, rgba(150, 208, 230, 0.34) 37% 42%, transparent 43%),
+    linear-gradient(45deg, transparent 0 48%, rgba(108, 183, 216, 0.28) 49% 54%, transparent 55%);
+  clip-path: polygon(0 82%, 14% 48%, 24% 74%, 39% 28%, 54% 77%, 68% 38%, 82% 68%, 100% 34%, 100% 100%, 0 100%);
+}
+
+.homeScene::after {
+  content: "";
+  position: absolute;
+  left: -20px;
+  right: -20px;
+  bottom: 18px;
+  height: 138px;
+  background:
+    radial-gradient(ellipse at 18% 72%, rgba(210, 239, 249, 0.95) 0 16%, transparent 17%),
+    radial-gradient(ellipse at 76% 68%, rgba(190, 229, 244, 0.92) 0 18%, transparent 19%),
+    linear-gradient(180deg, rgba(255,255,255,0.2), rgba(255,255,255,0.92));
+}
+
+.iceberg.one {
+  width: 132px;
+  height: 54px;
+  left: -8px;
+  bottom: 106px;
+}
+
+.iceberg.two {
+  width: 160px;
+  height: 62px;
+  right: -12px;
+  bottom: 82px;
+}
+
+.arcadePond {
+  min-height: 340px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  padding: 12px;
+  background:
+    radial-gradient(circle at 24% 22%, rgba(255,255,255,0.72), transparent 16%),
+    radial-gradient(circle at 78% 76%, rgba(255,255,255,0.5), transparent 20%),
+    linear-gradient(#98dcf6, #e8f9ff);
+}
+
+.fishSlot {
+  position: relative;
+  width: auto;
+  height: auto;
+  min-height: 88px;
+  border-radius: 16px;
+  background: rgba(255,255,255,0.32);
+  box-shadow: inset 0 0 0 1px rgba(95, 164, 200, 0.28);
+  color: transparent;
+}
+
+.fishSlot.active {
+  background:
+    radial-gradient(ellipse at 44% 46%, #ffcf79 0 34%, transparent 35%),
+    linear-gradient(#dff7ff, #bdeeff);
+  color: #fff;
+  font-size: 13px;
+  text-shadow: 0 1px 0 rgba(132, 73, 23, 0.4);
+}
+
+.fishSlot.active::after {
+  content: "";
+  position: absolute;
+  right: 20%;
+  top: 40%;
+  border: 10px solid transparent;
+  border-left-color: #ff9955;
+}
+
+.fishSlot.danger {
+  background:
+    linear-gradient(135deg, #ffffff, #a7d9eb 60%, #6aaac6);
+  color: #285b76;
+  font-size: 12px;
+}
+
+.miniRuleLine {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: #edf9ff;
+  color: #245e89;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.hardBoard {
+  grid-template-columns: repeat(5, 1fr);
+}
+
+.hardBoard .slideCell {
+  min-height: 56px;
+}
+
+.slideCell.rock {
+  background:
+    linear-gradient(135deg, #7c9caf, #31526b);
+  color: #dff5ff;
+}
+
+.slideCell.rock::before {
+  content: "岩";
+}
+
+.slideCell.hole {
+  background:
+    radial-gradient(circle at 50% 54%, #0e263d 0 34%, #315a74 35% 62%, #94cfe7 63%);
+  color: transparent;
+}
+
+.slideCell.hole::before {
+  content: "穴";
+  color: #eafaff;
+}
+
+.hiddenDot {
+  background: linear-gradient(#eef8fc, #bcddeb);
+  color: #2a6e99;
+}
+
+.memoryGame p,
+.slideGame p,
+.fishGame p {
+  color: #315f7c;
+}
+
+.homeScreen {
+  background:
+    radial-gradient(circle at 12% 16%, rgba(255,255,255,0.9) 0 2px, transparent 3px),
+    radial-gradient(circle at 36% 10%, rgba(255,255,255,0.86) 0 3px, transparent 4px),
+    radial-gradient(circle at 72% 18%, rgba(255,255,255,0.8) 0 2px, transparent 3px),
+    linear-gradient(115deg, transparent 0 26%, rgba(181, 240, 229, 0.28) 27% 35%, transparent 36%),
+    linear-gradient(70deg, transparent 0 44%, rgba(125, 216, 247, 0.2) 45% 54%, transparent 55%),
+    radial-gradient(ellipse at 50% 88%, rgba(255,255,255,0.98) 0 18%, transparent 19%),
+    linear-gradient(180deg, #9fe4ff 0%, #daf7ff 48%, #ffffff 100%);
+}
+
+.homeScreen .penguinFigure.hero {
+  z-index: 3;
+}
+
+.homeHud,
+.sideDock,
+.speechBubble,
+.primaryActions {
+  z-index: 6;
+}
+
+.homeScene::before {
+  bottom: 94px;
+  height: 240px;
+  background:
+    linear-gradient(135deg, transparent 0 36%, rgba(105, 179, 211, 0.34) 37% 41%, transparent 42%),
+    linear-gradient(45deg, transparent 0 47%, rgba(59, 144, 188, 0.22) 48% 53%, transparent 54%),
+    linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.5));
+  clip-path: polygon(0 78%, 10% 54%, 19% 72%, 32% 36%, 43% 70%, 55% 26%, 68% 74%, 78% 44%, 89% 70%, 100% 34%, 100% 100%, 0 100%);
+}
+
+.homeScene::after {
+  bottom: 0;
+  height: 170px;
+  background:
+    radial-gradient(ellipse at 20% 70%, rgba(255,255,255,0.98) 0 19%, transparent 20%),
+    radial-gradient(ellipse at 72% 74%, rgba(222, 248, 255, 0.96) 0 20%, transparent 21%),
+    radial-gradient(ellipse at 46% 92%, rgba(168, 220, 238, 0.52) 0 33%, transparent 34%),
+    linear-gradient(180deg, rgba(255,255,255,0.12), rgba(255,255,255,0.96));
+}
+
+.hardBoard {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  align-items: stretch;
+}
+
+.hardBoard .slideCell {
+  aspect-ratio: 1 / 1;
+  min-height: 0;
+  width: 100%;
+  overflow: hidden;
+}
+
+.slideCell .penguinFigure.collection {
+  width: 52px;
+  height: 52px;
+}
+
+.memoryCountdown {
+  min-height: 42px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  background: linear-gradient(#fff8c5, #ffe071);
+  color: #7a5517;
+  font-size: 16px;
+  font-weight: 900;
+  box-shadow: inset 0 0 0 1px rgba(190, 137, 31, 0.18);
+}
+
+.memoryInputTrail {
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: #edf9ff;
+  color: #315f7c;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.memoryInputTrail b {
+  min-width: 42px;
+  min-height: 28px;
+  display: grid;
+  place-items: center;
+  border-radius: 7px;
+  color: #fff;
+  font-size: 12px;
+}
+
+.memoryResult {
+  min-height: 58px;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  color: #fff;
+  font-size: 24px;
+  font-weight: 900;
+  box-shadow: 0 8px 18px rgba(37, 113, 166, 0.18);
+}
+
+.memoryResult.success {
+  background: linear-gradient(#80eadf, #25b6a7);
+}
+
+.memoryResult.failed {
+  background: linear-gradient(#ff9abb, #e94e83);
+}
+
+.outingProgress {
+  position: absolute;
+  z-index: 3;
+  right: 16px;
+  bottom: 14px;
+  left: 16px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 8px;
+  padding: 10px;
+}
+
+.outingProgress b,
+.outingProgress span {
+  display: block;
+  color: #204f78;
+  font-weight: 900;
+}
+
+.outingProgress span {
+  font-size: 12px;
+}
+
+.outingProgress button {
+  grid-row: 1 / span 2;
+  grid-column: 2;
+}
+
+.outingScreen .profileCloseButton {
+  top: 58px;
+  right: 16px;
+}
+
+.outingScreen .pageHeader {
+  padding-right: 58px;
+}
+
+.homeScreen::before {
+  height: 240px;
+  inset: 54px -40px auto;
+  background:
+    radial-gradient(circle at 18% 36%, rgba(255,255,255,0.75) 0 2px, transparent 3px),
+    radial-gradient(circle at 42% 28%, rgba(255,255,255,0.76) 0 2px, transparent 3px),
+    radial-gradient(circle at 74% 40%, rgba(255,255,255,0.78) 0 3px, transparent 4px),
+    linear-gradient(110deg, transparent 0 32%, rgba(180, 255, 235, 0.34) 33% 39%, transparent 40%),
+    linear-gradient(72deg, transparent 0 48%, rgba(88, 205, 255, 0.26) 49% 56%, transparent 57%);
+  opacity: 1;
+}
+
+.homeScene {
+  background:
+    linear-gradient(135deg, transparent 0 41%, rgba(93, 176, 213, 0.14) 42% 46%, transparent 47%),
+    linear-gradient(45deg, transparent 0 50%, rgba(93, 176, 213, 0.12) 51% 55%, transparent 56%);
+}
+
+.homeScene .iceberg {
+  background:
+    linear-gradient(135deg, rgba(255,255,255,0.98), rgba(214,244,255,0.88));
+  box-shadow:
+    inset 0 -12px 22px rgba(84, 167, 206, 0.22),
+    0 10px 22px rgba(55, 125, 169, 0.08);
+}
+
+/* Home Antarctica refresh */
+.homeScreen {
+  background:
+    radial-gradient(circle at 13% 21%, #ffffff 0 2px, transparent 3px),
+    radial-gradient(circle at 20% 16%, #ffffff 0 1px, transparent 2px),
+    radial-gradient(circle at 80% 15%, #ffffff 0 2px, transparent 3px),
+    radial-gradient(circle at 92% 26%, rgba(255,255,255,0.88) 0 1px, transparent 2px),
+    linear-gradient(180deg, #5a9ce5 0%, #3570cf 33%, #c8f2fb 34%, #eafdff 66%, #ffffff 100%);
+}
+
+.homeScreen::before {
+  inset: 0;
+  height: 260px;
+  background:
+    radial-gradient(circle at 12% 18%, #ffffff 0 3px, transparent 4px),
+    radial-gradient(circle at 37% 24%, #ffffff 0 2px, transparent 3px),
+    radial-gradient(circle at 86% 12%, #ffffff 0 4px, transparent 5px),
+    linear-gradient(12deg, transparent 0 51%, rgba(255,255,255,0.68) 52% 53%, transparent 54%),
+    radial-gradient(ellipse at 18% 101%, #2a55ba 0 36%, transparent 37%),
+    radial-gradient(ellipse at 78% 103%, #244bb2 0 38%, transparent 39%),
+    linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0));
+  opacity: 1;
+}
+
+.homeScreen::after {
+  left: -34px;
+  right: -34px;
+  bottom: 96px;
+  height: 260px;
+  background:
+    radial-gradient(ellipse at 18% 64%, rgba(255,255,255,0.98) 0 18%, transparent 19%),
+    radial-gradient(ellipse at 86% 56%, rgba(255,255,255,0.98) 0 21%, transparent 22%),
+    linear-gradient(12deg, transparent 0 34%, rgba(88, 203, 221, 0.6) 35% 37%, transparent 38%),
+    linear-gradient(180deg, transparent 0 45%, #effcff 46% 100%);
+  opacity: 1;
+}
+
+.noticeRound {
+  width: 58px;
+  min-width: 58px;
+  height: 54px;
+  min-height: 54px;
+  gap: 2px;
+  border: 1px solid rgba(183, 221, 245, 0.95);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 5px 0 #c6e4f5, 0 12px 20px rgba(36, 112, 166, 0.16);
+  color: #276995;
+}
+
+.noticeRound > span {
+  font-size: 10px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.sideDock {
+  top: 98px;
+  right: 13px;
+  gap: 12px;
+}
+
+.sideDock button {
+  min-height: 66px;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.98), rgba(237,249,255,0.96));
+}
+
+.homeScene {
+  height: 392px;
+  margin-top: -14px;
+  background:
+    linear-gradient(135deg, transparent 0 42%, rgba(86, 185, 215, 0.2) 43% 45%, transparent 46%),
+    linear-gradient(45deg, transparent 0 52%, rgba(255, 255, 255, 0.42) 53% 55%, transparent 56%);
+}
+
+.homeScene::before {
+  left: -44px;
+  right: -44px;
+  bottom: 128px;
+  height: 230px;
+  background:
+    linear-gradient(180deg, rgba(46, 92, 177, 0.2), transparent 38%),
+    linear-gradient(135deg, transparent 0 34%, rgba(255,255,255,0.8) 35% 45%, transparent 46%),
+    linear-gradient(45deg, transparent 0 42%, rgba(195,242,250,0.9) 43% 53%, transparent 54%);
+  clip-path: polygon(0 78%, 8% 52%, 18% 76%, 30% 42%, 42% 78%, 56% 30%, 68% 77%, 82% 38%, 94% 76%, 100% 54%, 100% 100%, 0 100%);
+}
+
+.homeScene::after {
+  left: -28px;
+  right: -28px;
+  bottom: 18px;
+  height: 150px;
+  background:
+    radial-gradient(ellipse at 18% 58%, #ffffff 0 19%, transparent 20%),
+    radial-gradient(ellipse at 80% 60%, #ffffff 0 21%, transparent 22%),
+    radial-gradient(ellipse at 50% 87%, rgba(83, 185, 205, 0.4) 0 33%, transparent 34%),
+    linear-gradient(180deg, rgba(237,252,255,0.2), #ffffff 74%);
+}
+
+.shootingStar {
+  position: absolute;
+  z-index: 2;
+  top: 44px;
+  left: 116px;
+  width: 170px;
+  height: 2px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.98));
+  transform: rotate(-22deg);
+  opacity: 0.9;
+}
+
+.shootingStar::after {
+  content: "";
+  position: absolute;
+  right: -4px;
+  top: -4px;
+  width: 10px;
+  height: 10px;
+  background: #fff;
+  clip-path: polygon(50% 0, 62% 35%, 100% 50%, 62% 64%, 50% 100%, 36% 64%, 0 50%, 36% 35%);
+}
+
+.igloo {
+  position: absolute;
+  z-index: 2;
+  width: 92px;
+  height: 58px;
+  border-radius: 50% 50% 10px 10px;
+  background:
+    radial-gradient(ellipse at 50% 72%, #cceff7 0 25%, transparent 26%),
+    linear-gradient(#ffffff, #edfaff);
+  box-shadow:
+    inset 0 -8px 16px rgba(111, 194, 217, 0.2),
+    0 10px 0 rgba(255,255,255,0.86);
+}
+
+.igloo.left {
+  left: 10px;
+  bottom: 112px;
+  transform: scale(0.86);
+}
+
+.igloo.right {
+  right: -2px;
+  bottom: 136px;
+}
+
+.homeScene .iceberg.one {
+  left: -4px;
+  bottom: 82px;
+  width: 142px;
+  height: 46px;
+}
+
+.homeScene .iceberg.two {
+  right: 72px;
+  bottom: 54px;
+  width: 170px;
+  height: 50px;
+}
+
+/* Home Antarctica shape correction */
+.homeScreen {
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 14% 20%, rgba(255,255,255,0.9) 0 2px, transparent 3px),
+    radial-gradient(circle at 34% 16%, rgba(255,255,255,0.8) 0 1px, transparent 2px),
+    radial-gradient(circle at 77% 18%, rgba(255,255,255,0.86) 0 2px, transparent 3px),
+    radial-gradient(circle at 90% 28%, rgba(255,255,255,0.7) 0 1px, transparent 2px),
+    linear-gradient(180deg, #74b7ee 0%, #3f7fd4 30%, #2c5bbd 43%, #d8f7fc 44%, #f7feff 78%, #ffffff 100%);
+}
+
+.homeScreen::before {
+  inset: 0 0 auto;
+  height: 282px;
+  background:
+    linear-gradient(10deg, transparent 0 55%, rgba(255,255,255,0.52) 56% 57%, transparent 58%),
+    radial-gradient(ellipse at 18% 100%, rgba(38, 79, 185, 0.9) 0 34%, transparent 35%),
+    radial-gradient(ellipse at 76% 103%, rgba(30, 67, 170, 0.86) 0 39%, transparent 40%),
+    linear-gradient(180deg, rgba(255,255,255,0.12), rgba(255,255,255,0));
+  opacity: 1;
+}
+
+.homeScreen::after {
+  left: -28px;
+  right: -28px;
+  bottom: 94px;
+  height: 232px;
+  background:
+    radial-gradient(ellipse at 20% 67%, rgba(255,255,255,0.98) 0 15%, transparent 16%),
+    radial-gradient(ellipse at 82% 61%, rgba(255,255,255,0.98) 0 18%, transparent 19%),
+    linear-gradient(180deg, transparent 0 47%, rgba(232, 251, 255, 0.94) 48% 100%);
+  opacity: 1;
+}
+
+.homeScene {
+  height: 392px;
+  margin-top: -14px;
+  overflow: hidden;
+  background: none;
+}
+
+.homeScene::before {
+  left: -28px;
+  right: -28px;
+  bottom: 138px;
+  height: 160px;
+  background:
+    linear-gradient(135deg, transparent 0 38%, rgba(255,255,255,0.82) 39% 48%, transparent 49%),
+    linear-gradient(45deg, transparent 0 48%, rgba(202,244,251,0.88) 49% 58%, transparent 59%),
+    linear-gradient(180deg, rgba(255,255,255,0.18), rgba(255,255,255,0.02));
+  clip-path: polygon(0 100%, 9% 66%, 18% 86%, 29% 52%, 42% 100%, 56% 42%, 70% 100%, 84% 59%, 100% 100%);
+  opacity: 0.72;
+}
+
+.homeScene::after {
+  left: -24px;
+  right: -24px;
+  bottom: 24px;
+  height: 128px;
+  background:
+    radial-gradient(ellipse at 20% 58%, rgba(255,255,255,0.98) 0 18%, transparent 19%),
+    radial-gradient(ellipse at 78% 63%, rgba(255,255,255,0.97) 0 21%, transparent 22%),
+    radial-gradient(ellipse at 50% 92%, rgba(74, 172, 199, 0.28) 0 32%, transparent 33%),
+    linear-gradient(180deg, rgba(246,253,255,0.16), rgba(255,255,255,0.96) 76%);
+}
+
+.shootingStar {
+  top: 86px;
+  left: 136px;
+  width: 128px;
+  height: 1px;
+  opacity: 0.72;
+}
+
+.shootingStar::after {
+  right: -3px;
+  top: -3px;
+  width: 8px;
+  height: 8px;
+}
+
+.igloo {
+  z-index: 2;
+  width: 74px;
+  height: 48px;
+  opacity: 0.9;
+  box-shadow:
+    inset 0 -7px 14px rgba(111, 194, 217, 0.18),
+    0 7px 0 rgba(255,255,255,0.72);
+}
+
+.igloo.left {
+  left: 12px;
+  bottom: 92px;
+  transform: scale(0.82);
+}
+
+.igloo.right {
+  right: 12px;
+  bottom: 110px;
+  transform: scale(0.9);
+}
+
+.homeScene .iceberg.one {
+  left: -14px;
+  bottom: 72px;
+  width: 132px;
+  height: 42px;
+  opacity: 0.85;
+}
+
+.homeScene .iceberg.two {
+  right: 50px;
+  bottom: 46px;
+  width: 168px;
+  height: 46px;
+  opacity: 0.78;
+}
+
+.homeScreen .penguinFigure.hero {
+  margin-bottom: 20px;
+}
+
+/* Home sky and snow blend refinement */
+.homeScreen {
+  background:
+    radial-gradient(circle at 14% 20%, rgba(255,255,255,0.9) 0 2px, transparent 3px),
+    radial-gradient(circle at 34% 16%, rgba(255,255,255,0.8) 0 1px, transparent 2px),
+    radial-gradient(circle at 77% 18%, rgba(255,255,255,0.86) 0 2px, transparent 3px),
+    radial-gradient(circle at 90% 28%, rgba(255,255,255,0.7) 0 1px, transparent 2px),
+    linear-gradient(180deg,
+      #78bdf0 0%,
+      #579fe4 24%,
+      #3f7bd1 40%,
+      #6ebde4 54%,
+      #cceff7 68%,
+      #f7feff 86%,
+      #ffffff 100%);
+}
+
+.homeScreen::before {
+  height: 330px;
+  background:
+    linear-gradient(10deg, transparent 0 55%, rgba(255,255,255,0.38) 56% 57%, transparent 58%),
+    radial-gradient(ellipse at 18% 88%, rgba(39, 79, 177, 0.58) 0 31%, transparent 32%),
+    radial-gradient(ellipse at 77% 90%, rgba(35, 76, 172, 0.54) 0 35%, transparent 36%),
+    linear-gradient(180deg, rgba(255,255,255,0.12), rgba(196, 239, 248, 0.34) 72%, rgba(255,255,255,0));
+}
+
+.homeScreen::after {
+  bottom: 86px;
+  height: 252px;
+  background:
+    linear-gradient(180deg, rgba(206, 244, 251, 0) 0%, rgba(216, 247, 252, 0.88) 26%, rgba(246, 253, 255, 0.98) 57%, #ffffff 100%),
+    radial-gradient(ellipse at 20% 72%, rgba(255,255,255,0.98) 0 15%, transparent 16%),
+    radial-gradient(ellipse at 82% 68%, rgba(255,255,255,0.98) 0 18%, transparent 19%);
+}
+
+.homeScene::before {
+  bottom: 126px;
+  opacity: 0.48;
+  filter: blur(0.2px);
+}
+
+.homeScene::after {
+  bottom: 18px;
+  background:
+    radial-gradient(ellipse at 20% 62%, rgba(255,255,255,0.96) 0 18%, transparent 19%),
+    radial-gradient(ellipse at 78% 66%, rgba(255,255,255,0.95) 0 21%, transparent 22%),
+    radial-gradient(ellipse at 50% 92%, rgba(74, 172, 199, 0.24) 0 32%, transparent 33%),
+    linear-gradient(180deg, rgba(246,253,255,0.08), rgba(255,255,255,0.96) 78%);
+}
+
+/* Home button icon readability */
+.homeScreen .icon {
+  width: 28px;
+  height: 28px;
+}
+
+.homeScreen .noticeRound .icon {
+  width: 26px;
+  height: 22px;
+}
+
+.homeScreen .noticeRound .icon-bell::before {
+  left: 2px;
+  top: 6px;
+  width: 22px;
+  height: 12px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.homeScreen .noticeRound .icon-bell::after {
+  left: 9px;
+  top: 9px;
+  width: 7px;
+  height: 7px;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  background: currentColor;
+  box-shadow: 0 0 0 2px currentColor;
+}
+
+.homeScreen .sideDock .icon-shop::before {
+  left: 5px;
+  top: 10px;
+  width: 18px;
+  height: 14px;
+  border-radius: 4px 4px 5px 5px;
+  background: currentColor;
+}
+
+.homeScreen .sideDock .icon-shop::after {
+  left: 9px;
+  top: 4px;
+  width: 10px;
+  height: 10px;
+  border: 3px solid currentColor;
+  border-bottom: 0;
+  border-radius: 10px 10px 0 0;
+  background: transparent;
+}
+
+.homeScreen .sideDock .icon-gift::before {
+  left: 4px;
+  top: 11px;
+  width: 20px;
+  height: 14px;
+  border-radius: 3px;
+  background:
+    linear-gradient(90deg, transparent 0 43%, #fff 44% 56%, transparent 57%),
+    currentColor;
+}
+
+.homeScreen .sideDock .icon-gift::after {
+  left: 3px;
+  top: 7px;
+  width: 22px;
+  height: 5px;
+  border-radius: 3px;
+  background:
+    linear-gradient(90deg, transparent 0 43%, #fff 44% 56%, transparent 57%),
+    currentColor;
+  box-shadow:
+    6px -5px 0 -2px currentColor,
+    12px -5px 0 -2px currentColor;
+}
+
+.homeScreen .roundAction .icon-pad::before {
+  left: 2px;
+  top: 8px;
+  width: 24px;
+  height: 16px;
+  border: 3px solid #fff;
+  border-radius: 9px;
+  background: transparent;
+}
+
+.homeScreen .roundAction .icon-pad::after {
+  left: 8px;
+  top: 13px;
+  width: 10px;
+  height: 3px;
+  border-radius: 2px;
+  background: #fff;
+  box-shadow:
+    3px -3px 0 -1px #fff,
+    3px 3px 0 -1px #fff,
+    11px -1px 0 0 #fff,
+    16px -1px 0 0 #fff;
+}
+
+.homeScreen .roundAction .icon-fish::before {
+  left: 3px;
+  top: 9px;
+  width: 18px;
+  height: 11px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.homeScreen .roundAction .icon-fish::after {
+  right: 1px;
+  top: 9px;
+  border: 6px solid transparent;
+  border-left-color: currentColor;
+}
+
+.homeScreen .roundAction.yellow .icon {
+  color: #6c4a14;
+  transform: translateY(1px);
+}
+
+.homeScreen .roundAction.blue .icon,
+.homeScreen .roundAction.green .icon {
+  transform: translateY(2px);
+}
+
+.homeScreen .sideDock .icon-gift::before {
+  left: 4px;
+  top: 10px;
+  width: 20px;
+  height: 15px;
+  border-radius: 3px;
+  background:
+    linear-gradient(90deg, transparent 0 42%, #fff 43% 57%, transparent 58%),
+    currentColor;
+}
+
+.homeScreen .sideDock .icon-gift::after {
+  left: 3px;
+  top: 7px;
+  width: 22px;
+  height: 5px;
+  border-radius: 3px;
+  background: currentColor;
+  box-shadow: none;
+}
+
+.homeScreen .roundAction .icon-boat::before {
+  left: 4px;
+  top: 16px;
+  width: 21px;
+  height: 8px;
+  border-radius: 0 0 12px 12px;
+  background: currentColor;
+}
+
+.homeScreen .roundAction .icon-boat::after {
+  left: 13px;
+  top: 4px;
+  width: 11px;
+  height: 13px;
+  background: #fff;
+  clip-path: polygon(0 0, 100% 54%, 0 100%);
+  box-shadow: -4px 8px 0 -5px currentColor;
+}
+
+/* Stable home pictograms */
+.homeIcon {
+  width: 32px;
+  height: 32px;
+  display: block;
+  margin-inline: auto;
+  flex: 0 0 auto;
+  overflow: visible;
+}
+
+.roundAction .homeIcon {
+  width: 38px;
+  height: 36px;
+}
+
+.roundAction.yellow .homeIcon {
+  width: 42px;
+  height: 38px;
+}
+
+/* Care screen one-view layout and direct interactions */
+.careScreen {
+  min-height: auto;
+  padding: 8px 10px 12px;
+}
+
+.careScreen .careHero {
+  min-height: 258px;
+}
+
+.careScreen .careHeader {
+  min-height: 66px;
+  padding: 9px 10px;
+}
+
+.careScreen .avatarBadge {
+  width: 52px;
+  height: 52px;
+}
+
+.careScreen .roomScene {
+  min-height: 190px;
+  overflow: hidden;
+  touch-action: none;
+  cursor: default;
+}
+
+.careScreen .careHero::after,
+.careScreen .roomScene::before {
+  display: none;
+}
+
+.careScreen .careHero::before {
+  left: 14px;
+  right: 14px;
+  bottom: 12px;
+  height: 52px;
+  border-radius: 14px;
+}
+
+.careScreen .facilityMonitor,
+.careScreen .facilityWindow,
+.careScreen .facilityFeeder,
+.careScreen .facilityPod {
+  position: absolute;
+  z-index: 1;
+  box-sizing: border-box;
+}
+
+.careHero.petMode .roomScene {
+  cursor: grab;
+}
+
+.careHero.petting .roomScene {
+  cursor: grabbing;
+}
+
+.careScreen .penguinFigure.large {
+  width: 154px;
+  height: 172px;
+}
+
+.careScreen .roomScene .penguinFigure.large {
+  z-index: 4;
+  margin-top: 22px;
+}
+
+.careScreen .facilityMonitor {
+  left: 13px;
+  top: 14px;
+  width: 78px;
+  height: 54px;
+  padding: 8px;
+}
+
+.careScreen .facilityWindow {
+  right: 14px;
+  top: 16px;
+  width: 84px;
+  height: 50px;
+}
+
+.careScreen .facilityFeeder {
+  left: 14px;
+  bottom: 34px;
+  width: 120px;
+  height: 38px;
+}
+
+.careScreen .facilityPod {
+  right: 18px;
+  bottom: 30px;
+  width: 70px;
+  height: 68px;
+}
+
+.quickCareActions {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 5px;
+  margin-top: 6px;
+}
+
+.quickCareActions .careButton {
+  min-height: 50px;
+  padding: 5px 3px;
+  border-radius: 11px;
+  gap: 2px;
+  font-size: 9px;
+}
+
+.quickCareActions .icon {
+  width: 18px;
+  height: 18px;
+}
+
+.careIcon {
+  width: 24px;
+  height: 24px;
+  display: block;
+  fill: currentColor;
+  color: #2f729b;
+  margin-inline: auto;
+}
+
+.careIcon path,
+.careIcon circle {
+  vector-effect: non-scaling-stroke;
+}
+
+.quickCareActions .careButton {
+  color: #2f729b;
+}
+
+.quickCareActions .careButton span {
+  margin-top: 1px;
+  color: #245e89;
+  font-weight: 900;
+}
+
+.quickCareActions .activeCareTool .careIcon,
+.quickCareActions .activeCareTool span {
+  color: #6b4c16;
+}
+
+/* Larger penguin presence */
+.homeScreen .penguinFigure.hero {
+  width: 430px;
+  height: 470px;
+  margin-bottom: 22px;
+}
+
+.homeScene {
+  height: 500px;
+}
+
+.careScreen .roomScene .penguinFigure.large {
+  width: 430px;
+  height: 470px;
+  margin-top: -26px;
+}
+
+.homeScreen .speechBubble {
+  bottom: 104px;
+}
+
+.homeScreen .penguinFigure.hero img,
+.careScreen .roomScene .penguinFigure.large img {
+  transform: scale(1.16);
+}
+
+.quickCareActions .activeCareTool {
+  background: linear-gradient(#fff3a5, #ffd45d);
+  box-shadow: 0 5px 0 #d79b21, 0 10px 18px rgba(43, 121, 179, 0.12);
+  color: #6b4c16;
+}
+
+.inventoryChips {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 5px;
+  margin-top: 7px;
+}
+
+.inventoryChips button {
+  min-height: 32px;
+  padding: 4px 5px;
+  font-size: 9px;
+}
+
+.careInfoGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.24fr) minmax(0, 0.76fr);
+  gap: 7px;
+  margin-top: 7px;
+}
+
+.careInfoGrid .statPanel,
+.careInfoGrid .lovePanel {
+  margin-top: 0;
+  padding: 8px;
+}
+
+.careInfoGrid .levelLine,
+.careInfoGrid .lovePanel > div:first-child {
+  margin-bottom: 5px;
+  font-size: 10px;
+}
+
+.careInfoGrid .meter {
+  gap: 2px;
+  margin-top: 4px;
+}
+
+.careInfoGrid .meterTop {
+  font-size: 9px;
+}
+
+.careInfoGrid .meterTrack {
+  height: 6px;
+}
+
+.careInfoGrid .lovePanel {
+  align-content: start;
+}
+
+.careInfoGrid .hearts {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 5px;
+}
+
+.careInfoGrid .hearts span {
+  width: 18px;
+  height: 18px;
+}
+
+.petModeHint,
+.cleanModeHint {
+  position: absolute;
+  z-index: 7;
+  left: 50%;
+  bottom: 12px;
+  display: none;
+  width: max-content;
+  max-width: calc(100% - 32px);
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.94);
+  color: #26648e;
+  font-size: 11px;
+  font-weight: 900;
+  box-shadow: 0 8px 18px rgba(36, 112, 166, 0.14);
+  transform: translateX(-50%);
+}
+
+.careHero.petMode .petModeHint {
+  display: block;
+}
+
+.pettingHand {
+  position: absolute;
+  z-index: 9;
+  width: 46px;
+  height: 52px;
+  display: none;
+  pointer-events: none;
+  transform: translate(-12px, -10px) rotate(-15deg);
+}
+
+.pettingHand::before {
+  content: "";
+  position: absolute;
+  left: 12px;
+  top: 14px;
+  width: 25px;
+  height: 31px;
+  border-radius: 14px 14px 12px 12px;
+  background: #fff8ef;
+  box-shadow:
+    inset 0 0 0 2px rgba(206, 161, 118, 0.42),
+    0 8px 14px rgba(67, 124, 160, 0.18);
+}
+
+.pettingHand::after {
+  content: "";
+  position: absolute;
+  left: 2px;
+  top: 3px;
+  width: 9px;
+  height: 25px;
+  border-radius: 999px;
+  background: #fff8ef;
+  box-shadow:
+    9px -4px 0 #fff8ef,
+    18px -3px 0 #fff8ef,
+    27px 0 0 #fff8ef;
+}
+
+.careHero.petting .pettingHand {
+  display: block;
+}
+
+.careHero.petting .penguinFigure.large {
+  animation: petHappyBounce 0.38s ease-in-out infinite alternate;
+}
+
+.cameraFrame {
+  position: absolute;
+  z-index: 8;
+  inset: 12px;
+  display: none;
+  pointer-events: none;
+  border: 4px solid rgba(255,255,255,0.96);
+  border-radius: 16px;
+  box-shadow:
+    inset 0 0 0 2px rgba(47, 114, 155, 0.24),
+    0 0 0 999px rgba(17, 58, 90, 0.22);
+}
+
+.cameraFrame::before,
+.cameraFrame::after {
+  content: "";
+  position: absolute;
+  width: 34px;
+  height: 34px;
+  border-color: #fff;
+}
+
+.cameraFrame::before {
+  left: 12px;
+  top: 12px;
+  border-top: 4px solid;
+  border-left: 4px solid;
+}
+
+.cameraFrame::after {
+  right: 12px;
+  bottom: 12px;
+  border-right: 4px solid;
+  border-bottom: 4px solid;
+}
+
+.cameraFrame span {
+  position: absolute;
+  top: 9px;
+  right: 13px;
+  padding: 3px 7px;
+  border-radius: 999px;
+  background: rgba(255, 94, 134, 0.94);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 900;
+}
+
+.careHero.photoMode .cameraFrame,
+.careHero.photoFlash .cameraFrame {
+  display: block;
+}
+
+.photoControls {
+  position: absolute;
+  z-index: 10;
+  right: 18px;
+  bottom: 14px;
+  left: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  pointer-events: auto;
+}
+
+.photoControls .whiteButton {
+  width: 38px;
+  min-width: 38px;
+  height: 38px;
+  min-height: 38px;
+  padding: 0;
+  border-radius: 50%;
+  font-size: 18px;
+}
+
+.photoShutter {
+  width: 58px;
+  min-width: 58px;
+  height: 58px;
+  min-height: 58px;
+  padding: 0;
+  border: 5px solid #fff;
+  border-radius: 50%;
+  background: #ff6f9e;
+  box-shadow:
+    inset 0 0 0 4px rgba(255,255,255,0.72),
+    0 5px 0 #c85178,
+    0 12px 22px rgba(38, 126, 190, 0.24);
+}
+
+.careHero.photoFlash .roomScene::before {
+  content: "";
+  position: absolute;
+  z-index: 11;
+  inset: 0;
+  display: block;
+  background: rgba(255,255,255,0.86);
+  animation: cameraFlash 0.72s ease-out both;
+  pointer-events: none;
+}
+
+@keyframes petHappyBounce {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-5px);
+  }
+}
+
+@keyframes cameraFlash {
+  0% {
+    opacity: 0;
+  }
+  16% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/* Care screen reference polish */
+.careScreen {
+  position: relative;
+  padding: 8px 10px 10px;
+  background:
+    radial-gradient(circle at 16% 8%, rgba(255,255,255,0.9) 0 2px, transparent 3px),
+    radial-gradient(circle at 84% 12%, rgba(255,255,255,0.86) 0 2px, transparent 3px),
+    linear-gradient(180deg, #dff7ff 0%, #eefaff 44%, #ffffff 100%);
+}
+
+.careScreen .careHero {
+  min-height: 382px;
+  overflow: hidden;
+  border-radius: 22px;
+  background:
+    radial-gradient(circle at 18% 24%, rgba(255,255,255,0.78) 0 10%, transparent 11%),
+    linear-gradient(180deg, rgba(194,237,255,0.72) 0%, rgba(232,250,255,0.88) 55%, rgba(255,255,255,0.95) 100%),
+    linear-gradient(135deg, #aee6ff, #eefbff);
+  box-shadow: 0 16px 34px rgba(49, 127, 179, 0.16);
+}
+
+.careScreen .careHeader {
+  min-height: 72px;
+  align-items: center;
+  border-bottom: 0;
+  background: linear-gradient(180deg, rgba(255,255,255,0.76), rgba(255,255,255,0.28));
+}
+
+.careScreen .careHeader h1 {
+  font-size: 18px;
+}
+
+.careScreen .careHeader p {
+  color: #426f8b;
+  font-size: 11px;
+}
+
+.careScreen .roomScene {
+  min-height: 300px;
+  background:
+    radial-gradient(circle at 46% 20%, rgba(255,255,255,0.76) 0 5%, transparent 6%),
+    radial-gradient(circle at 28% 42%, rgba(255,141,178,0.3) 0 10px, transparent 11px),
+    radial-gradient(circle at 68% 35%, rgba(255,141,178,0.24) 0 8px, transparent 9px),
+    linear-gradient(180deg, transparent 0 56%, rgba(195,230,242,0.56) 57% 100%),
+    linear-gradient(135deg, rgba(122,210,241,0.22), rgba(255,255,255,0.28));
+}
+
+.careScreen .careHero::before {
+  left: 26px;
+  right: 88px;
+  bottom: 24px;
+  height: 72px;
+  border-radius: 999px;
+  background:
+    radial-gradient(ellipse at 50% 50%, rgba(255,255,255,0.9) 0 22%, transparent 23%),
+    repeating-radial-gradient(ellipse at center, rgba(255,255,255,0.92) 0 10px, rgba(181,226,239,0.82) 11px 20px);
+  opacity: 0.9;
+}
+
+.careScreen .roomScene::after {
+  left: 78px;
+  right: 108px;
+  bottom: 32px;
+  height: 62px;
+  opacity: 0.82;
+}
+
+.careScreen .roomScene .penguinFigure.large {
+  width: 218px;
+  height: 244px;
+  margin-top: 28px;
+}
+
+.careScreen .facilityMonitor {
+  left: 14px;
+  top: 18px;
+  width: 106px;
+  height: 66px;
+  border-radius: 18px;
+  background: rgba(255,255,255,0.78);
+  backdrop-filter: blur(4px);
+}
+
+.careScreen .facilityWindow {
+  right: 92px;
+  top: 22px;
+  width: 74px;
+  height: 48px;
+  opacity: 0.62;
+}
+
+.careScreen .facilityFeeder {
+  left: 20px;
+  bottom: 44px;
+  width: 126px;
+  height: 42px;
+  opacity: 0.8;
+}
+
+.careScreen .facilityPod {
+  right: 94px;
+  bottom: 50px;
+  width: 58px;
+  height: 58px;
+  opacity: 0.68;
+}
+
+.quickCareActions {
+  position: absolute;
+  z-index: 8;
+  top: 112px;
+  right: 22px;
+  width: 58px;
+  grid-template-columns: 1fr;
+  gap: 6px;
+  margin-top: 0;
+}
+
+.quickCareActions .careButton {
+  min-height: 45px;
+  padding: 6px 3px;
+  border-radius: 18px;
+  background: rgba(255,255,255,0.94);
+  box-shadow:
+    0 5px 0 #cbe5f6,
+    0 12px 18px rgba(49, 127, 179, 0.14);
+}
+
+.quickCareActions .icon {
+  width: 18px;
+  height: 18px;
+}
+
+.quickCareActions .careButton span {
+  font-size: 9px;
+  line-height: 1.15;
+}
+
+.inventoryChips {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 7px;
+  margin-top: 8px;
+}
+
+.inventoryChips button {
+  min-height: 45px;
+  border-radius: 14px;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.98), rgba(235,248,255,0.96));
+  box-shadow: 0 5px 0 #d3e9f8, 0 10px 16px rgba(43, 121, 179, 0.1);
+  color: #24638f;
+  font-size: 10px;
+}
+
+.careInfoGrid {
+  grid-template-columns: 1fr;
+  gap: 7px;
+  margin-top: 8px;
+}
+
+.careInfoGrid .statPanel {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 10px;
+  row-gap: 4px;
+}
+
+.careInfoGrid .statPanel .levelLine {
+  grid-column: 1 / -1;
+}
+
+.careInfoGrid .lovePanel {
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 8px;
+}
+
+.careInfoGrid .lovePanel > div:first-child {
+  display: grid;
+  gap: 2px;
+  margin-bottom: 0;
+}
+
+.careInfoGrid .hearts {
+  grid-template-columns: repeat(10, 1fr);
+  gap: 4px;
+}
+
+.careInfoGrid .hearts span {
+  width: 14px;
+  height: 14px;
+}
+
+/* Care cleanup after reference pass */
+.careScreen,
+.careScreen * {
+  user-select: none;
+}
+
+.careScreen .facilityMonitor,
+.careScreen .facilityWindow,
+.careScreen .facilityFeeder,
+.careScreen .facilityPod,
+.careScreen .outfitLabel {
+  display: none;
+}
+
+.careScreen .roomScene {
+  min-height: 314px;
+  background:
+    radial-gradient(circle at 32% 34%, rgba(255,141,178,0.25) 0 10px, transparent 11px),
+    radial-gradient(circle at 70% 27%, rgba(255,141,178,0.22) 0 8px, transparent 9px),
+    radial-gradient(circle at 50% 19%, rgba(255,255,255,0.78) 0 18px, transparent 19px),
+    linear-gradient(180deg, transparent 0 58%, rgba(195,230,242,0.54) 59% 100%),
+    linear-gradient(135deg, rgba(122,210,241,0.22), rgba(255,255,255,0.28));
+}
+
+.careScreen .roomScene .penguinFigure.large {
+  width: 260px;
+  height: 286px;
+  margin-top: 18px;
+}
+
+.careScreen .careHero::before {
+  left: 48px;
+  right: 100px;
+  bottom: 24px;
+  height: 76px;
+}
+
+.careScreen .roomScene::after {
+  left: 58px;
+  right: 112px;
+  bottom: 32px;
+  height: 68px;
+}
+
+.careHero.petMode .penguinFigure img,
+.careHero.petting .penguinFigure img {
+  pointer-events: none;
+}
+
+.pettingHand {
+  transform: translate(-18px, -18px) rotate(-15deg);
+}
+
+/* Care interaction realism pass */
+.careScreen .careHero {
+  min-height: 458px;
+}
+
+.careScreen .careHeader {
+  position: relative;
+  z-index: 9;
+  min-height: 58px;
+  padding: 8px 10px 4px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.82), rgba(255,255,255,0));
+}
+
+.careScreen .avatarBadge {
+  width: 46px;
+  height: 46px;
+}
+
+.careScreen .roomScene {
+  min-height: 400px;
+  margin-top: -6px;
+}
+
+.careScreen .roomScene .penguinFigure.large {
+  width: 292px;
+  height: 322px;
+  margin-top: 34px;
+}
+
+.careScreen .careHero::before {
+  left: 38px;
+  right: 74px;
+  bottom: 28px;
+  height: 96px;
+}
+
+.careScreen .roomScene::after {
+  left: 32px;
+  right: 82px;
+  bottom: 38px;
+  height: 92px;
+}
+
+.quickCareActions {
+  top: 118px;
+  right: 19px;
+  width: 58px;
+}
+
+.inventoryChips {
+  margin-top: 6px;
+}
+
+.inventoryChips button {
+  min-height: 36px;
+}
+
+.careInfoGrid {
+  grid-template-columns: 1fr;
+  margin-top: 6px;
+}
+
+.careInfoGrid .statPanel {
+  padding: 7px 9px;
+}
+
+.careInfoGrid .lovePanel {
+  display: none;
+}
+
+.cleanModeHint,
+.petModeHint {
+  bottom: 16px;
+}
+
+.careHero.cleanMode .cleanModeHint {
+  display: block;
+}
+
+.careHero.cleanMode .roomScene {
+  cursor: grab;
+}
+
+.careHero.cleaning .roomScene {
+  cursor: grabbing;
+}
+
+.pettingHand {
+  width: 62px;
+  height: 72px;
+  transform: translate(-26px, -36px) rotate(-10deg);
+}
+
+.pettingHand::before {
+  left: 18px;
+  top: 27px;
+  width: 33px;
+  height: 36px;
+  border-radius: 18px 18px 14px 14px;
+  background:
+    radial-gradient(circle at 72% 80%, rgba(232, 180, 130, 0.35) 0 4px, transparent 5px),
+    #fff2df;
+  box-shadow:
+    inset 0 0 0 2px rgba(203, 151, 103, 0.42),
+    0 10px 16px rgba(67, 124, 160, 0.2);
+}
+
+.pettingHand::after {
+  left: 7px;
+  top: 5px;
+  width: 11px;
+  height: 34px;
+  border-radius: 999px;
+  background: #fff2df;
+  box-shadow:
+    12px -4px 0 1px #fff2df,
+    24px -3px 0 1px #fff2df,
+    36px 2px 0 0 #fff2df,
+    4px 31px 0 5px #fff2df;
+  transform: rotate(-6deg);
+}
+
+.careHero.petting .pettingHand {
+  display: block;
+  animation: handPress 0.32s ease-in-out infinite alternate;
+}
+
+.cleaningBroom {
+  position: absolute;
+  z-index: 9;
+  width: 74px;
+  height: 78px;
+  display: none;
+  pointer-events: none;
+  transform: translate(-34px, -58px) rotate(-26deg);
+}
+
+.cleaningBroom::before {
+  content: "";
+  position: absolute;
+  left: 36px;
+  top: 0;
+  width: 7px;
+  height: 64px;
+  border-radius: 999px;
+  background: linear-gradient(#bb8342, #7b4f27);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.26);
+}
+
+.cleaningBroom::after {
+  content: "";
+  position: absolute;
+  left: 19px;
+  top: 48px;
+  width: 44px;
+  height: 24px;
+  border-radius: 8px 8px 14px 14px;
+  background:
+    repeating-linear-gradient(90deg, #e9c57c 0 5px, #d7a64f 6px 8px),
+    #e9c57c;
+  box-shadow:
+    inset 0 5px 0 #8f5f2d,
+    0 8px 14px rgba(67, 124, 160, 0.18);
+}
+
+.careHero.cleaning .cleaningBroom {
+  display: block;
+  animation: broomSweep 0.38s ease-in-out infinite alternate;
+}
+
+.careHero.cleaning .roomScene::after {
+  filter: brightness(1.08);
+}
+
+.careScreen.photoModeScreen {
+  padding: 0;
+}
+
+.careScreen.photoModeScreen .careHero {
+  position: absolute;
+  z-index: 30;
+  inset: 0;
+  min-height: 100%;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.careScreen.photoModeScreen .careHeader,
+.careScreen.photoModeScreen .quickCareActions,
+.careScreen.photoModeScreen .inventoryChips,
+.careScreen.photoModeScreen .careInfoGrid {
+  display: none;
+}
+
+.careScreen.photoModeScreen .roomScene {
+  min-height: 100%;
+  height: 100%;
+  margin-top: 0;
+  border: 10px solid rgba(255,255,255,0.82);
+  border-radius: 20px;
+  background:
+    linear-gradient(rgba(255,255,255,0.14) 0 1px, transparent 1px 33.333%),
+    linear-gradient(90deg, rgba(255,255,255,0.14) 0 1px, transparent 1px 33.333%),
+    radial-gradient(circle at 50% 18%, rgba(255,255,255,0.78) 0 21px, transparent 22px),
+    linear-gradient(180deg, #bfefff 0%, #e6faff 57%, #ffffff 100%);
+}
+
+.careScreen.photoModeScreen .roomScene .penguinFigure.large {
+  width: 320px;
+  height: 354px;
+  margin-top: 180px;
+}
+
+.careScreen.photoModeScreen .careHero::before {
+  left: 36px;
+  right: 36px;
+  bottom: 150px;
+  height: 106px;
+}
+
+.careScreen.photoModeScreen .roomScene::after {
+  left: 34px;
+  right: 34px;
+  bottom: 156px;
+  height: 100px;
+}
+
+.careScreen.photoModeScreen .cameraFrame {
+  inset: 18px;
+  border-width: 5px;
+  border-radius: 18px;
+  box-shadow:
+    inset 0 0 0 2px rgba(47, 114, 155, 0.22),
+    0 0 0 999px rgba(9, 35, 58, 0.16);
+}
+
+.careScreen.photoModeScreen .photoControls {
+  right: 24px;
+  bottom: 22px;
+  left: 24px;
+}
+
+.careScreen.photoModeScreen .photoShutter {
+  width: 72px;
+  min-width: 72px;
+  height: 72px;
+  min-height: 72px;
+}
+
+@keyframes handPress {
+  from {
+    transform: translate(-26px, -36px) rotate(-14deg) scale(1);
+  }
+  to {
+    transform: translate(-22px, -32px) rotate(-2deg) scale(0.98);
+  }
+}
+
+@keyframes broomSweep {
+  from {
+    transform: translate(-40px, -58px) rotate(-36deg);
+  }
+  to {
+    transform: translate(-22px, -52px) rotate(-14deg);
+  }
+}
+
+/* Care screen bugfix pass */
+.careScreen .careHeader {
+  display: grid;
+  grid-template-columns: 46px minmax(0, 1fr);
+  gap: 10px;
+}
+
+.careScreen .careHeader .circleButton {
+  display: none;
+}
+
+.careScreen .careHeader h1,
+.careScreen .careHeader p {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.careScreen .avatarBadge span {
+  right: -8px;
+  bottom: -5px;
+  padding: 2px 6px;
+  font-size: 9px;
+}
+
+svg.pettingHand {
+  position: absolute;
+  z-index: 12;
+  width: 74px;
+  height: 74px;
+  display: none;
+  pointer-events: none;
+  overflow: visible;
+  transform: translate(-28px, -42px) rotate(-8deg);
+  filter: drop-shadow(0 8px 10px rgba(67, 124, 160, 0.2));
+}
+
+svg.pettingHand::before,
+svg.pettingHand::after {
+  display: none;
+}
+
+.pettingHand .handShadow {
+  fill: rgba(167, 113, 75, 0.18);
+  transform: translate(3px, 4px);
+}
+
+.pettingHand .handPalm {
+  fill: #fff1dd;
+  stroke: rgba(195, 140, 96, 0.46);
+  stroke-width: 2.4;
+  stroke-linejoin: round;
+}
+
+.pettingHand .handLines,
+.pettingHand .handThumb {
+  fill: none;
+  stroke: rgba(196, 141, 96, 0.42);
+  stroke-width: 2.2;
+  stroke-linecap: round;
+}
+
+.careHero.petting svg.pettingHand {
+  display: block;
+  animation: handPressSvg 0.32s ease-in-out infinite alternate;
+}
+
+.careScreen.photoModeScreen {
+  position: relative;
+  height: 100%;
+  min-height: 100%;
+  overflow: hidden;
+  padding: 0;
+  background: #dff5fb;
+}
+
+.careScreen.photoModeScreen .careHero {
+  position: absolute;
+  z-index: 30;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  min-height: 100%;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  background:
+    radial-gradient(circle at 50% 18%, rgba(255,255,255,0.8) 0 22px, transparent 23px),
+    linear-gradient(180deg, #bfefff 0%, #e6faff 58%, #ffffff 100%);
+}
+
+.careScreen.photoModeScreen .roomScene {
+  position: absolute;
+  inset: 0;
+  width: auto;
+  height: auto;
+  min-height: 0;
+  margin: 0;
+  display: grid;
+  place-items: center;
+  border: 10px solid rgba(255,255,255,0.82);
+  border-radius: 20px;
+  background:
+    linear-gradient(rgba(255,255,255,0.16) 0 1px, transparent 1px 33.333%),
+    linear-gradient(90deg, rgba(255,255,255,0.16) 0 1px, transparent 1px 33.333%),
+    radial-gradient(circle at 50% 18%, rgba(255,255,255,0.78) 0 21px, transparent 22px),
+    linear-gradient(180deg, #bfefff 0%, #e6faff 57%, #ffffff 100%);
+}
+
+.careScreen.photoModeScreen .roomScene .penguinFigure.large {
+  width: 310px;
+  height: 342px;
+  margin: 0 0 62px;
+}
+
+.careScreen.photoModeScreen .careHero::before {
+  left: 34px;
+  right: 34px;
+  bottom: 134px;
+  height: 104px;
+}
+
+.careScreen.photoModeScreen .roomScene::after {
+  left: 36px;
+  right: 36px;
+  bottom: 142px;
+  height: 96px;
+}
+
+.careScreen.photoModeScreen .cameraFrame {
+  z-index: 34;
+  inset: 18px;
+  display: block;
+}
+
+.careScreen.photoModeScreen .photoControls {
+  z-index: 36;
+  right: 24px;
+  bottom: 22px;
+  left: 24px;
+}
+
+@keyframes handPressSvg {
+  from {
+    transform: translate(-30px, -44px) rotate(-12deg) scale(1);
+  }
+  to {
+    transform: translate(-25px, -38px) rotate(-2deg) scale(0.98);
+  }
+}
+
+/* Care header, love meter, cleaning dust, and camera flavor */
+.careScreen .careHeader {
+  grid-template-columns: 48px minmax(0, 1fr);
+  margin: 8px 10px 0;
+  padding: 8px 10px;
+  border: 1px solid rgba(174, 219, 244, 0.88);
+  border-radius: 18px;
+  background: rgba(255,255,255,0.82);
+  box-shadow: 0 10px 18px rgba(49, 127, 179, 0.1);
+}
+
+.careScreen .careHeader .avatarBadge img {
+  border-radius: 14px;
+  background:
+    radial-gradient(circle at 50% 76%, rgba(201,235,247,0.9) 0 28%, transparent 29%),
+    #fff;
+}
+
+.careScreen .careHeader h1 {
+  color: #16486d;
+  font-size: 17px;
+}
+
+.careScreen .careHeader p {
+  color: #477491;
+}
+
+.careInfoGrid .statPanel {
+  position: relative;
+}
+
+.compactLove {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+  padding: 6px 8px;
+  border-radius: 10px;
+  background: linear-gradient(90deg, rgba(255,138,174,0.18), rgba(255,255,255,0.8));
+  color: #9e4164;
+  font-size: 10px;
+  font-weight: 900;
+}
+
+.compactLove::after {
+  content: "";
+  grid-column: 1 / -1;
+  height: 7px;
+  overflow: hidden;
+  border-radius: 999px;
+  background:
+    linear-gradient(90deg, #ff78a5 0 40%, rgba(255,120,165,0.18) 41%),
+    #f0d8e2;
+}
+
+.compactLove b {
+  justify-self: end;
+}
+
+.cleaningBroom span,
+.cleaningBroom b,
+.cleaningBroom em,
+.cleaningBroom i {
+  position: absolute;
+  display: block;
+  pointer-events: none;
+  font-style: normal;
+}
+
+.cleaningBroom span {
+  left: -22px;
+  top: 57px;
+  width: 34px;
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(119, 154, 170, 0.34);
+  box-shadow:
+    -18px 7px 0 -2px rgba(119,154,170,0.22),
+    14px 12px 0 -3px rgba(119,154,170,0.18);
+  opacity: 0;
+}
+
+.cleaningBroom b {
+  left: -18px;
+  top: 44px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(130, 161, 174, 0.32);
+  box-shadow:
+    -16px 8px 0 -2px rgba(130,161,174,0.24),
+    22px 6px 0 -3px rgba(130,161,174,0.22),
+    10px 18px 0 -3px rgba(130,161,174,0.18);
+  opacity: 0;
+}
+
+.careHero.cleaning .cleaningBroom span,
+.careHero.cleaning .cleaningBroom b {
+  opacity: 1;
+  animation: dustSweep 0.38s ease-out infinite alternate;
+}
+
+.photoHud {
+  position: absolute;
+  z-index: 35;
+  left: 28px;
+  right: 28px;
+  top: 74px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 12px;
+  background: rgba(10, 50, 78, 0.32);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 900;
+  pointer-events: none;
+  backdrop-filter: blur(5px);
+}
+
+.photoHud span {
+  color: rgba(255,255,255,0.88);
+  font-size: 10px;
+}
+
+.careScreen.photoModeScreen .cameraFrame::before {
+  width: 44px;
+  height: 44px;
+}
+
+.careScreen.photoModeScreen .cameraFrame::after {
+  width: 44px;
+  height: 44px;
+}
+
+.careScreen.photoModeScreen .cameraFrame {
+  background:
+    radial-gradient(circle at 50% 50%, transparent 0 52%, rgba(255,255,255,0.08) 53% 54%, transparent 55%),
+    linear-gradient(rgba(255,255,255,0.12) 0 1px, transparent 1px 33.333%),
+    linear-gradient(90deg, rgba(255,255,255,0.12) 0 1px, transparent 1px 33.333%);
+}
+
+.careScreen.photoModeScreen .cameraFrame span::before {
+  content: "";
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin-right: 5px;
+  border-radius: 50%;
+  background: #fff;
+  vertical-align: 0;
+}
+
+.careScreen.photoModeScreen .photoShutter::after {
+  content: "";
+  display: block;
+  width: 34px;
+  height: 34px;
+  margin: auto;
+  border: 3px solid rgba(255,255,255,0.9);
+  border-radius: 50%;
+}
+
+@keyframes dustSweep {
+  from {
+    transform: translate(6px, 0);
+    opacity: 0.9;
+  }
+  to {
+    transform: translate(-18px, 7px);
+    opacity: 0.18;
+  }
+}
+
+/* Softer sweeping trails and richer photo mode */
+.cleaningBroom span {
+  left: -52px;
+  top: 57px;
+  width: 58px;
+  height: 18px;
+  border-top: 3px solid rgba(105, 169, 190, 0.2);
+  border-radius: 50%;
+  background: transparent;
+  box-shadow:
+    12px 8px 0 -2px rgba(105,169,190,0.16),
+    30px -6px 0 -4px rgba(105,169,190,0.12);
+  opacity: 0;
+}
+
+.cleaningBroom b {
+  left: -38px;
+  top: 44px;
+  width: 24px;
+  height: 14px;
+  border-top: 2px solid rgba(105, 169, 190, 0.18);
+  border-radius: 50%;
+  background: transparent;
+  box-shadow:
+    -18px 11px 0 -5px rgba(105,169,190,0.16),
+    25px 16px 0 -6px rgba(105,169,190,0.12);
+  opacity: 0;
+}
+
+.cleaningBroom em {
+  left: -46px;
+  top: 69px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: rgba(105,169,190,0.12);
+  box-shadow:
+    16px -4px 0 -3px rgba(105,169,190,0.14),
+    31px 5px 0 -4px rgba(105,169,190,0.1),
+    -10px 8px 0 -4px rgba(105,169,190,0.1);
+  opacity: 0;
+}
+
+.careHero.cleaning .cleaningBroom span {
+  animation: sweepTrail 0.42s ease-out infinite;
+}
+
+.careHero.cleaning .cleaningBroom b,
+.careHero.cleaning .cleaningBroom em {
+  animation: sweepPuff 0.42s ease-out infinite;
+}
+
+.careScreen.photoModeScreen .cameraFrame {
+  background:
+    radial-gradient(circle at 50% 45%, transparent 0 70px, rgba(255,255,255,0.18) 71px 72px, transparent 73px),
+    radial-gradient(circle at 50% 45%, transparent 0 118px, rgba(255,255,255,0.1) 119px 120px, transparent 121px),
+    linear-gradient(rgba(255,255,255,0.12) 0 1px, transparent 1px 33.333%),
+    linear-gradient(90deg, rgba(255,255,255,0.12) 0 1px, transparent 1px 33.333%),
+    linear-gradient(180deg, rgba(9,35,58,0.18), transparent 20%, transparent 76%, rgba(9,35,58,0.18));
+}
+
+.photoHud {
+  top: 28px;
+  left: 78px;
+  right: 78px;
+  justify-content: center;
+  text-align: center;
+  border: 1px solid rgba(255,255,255,0.28);
+  background: rgba(14, 63, 96, 0.34);
+}
+
+.photoHud span {
+  display: none;
+}
+
+.careScreen.photoModeScreen .photoControls::before {
+  content: "0.5x   1x   2x";
+  position: absolute;
+  left: 50%;
+  bottom: 88px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(12, 55, 84, 0.34);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.5px;
+  transform: translateX(-50%);
+  backdrop-filter: blur(5px);
+}
+
+.careScreen.photoModeScreen .photoControls::after {
+  content: "PHOTO";
+  position: absolute;
+  left: 50%;
+  bottom: 63px;
+  color: #ff5e92;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 1px;
+  transform: translateX(-50%);
+}
+
+.careScreen.photoModeScreen .photoControls .whiteButton {
+  border: 2px solid rgba(255,255,255,0.82);
+  background: rgba(255,255,255,0.9);
+}
+
+.careScreen.photoModeScreen .cameraFrame span {
+  top: 16px;
+  right: 16px;
+  box-shadow: 0 8px 18px rgba(255, 94, 134, 0.28);
+}
+
+@keyframes sweepTrail {
+  0% {
+    transform: translate(18px, 0) scaleX(0.4);
+    opacity: 0;
+  }
+  35% {
+    opacity: 0.85;
+  }
+  100% {
+    transform: translate(-28px, 8px) scaleX(1);
+    opacity: 0;
+  }
+}
+
+@keyframes sweepPuff {
+  0% {
+    transform: translate(12px, 2px);
+    opacity: 0;
+  }
+  42% {
+    opacity: 0.55;
+  }
+  100% {
+    transform: translate(-20px, 10px);
+    opacity: 0;
+  }
+}
+
+/* Photo zoom/pan and clearer sweep trail */
+.photoSubject {
+  position: relative;
+  z-index: 4;
+  display: grid;
+  place-items: center;
+  transition: transform 0.18s ease;
+}
+
+.careScreen.photoModeScreen .photoSubject {
+  transform: translate(var(--photo-x), var(--photo-y)) scale(var(--photo-zoom));
+  cursor: grab;
+}
+
+.careScreen.photoModeScreen .roomScene:active .photoSubject {
+  cursor: grabbing;
+}
+
+.careScreen.photoModeScreen .cameraFrame span {
+  display: none;
+}
+
+.careScreen.photoModeScreen .photoControls {
+  display: grid;
+  grid-template-columns: 44px 1fr 78px;
+  align-items: end;
+  gap: 12px;
+}
+
+.careScreen.photoModeScreen .photoControls::before,
+.careScreen.photoModeScreen .photoControls::after {
+  content: none;
+}
+
+.zoomControls {
+  justify-self: center;
+  display: flex;
+  gap: 5px;
+  padding: 5px;
+  border-radius: 999px;
+  background: rgba(12, 55, 84, 0.34);
+  backdrop-filter: blur(5px);
+}
+
+.zoomControls button {
+  min-height: 28px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: transparent;
+  box-shadow: none;
+  color: rgba(255,255,255,0.88);
+  font-size: 10px;
+}
+
+.zoomControls button.active {
+  background: rgba(255,255,255,0.92);
+  color: #24638f;
+}
+
+.manualZoom {
+  position: absolute;
+  left: 50%;
+  bottom: 82px;
+  width: min(188px, 48vw);
+  display: grid;
+  grid-template-columns: 42px 1fr;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
+  border-radius: 999px;
+  background: rgba(12, 55, 84, 0.38);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 900;
+  transform: translateX(-50%);
+  backdrop-filter: blur(5px);
+}
+
+.manualZoom input {
+  width: 100%;
+  accent-color: #ff6f9e;
+}
+
+.photoHud {
+  top: 30px;
+  left: 26px;
+  right: auto;
+  max-width: 170px;
+  justify-content: flex-start;
+  border-radius: 999px;
+}
+
+.photoHud b::before {
+  content: "FOCUS";
+  margin-right: 8px;
+  color: rgba(255,255,255,0.7);
+  font-size: 9px;
+  font-weight: 900;
+}
+
+.cleaningBroom span {
+  left: -64px;
+  top: 56px;
+  width: 72px;
+  height: 22px;
+  border-top: 4px solid rgba(78, 145, 168, 0.34);
+  border-radius: 55%;
+  box-shadow:
+    14px 8px 0 -1px rgba(78,145,168,0.25),
+    35px -6px 0 -3px rgba(78,145,168,0.2),
+    2px 17px 0 -4px rgba(78,145,168,0.2);
+}
+
+.cleaningBroom b {
+  left: -48px;
+  top: 43px;
+  width: 34px;
+  height: 18px;
+  border-top: 3px solid rgba(86, 150, 171, 0.3);
+  box-shadow:
+    -19px 12px 0 -4px rgba(86,150,171,0.26),
+    24px 16px 0 -5px rgba(86,150,171,0.2);
+}
+
+.cleaningBroom em {
+  left: -56px;
+  top: 68px;
+  width: 12px;
+  height: 12px;
+  background: rgba(87, 145, 166, 0.18);
+  box-shadow:
+    16px -5px 0 -2px rgba(87,145,166,0.2),
+    33px 5px 0 -3px rgba(87,145,166,0.18),
+    -11px 8px 0 -3px rgba(87,145,166,0.16);
+}
+
+.careHero.cleaning .cleaningBroom span {
+  animation: sweepTrail 0.34s ease-out infinite;
+}
+
+.careHero.cleaning .cleaningBroom b,
+.careHero.cleaning .cleaningBroom em,
+.careHero.cleaning .cleaningBroom i {
+  animation: sweepPuff 0.34s ease-out infinite;
+}
+
+/* Final care interaction fixes */
+.careScreen .careHeader {
+  grid-template-columns: 48px minmax(0, 1fr);
+  gap: 14px;
+  padding: 8px 12px 10px;
+}
+
+.careScreen .avatarBadge span {
+  right: auto;
+  left: 50%;
+  bottom: -8px;
+  transform: translateX(-50%);
+}
+
+.careScreen.photoModeScreen .photoControls {
+  z-index: 90;
+  pointer-events: auto;
+}
+
+.careScreen.photoModeScreen .photoShutter,
+.careScreen.photoModeScreen .photoControls .whiteButton,
+.zoomControls,
+.zoomControls button {
+  position: relative;
+  z-index: 92;
+  pointer-events: auto;
+}
+
+.cleaningBroom span {
+  left: -76px;
+  top: 54px;
+  width: 86px;
+  height: 24px;
+  border-top: 5px solid rgba(77, 123, 140, 0.5);
+  border-radius: 55%;
+  box-shadow:
+    15px 8px 0 -1px rgba(77,123,140,0.4),
+    39px -7px 0 -3px rgba(77,123,140,0.32),
+    3px 18px 0 -4px rgba(77,123,140,0.34);
+}
+
+.cleaningBroom b {
+  left: -58px;
+  top: 40px;
+  width: 46px;
+  height: 24px;
+  border-top: 4px solid rgba(91, 128, 142, 0.5);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 18% 76%, rgba(91, 128, 142, 0.42) 0 5px, transparent 6px),
+    radial-gradient(circle at 56% 54%, rgba(91, 128, 142, 0.34) 0 7px, transparent 8px),
+    radial-gradient(circle at 84% 72%, rgba(91, 128, 142, 0.28) 0 5px, transparent 6px);
+  box-shadow:
+    -21px 13px 0 -4px rgba(91,128,142,0.36),
+    27px 17px 0 -5px rgba(91,128,142,0.3);
+}
+
+.cleaningBroom em {
+  left: -68px;
+  top: 66px;
+  width: 16px;
+  height: 16px;
+  background: rgba(91, 127, 140, 0.34);
+  box-shadow:
+    17px -5px 0 -2px rgba(91,127,140,0.34),
+    36px 5px 0 -3px rgba(91,127,140,0.28),
+    -12px 8px 0 -3px rgba(91,127,140,0.26),
+    48px -7px 0 -5px rgba(91,127,140,0.24);
+}
+
+.careHero.cleaning .cleaningBroom span {
+  animation: sweepTrail 0.32s ease-out infinite;
+}
+
+.careHero.cleaning .cleaningBroom b,
+.careHero.cleaning .cleaningBroom em,
+.careHero.cleaning .cleaningBroom i {
+  animation: sweepPuff 0.32s ease-out infinite;
+}
+
+/* Final requested polish */
+.homeScreen .penguinFigure.hero {
+  width: 284px;
+  height: 320px;
+  margin-bottom: 8px;
+}
+
+.homeScene {
+  height: 420px;
+}
+
+.careNameLine {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.careNameLine h1 {
+  min-width: 0;
+}
+
+.careNameLine span {
+  flex: 0 0 auto;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: linear-gradient(#61c0ff, #2d85d5);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 900;
+  box-shadow: 0 4px 0 #1f74b8;
+}
+
+.careScreen .avatarBadge span {
+  display: none;
+}
+
+.careHero.photoFlash .roomScene::before {
+  background:
+    radial-gradient(circle at 50% 45%, rgba(255,255,255,1) 0 16%, rgba(255,255,255,0.82) 17% 36%, transparent 37%),
+    rgba(255,255,255,0.9);
+  animation: strongCameraFlash 0.72s ease-out both;
+}
+
+.careHero.photoFlash .cameraFrame {
+  animation: shutterBlink 0.72s ease-out both;
+}
+
+.careHero.cleaning .cleaningBroom {
+  animation: broomSwingBoth 0.44s ease-in-out infinite alternate;
+}
+
+.cleaningBroom span {
+  left: -82px;
+  top: 52px;
+  width: 92px;
+  border-top-color: rgba(72, 116, 130, 0.6);
+  box-shadow:
+    15px 8px 0 -1px rgba(72,116,130,0.46),
+    41px -7px 0 -3px rgba(72,116,130,0.38),
+    4px 18px 0 -4px rgba(72,116,130,0.42),
+    90px 12px 0 -5px rgba(72,116,130,0.34);
+}
+
+.cleaningBroom b {
+  background:
+    radial-gradient(circle at 18% 76%, rgba(86, 120, 132, 0.52) 0 6px, transparent 7px),
+    radial-gradient(circle at 56% 54%, rgba(86, 120, 132, 0.45) 0 8px, transparent 9px),
+    radial-gradient(circle at 84% 72%, rgba(86, 120, 132, 0.36) 0 6px, transparent 7px);
+}
+
+.cleaningBroom em {
+  box-shadow:
+    17px -5px 0 -2px rgba(86,120,132,0.42),
+    36px 5px 0 -3px rgba(86,120,132,0.36),
+    -12px 8px 0 -3px rgba(86,120,132,0.34),
+    48px -7px 0 -5px rgba(86,120,132,0.32),
+    88px 1px 0 -4px rgba(86,120,132,0.28);
+}
+
+.cleaningBroom::before {
+  transform-origin: 50% 92%;
+}
+
+.cleaningBroom::after {
+  transform-origin: 50% 20%;
+}
+
+@keyframes strongCameraFlash {
+  0% {
+    opacity: 0;
+  }
+  12% {
+    opacity: 1;
+  }
+  28% {
+    opacity: 0.72;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes shutterBlink {
+  0% {
+    filter: brightness(1);
+  }
+  16% {
+    filter: brightness(1.8);
+  }
+  100% {
+    filter: brightness(1);
+  }
+}
+
+@keyframes broomSwingBoth {
+  from {
+    transform: translate(-38px, -58px) rotate(-42deg);
+  }
+  to {
+    transform: translate(-22px, -52px) rotate(18deg);
+  }
+}
+
+/* Final home/care polish pass */
+.homeScreen .penguinFigure.hero {
+  width: 304px;
+  height: 340px;
+  margin-bottom: 68px;
+}
+
+.homeScene {
+  height: 444px;
+  align-items: end;
+}
+
+.homeScreen .speechBubble {
+  left: 58px;
+  bottom: 118px;
+  max-width: 236px;
+}
+
+.homeScreen .primaryActions {
+  bottom: 6px;
+}
+
+.homeScreen .roundAction {
+  height: 78px;
+}
+
+.homeScreen .roundAction.yellow {
+  width: 102px;
+  height: 102px;
+}
+
+.careNameLine span {
+  padding: 2px 6px;
+  font-size: 8px;
+  box-shadow: 0 3px 0 #1f74b8;
+  transform: translateY(-1px);
+}
+
+.cleaningBroom span::after {
+  content: "";
+  position: absolute;
+  right: -74px;
+  top: 7px;
+  width: 66px;
+  height: 20px;
+  border-top: 4px solid rgba(77, 123, 140, 0.42);
+  border-radius: 55%;
+  box-shadow:
+    -14px 9px 0 -2px rgba(77,123,140,0.32),
+    -34px -6px 0 -4px rgba(77,123,140,0.28);
+}
+
+.cleaningBroom b::after {
+  content: "";
+  position: absolute;
+  right: -70px;
+  top: 3px;
+  width: 40px;
+  height: 21px;
+  border-top: 3px solid rgba(91, 128, 142, 0.4);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 18% 76%, rgba(91, 128, 142, 0.34) 0 5px, transparent 6px),
+    radial-gradient(circle at 62% 54%, rgba(91, 128, 142, 0.28) 0 7px, transparent 8px);
+}
+
+.careHero.photoFlash .cameraFrame::before,
+.careHero.photoFlash .cameraFrame::after {
+  animation: apertureClose 0.66s ease-out both;
+}
+
+.careHero.photoFlash .cameraFrame {
+  overflow: hidden;
+}
+
+.apertureOverlay {
+  position: absolute;
+  z-index: 38;
+  inset: 0;
+  display: none;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 50% 50%, transparent 0 12%, rgba(255,255,255,0.98) 13% 19%, transparent 20%),
+    conic-gradient(from 0deg at 50% 50%,
+      rgba(4, 18, 30, 0.92) 0 13%,
+      rgba(255,255,255,0.88) 13% 15%,
+      rgba(4, 18, 30, 0.92) 15% 30%,
+      rgba(255,255,255,0.88) 30% 32%,
+      rgba(4, 18, 30, 0.92) 32% 47%,
+      rgba(255,255,255,0.88) 47% 49%,
+      rgba(4, 18, 30, 0.92) 49% 64%,
+      rgba(255,255,255,0.88) 64% 66%,
+      rgba(4, 18, 30, 0.92) 66% 81%,
+      rgba(255,255,255,0.88) 81% 83%,
+      rgba(4, 18, 30, 0.92) 83% 98%,
+      rgba(255,255,255,0.88) 98% 100%);
+}
+
+.careHero.photoFlash .apertureOverlay {
+  display: block;
+  animation: apertureIris 0.78s cubic-bezier(.2,.8,.2,1) both;
+}
+
+.careHero.photoFlash .cameraFrame span {
+  display: none;
+}
+
+.careHero.photoFlash .cameraFrame .unused {
+  display: none;
+}
+
+.careHero.photoFlash .cameraFrame::selection {
+  background: transparent;
+}
+
+.careHero.photoFlash .cameraFrame {
+  background:
+    conic-gradient(from 0deg at 50% 50%,
+      rgba(12, 45, 70, 0.72) 0 16%,
+      transparent 16% 20%,
+      rgba(12, 45, 70, 0.72) 20% 36%,
+      transparent 36% 40%,
+      rgba(12, 45, 70, 0.72) 40% 56%,
+      transparent 56% 60%,
+      rgba(12, 45, 70, 0.72) 60% 76%,
+      transparent 76% 80%,
+      rgba(12, 45, 70, 0.72) 80% 96%,
+      transparent 96% 100%),
+    radial-gradient(circle at 50% 50%, transparent 0 18%, rgba(255,255,255,0.95) 19% 25%, transparent 26%);
+  animation: apertureFlash 0.72s ease-out both;
+}
+
+@keyframes apertureFlash {
+  0% {
+    clip-path: circle(72% at 50% 50%);
+    opacity: 0;
+  }
+  18% {
+    clip-path: circle(16% at 50% 50%);
+    opacity: 1;
+  }
+  42% {
+    clip-path: circle(100% at 50% 50%);
+    opacity: 0.9;
+  }
+  100% {
+    clip-path: circle(100% at 50% 50%);
+    opacity: 0;
+  }
+}
+
+@keyframes apertureClose {
+  0% {
+    transform: scale(1);
+  }
+  18% {
+    transform: scale(0.72);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Photo review and final micro-polish */
+.careNameLine span {
+  padding: 1px 5px;
+  font-size: 7px;
+  box-shadow: 0 2px 0 #1f74b8;
+  transform: translateY(-2px);
+}
+
+.cleaningBroom em::after {
+  content: "";
+  position: absolute;
+  right: -106px;
+  top: -4px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: rgba(91, 127, 140, 0.38);
+  box-shadow:
+    18px 7px 0 -3px rgba(91,127,140,0.34),
+    36px -5px 0 -4px rgba(91,127,140,0.3),
+    50px 11px 0 -6px rgba(91,127,140,0.28);
+}
+
+.cleaningBroom i {
+  right: -82px;
+  top: 54px;
+  width: 78px;
+  height: 25px;
+  border-top: 5px solid rgba(77, 123, 140, 0.54);
+  border-radius: 55%;
+  background:
+    radial-gradient(circle at 22% 72%, rgba(91,127,140,0.42) 0 7px, transparent 8px),
+    radial-gradient(circle at 64% 48%, rgba(91,127,140,0.34) 0 9px, transparent 10px);
+  box-shadow:
+    -16px 10px 0 -2px rgba(77,123,140,0.42),
+    -38px -7px 0 -4px rgba(77,123,140,0.34),
+    10px 18px 0 -4px rgba(77,123,140,0.34);
+  opacity: 0;
+}
+
+.cleaningBroom i::after {
+  content: "";
+  position: absolute;
+  right: -18px;
+  top: 11px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: rgba(91,127,140,0.35);
+  box-shadow:
+    -18px -6px 0 -2px rgba(91,127,140,0.32),
+    -34px 7px 0 -3px rgba(91,127,140,0.3);
+}
+
+.careHero.photoFlash .cameraFrame {
+  background:
+    radial-gradient(circle at 50% 50%, rgba(255,255,255,0.95) 0 8%, transparent 9%),
+    conic-gradient(from 20deg at 50% 50%,
+      rgba(6, 26, 42, 0.88) 0 11%,
+      rgba(255,255,255,0.95) 12% 14%,
+      rgba(6, 26, 42, 0.88) 15% 27%,
+      rgba(255,255,255,0.95) 28% 30%,
+      rgba(6, 26, 42, 0.88) 31% 43%,
+      rgba(255,255,255,0.95) 44% 46%,
+      rgba(6, 26, 42, 0.88) 47% 59%,
+      rgba(255,255,255,0.95) 60% 62%,
+      rgba(6, 26, 42, 0.88) 63% 75%,
+      rgba(255,255,255,0.95) 76% 78%,
+      rgba(6, 26, 42, 0.88) 79% 91%,
+      rgba(255,255,255,0.95) 92% 94%,
+      rgba(6, 26, 42, 0.88) 95% 100%);
+  animation: apertureFlashReal 0.76s ease-out both;
+}
+
+.photoReview {
+  position: absolute;
+  z-index: 100;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background:
+    radial-gradient(circle at 50% 18%, rgba(255,255,255,0.2), transparent 24%),
+    rgba(13, 47, 72, 0.42);
+  backdrop-filter: blur(8px);
+  pointer-events: auto;
+}
+
+.photoReview > .whiteButton {
+  position: absolute;
+  z-index: 2;
+  top: 22px;
+  right: 22px;
+  width: 42px;
+  min-width: 42px;
+  height: 42px;
+  min-height: 42px;
+  padding: 0;
+  border-radius: 50%;
+  font-size: 18px;
+  pointer-events: auto;
+}
+
+.photoPrint {
+  width: min(320px, 86%);
+  display: grid;
+  place-items: center;
+  gap: 8px;
+  padding: 18px 18px 14px;
+  border: 8px solid #fff;
+  border-bottom-width: 34px;
+  border-radius: 12px;
+  background:
+    radial-gradient(circle at 50% 16%, rgba(255,255,255,0.9) 0 20px, transparent 21px),
+    linear-gradient(180deg, #c8f2ff, #ffffff 78%);
+  box-shadow:
+    0 22px 44px rgba(6, 34, 56, 0.28),
+    inset 0 0 0 1px rgba(82, 157, 195, 0.16);
+  animation: photoPrintIn 0.32s ease-out both;
+  overflow: hidden;
+}
+
+.photoPrintScene {
+  width: 100%;
+  height: 430px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 50% 16%, rgba(255,255,255,0.9) 0 20px, transparent 21px),
+    linear-gradient(180deg, #c8f2ff, #ffffff 78%);
+}
+
+.photoPrintScene .penguinFigure.large {
+  width: 250px;
+  height: 274px;
+  transform: translate(var(--photo-x), var(--photo-y)) scale(var(--photo-zoom));
+}
+
+.photoPrint span {
+  margin-bottom: -25px;
+  color: #315f7c;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+@keyframes apertureFlashReal {
+  0% {
+    clip-path: circle(75% at 50% 50%);
+    opacity: 0;
+    transform: rotate(0deg) scale(1);
+  }
+  18% {
+    clip-path: circle(9% at 50% 50%);
+    opacity: 1;
+    transform: rotate(18deg) scale(1.04);
+  }
+  36% {
+    clip-path: circle(18% at 50% 50%);
+    opacity: 0.92;
+  }
+  100% {
+    clip-path: circle(110% at 50% 50%);
+    opacity: 0;
+    transform: rotate(32deg) scale(1);
+  }
+}
+
+@keyframes apertureIris {
+  0% {
+    clip-path: circle(115% at 50% 50%);
+    opacity: 0;
+    transform: rotate(0deg) scale(1);
+  }
+  18% {
+    clip-path: circle(12% at 50% 50%);
+    opacity: 1;
+    transform: rotate(28deg) scale(1.06);
+  }
+  34% {
+    clip-path: circle(6% at 50% 50%);
+    opacity: 1;
+    transform: rotate(42deg) scale(1.08);
+  }
+  58% {
+    clip-path: circle(88% at 50% 50%);
+    opacity: 0.88;
+  }
+  100% {
+    clip-path: circle(120% at 50% 50%);
+    opacity: 0;
+    transform: rotate(58deg) scale(1);
+  }
+}
+
+@keyframes photoPrintIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.92) rotate(-2deg);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1) rotate(0deg);
+  }
+}
+
+/* Retake flow, alternating dust, and centered photo print */
+.careHero.cleaning .cleaningBroom {
+  animation: broomSwingBothSlow 0.96s ease-in-out infinite alternate;
+}
+
+.careHero.cleaning .cleaningBroom span,
+.careHero.cleaning .cleaningBroom b,
+.careHero.cleaning .cleaningBroom em {
+  animation: leftDustPulse 0.96s ease-out infinite;
+}
+
+.careHero.cleaning .cleaningBroom i {
+  animation: rightDustPulse 0.96s ease-out infinite;
+}
+
+.photoReview {
+  place-items: center;
+}
+
+.retakeButton {
+  position: absolute;
+  z-index: 2;
+  left: 22px;
+  bottom: 24px;
+  min-height: 40px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.92);
+  box-shadow: 0 5px 0 #c6e4f5, 0 12px 20px rgba(36, 112, 166, 0.16);
+  color: #24638f;
+}
+
+.photoPrint {
+  width: min(330px, 88%);
+  padding: 12px 12px 38px;
+}
+
+.photoPrintScene {
+  position: relative;
+  height: 440px;
+  border: 1px solid rgba(119, 188, 220, 0.28);
+  background:
+    radial-gradient(circle at 50% 18%, rgba(255,255,255,0.9) 0 22px, transparent 23px),
+    linear-gradient(180deg, #c5f1ff 0%, #e9fbff 58%, #ffffff 100%);
+}
+
+.photoPrintScene::before {
+  content: "";
+  position: absolute;
+  left: 22px;
+  right: 22px;
+  bottom: 82px;
+  height: 96px;
+  border-radius: 50%;
+  background:
+    radial-gradient(ellipse at 50% 50%, rgba(255,255,255,0.82) 0 23%, transparent 24%),
+    repeating-radial-gradient(ellipse at center, rgba(199,237,247,0.9) 0 12px, rgba(147,210,229,0.65) 13px 24px);
+}
+
+.photoPrintScene::after {
+  content: "";
+  position: absolute;
+  left: 42px;
+  right: 42px;
+  bottom: 78px;
+  height: 68px;
+  border-radius: 50%;
+  background: rgba(70, 119, 150, 0.14);
+}
+
+.photoPrintScene .penguinFigure.large {
+  position: relative;
+  z-index: 2;
+  width: 310px;
+  height: 342px;
+  transform: translate(var(--photo-x), var(--photo-y)) scale(var(--photo-zoom));
+}
+
+.photoPrint span {
+  margin-bottom: -30px;
+}
+
+.careHero.photoFlash .apertureOverlay {
+  animation: apertureIrisReal 0.82s cubic-bezier(.16,.9,.2,1) both;
+}
+
+@keyframes broomSwingBothSlow {
+  from {
+    transform: translate(-42px, -58px) rotate(-40deg);
+  }
+  to {
+    transform: translate(-18px, -52px) rotate(20deg);
+  }
+}
+
+@keyframes leftDustPulse {
+  0%, 44% {
+    opacity: 0;
+    transform: translate(20px, 0) scaleX(0.45);
+  }
+  58% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-34px, 8px) scaleX(1.08);
+  }
+}
+
+@keyframes rightDustPulse {
+  0% {
+    opacity: 0;
+    transform: translate(-20px, 0) scaleX(0.45);
+  }
+  16% {
+    opacity: 1;
+  }
+  48% {
+    opacity: 0;
+    transform: translate(34px, 8px) scaleX(1.08);
+  }
+  49%, 100% {
+    opacity: 0;
+  }
+}
+
+@keyframes apertureIrisReal {
+  0% {
+    clip-path: circle(120% at 50% 50%);
+    opacity: 0;
+    transform: rotate(0deg) scale(1);
+  }
+  12% {
+    opacity: 1;
+  }
+  22% {
+    clip-path: circle(8% at 50% 50%);
+    opacity: 1;
+    transform: rotate(34deg) scale(1.08);
+  }
+  34% {
+    clip-path: circle(4% at 50% 50%);
+    opacity: 1;
+    transform: rotate(48deg) scale(1.08);
+  }
+  54% {
+    clip-path: circle(80% at 50% 50%);
+    opacity: 0.9;
+  }
+  100% {
+    clip-path: circle(130% at 50% 50%);
+    opacity: 0;
+    transform: rotate(68deg) scale(1);
+  }
+}
+
+/* Iris shutter, centered print, and compact dust */
+.careHero.photoFlash .apertureOverlay {
+  background:
+    radial-gradient(circle at 50% 50%, transparent 0 16%, rgba(255,255,255,0.96) 17% 23%, transparent 24%),
+    rgba(4, 18, 30, 0.86);
+  animation: fullIrisShutter 0.82s cubic-bezier(.16,.9,.2,1) both;
+}
+
+.careHero.photoFlash .cameraFrame {
+  background:
+    radial-gradient(circle at 50% 50%, transparent 0 62%, rgba(255,255,255,0.16) 63% 64%, transparent 65%);
+}
+
+.photoPrint {
+  width: min(314px, 84%);
+  margin-inline: auto;
+}
+
+.photoPrintScene {
+  place-items: center;
+  overflow: hidden;
+}
+
+.photoPrintScene .penguinFigure.large {
+  width: 310px;
+  height: 342px;
+}
+
+.photoPrintSubject {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  transform: translate(var(--photo-x), var(--photo-y)) scale(var(--photo-zoom));
+  transform-origin: center center;
+}
+
+/* Keep review in the same coordinate system as the camera screen */
+.photoReview {
+  padding: 18px;
+}
+
+.photoPrint {
+  position: absolute;
+  inset: 18px;
+  width: auto;
+  margin: 0;
+  padding: 0;
+  border: 5px solid rgba(255,255,255,0.96);
+  border-radius: 18px;
+  background: transparent;
+  overflow: hidden;
+}
+
+.photoPrintScene {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  border: 0;
+  background:
+    radial-gradient(circle at 50% 18%, rgba(255,255,255,0.78) 0 21px, transparent 22px),
+    linear-gradient(180deg, #bfefff 0%, #e6faff 57%, #ffffff 100%);
+}
+
+.photoPrintScene::before {
+  left: 34px;
+  right: 34px;
+  bottom: 134px;
+  height: 104px;
+}
+
+.photoPrintScene::after {
+  left: 36px;
+  right: 36px;
+  bottom: 142px;
+  height: 96px;
+}
+
+.photoPrintScene .penguinFigure.large {
+  width: 310px;
+  height: 342px;
+  margin: 0 0 62px;
+}
+
+.photoPrint > span {
+  position: absolute;
+  z-index: 4;
+  left: 50%;
+  bottom: 12px;
+  margin: 0;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.86);
+  transform: translateX(-50%);
+}
+
+.photoReview > .whiteButton {
+  z-index: 110;
+  top: auto;
+  right: 20px;
+  bottom: 16px;
+}
+
+.retakeButton {
+  z-index: 110;
+  left: 20px;
+  bottom: 16px;
+}
+
+.photoReview {
+  padding-bottom: 78px;
+}
+
+.photoReview .photoPrint {
+  bottom: 78px;
+}
+
+.cleaningBroom span {
+  left: -38px;
+  top: 59px;
+  width: 36px;
+  height: 18px;
+  border-top: 0;
+  background:
+    radial-gradient(circle at 25% 60%, rgba(82, 121, 136, 0.48) 0 8px, transparent 9px),
+    radial-gradient(circle at 62% 42%, rgba(82, 121, 136, 0.36) 0 10px, transparent 11px);
+  box-shadow:
+    -10px 7px 0 -4px rgba(82,121,136,0.42),
+    15px 9px 0 -5px rgba(82,121,136,0.34);
+}
+
+.cleaningBroom span::after {
+  right: -64px;
+  top: -2px;
+  width: 34px;
+  height: 18px;
+  border-top: 0;
+  background:
+    radial-gradient(circle at 34% 58%, rgba(82, 121, 136, 0.44) 0 8px, transparent 9px),
+    radial-gradient(circle at 72% 44%, rgba(82, 121, 136, 0.32) 0 10px, transparent 11px);
+  box-shadow:
+    11px 8px 0 -5px rgba(82,121,136,0.34),
+    -9px 9px 0 -4px rgba(82,121,136,0.34);
+}
+
+.cleaningBroom b {
+  left: -34px;
+  top: 44px;
+  width: 34px;
+  height: 26px;
+  border-top: 0;
+  background:
+    radial-gradient(circle at 22% 68%, rgba(91, 128, 142, 0.46) 0 7px, transparent 8px),
+    radial-gradient(circle at 58% 48%, rgba(91, 128, 142, 0.38) 0 9px, transparent 10px),
+    radial-gradient(circle at 86% 72%, rgba(91, 128, 142, 0.3) 0 6px, transparent 7px);
+  box-shadow: none;
+}
+
+.cleaningBroom b::after {
+  right: -62px;
+  top: 3px;
+  width: 34px;
+  height: 25px;
+  border-top: 0;
+  background:
+    radial-gradient(circle at 18% 70%, rgba(91, 128, 142, 0.42) 0 7px, transparent 8px),
+    radial-gradient(circle at 62% 52%, rgba(91, 128, 142, 0.34) 0 9px, transparent 10px);
+}
+
+.cleaningBroom em {
+  display: none;
+}
+
+.cleaningBroom i {
+  display: block;
+  right: -72px;
+  top: 46px;
+  width: 42px;
+  height: 30px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 24% 68%, rgba(82, 121, 136, 0.48) 0 8px, transparent 9px),
+    radial-gradient(circle at 62% 46%, rgba(82, 121, 136, 0.38) 0 11px, transparent 12px),
+    radial-gradient(circle at 88% 70%, rgba(82, 121, 136, 0.28) 0 7px, transparent 8px);
+  box-shadow:
+    16px 7px 0 -4px rgba(82,121,136,0.38),
+    33px -4px 0 -6px rgba(82,121,136,0.3);
+}
+
+.careHero.cleaning .cleaningBroom i {
+  animation: rightDustPulse 0.96s ease-out infinite;
+}
+
+@keyframes fullIrisShutter {
+  0% {
+    clip-path: circle(145% at 50% 50%);
+    opacity: 0;
+  }
+  14% {
+    opacity: 1;
+  }
+  28% {
+    clip-path: circle(10% at 50% 50%);
+    opacity: 1;
+  }
+  42% {
+    clip-path: circle(4% at 50% 50%);
+    opacity: 1;
+  }
+  62% {
+    clip-path: circle(78% at 50% 50%);
+    opacity: 0.88;
+  }
+  100% {
+    clip-path: circle(145% at 50% 50%);
+    opacity: 0;
+  }
+}

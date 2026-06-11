@@ -1,0 +1,19 @@
+{
+  "name": "ペンとも",
+  "short_name": "ペンとも",
+  "description": "放置育成ペンギンゲーム",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#dff7ff",
+  "theme_color": "#9fdcf4",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/pentomo-icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
