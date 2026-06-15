@@ -86,6 +86,17 @@ function createId() {
   return `id-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
 }
 
+function getDailyGiftKey(date = new Date()) {
+  const resetDate = new Date(date);
+  if (resetDate.getHours() < 6) {
+    resetDate.setDate(resetDate.getDate() - 1);
+  }
+  const year = resetDate.getFullYear();
+  const month = String(resetDate.getMonth() + 1).padStart(2, "0");
+  const day = String(resetDate.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
 function starterPenguin(name = "コウちゃん", speciesId = 0) {
   return {
     id: createId(),
@@ -139,6 +150,7 @@ function createDefaultGame() {
     achievements: { daily: 20, normal: 8, special: 2 },
     miniGameExpToday: 0,
     claimedToday: false,
+    dailyGiftKey: "",
     lastMessage: "今日もペンギンたちとゆっくり過ごそう。",
   };
 }
@@ -155,6 +167,8 @@ function loadGame() {
 
 function normalizeGame(game) {
   const fallback = createDefaultGame();
+  const currentGiftKey = getDailyGiftKey();
+  const savedGiftKey = game.dailyGiftKey || (game.claimedToday ? currentGiftKey : "");
   const penguins = game.penguins.length ? game.penguins : fallback.penguins;
   const normalizedPenguins = penguins.map((p, index) => ({
     ...starterPenguin(p.name || `ペン${index + 1}`, clampSpecies(p.speciesId)),
@@ -180,6 +194,8 @@ function normalizeGame(game) {
     ownedTitles: unique([...(game.ownedTitles || fallback.ownedTitles)].map((name) => validText(name, "氷海の飼育員"))),
     capacityBonus: Number.isFinite(game.capacityBonus) ? game.capacityBonus : 0,
     photos: Array.isArray(game.photos) ? game.photos : [],
+    dailyGiftKey: savedGiftKey,
+    claimedToday: savedGiftKey === currentGiftKey ? Boolean(game.claimedToday) : false,
   };
 }
 
@@ -437,14 +453,23 @@ function TopStatus({ game, onProfile }) {
 }
 
 function Home({ game, homePenguin, message, setActive, setMessage, setGame }) {
+  const [giftKey, setGiftKey] = useState(getDailyGiftKey);
+  useEffect(() => {
+    const timer = setInterval(() => setGiftKey(getDailyGiftKey()), 30 * 1000);
+    return () => clearInterval(timer);
+  }, []);
+  const giftClaimed = game.claimedToday && game.dailyGiftKey === giftKey;
   const claimGift = () => {
-    if (game.claimedToday) {
+    const currentGiftKey = getDailyGiftKey();
+    if (game.claimedToday && game.dailyGiftKey === currentGiftKey) {
       setMessage("今日のプレゼントは受け取り済みだよ。");
       return;
     }
+    setGiftKey(currentGiftKey);
     setGame((current) => ({
       ...current,
       claimedToday: true,
+      dailyGiftKey: currentGiftKey,
       coins: current.coins + 300,
       diamonds: current.diamonds + 10,
       inventory: { ...current.inventory, normal: current.inventory.normal + 1 },
@@ -469,7 +494,7 @@ function Home({ game, homePenguin, message, setActive, setMessage, setGame }) {
       <SideDock
         items={[
           ["ショップ", "shop", () => setActive("shop")],
-          [game.claimedToday ? "受取済み" : "プレゼント", "gift", claimGift],
+          [giftClaimed ? "受取済み" : "プレゼント", "gift", claimGift],
         ]}
       />
       <div className="homeScene">
