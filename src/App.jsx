@@ -782,6 +782,19 @@ function PenguinList({ game, setGame, setHatchModal, setActive }) {
   const [selectedPenguinId, setSelectedPenguinId] = useState("");
   const capacity = BASE_CAPACITY + game.capacityBonus;
   const selectedPenguin = game.penguins.find((p) => p.id === selectedPenguinId);
+  const toggleFavorite = (id) => {
+    setGame((current) => ({
+      ...current,
+      penguins: current.penguins.map((p) => (p.id === id ? { ...p, favorite: !p.favorite } : p)),
+    }));
+  };
+  const setDetailRole = (id, role) => {
+    setGame((current) => ({
+      ...current,
+      homeDisplayId: role === "home" ? id : current.homeDisplayId,
+      activeCareId: role === "care" ? id : current.activeCareId,
+    }));
+  };
 
   return (
     <Screen className="listScreen">
@@ -819,6 +832,32 @@ function PenguinList({ game, setGame, setHatchModal, setActive }) {
                     <h2>{selectedPenguin.name}</h2>
                     <p>{selectedPenguin.speciesName} / {selectedPenguin.stage === "adult" ? "大人" : "ヒナ"}</p>
                   </div>
+                </div>
+                <div className="detailRoleActions">
+                  <button
+                    className={selectedPenguin.favorite ? "active" : ""}
+                    onClick={() => toggleFavorite(selectedPenguin.id)}
+                    type="button"
+                  >
+                    <i className="detailIcon detailIconStar" />
+                    <span>{selectedPenguin.favorite ? "お気に入り中" : "お気に入り"}</span>
+                  </button>
+                  <button
+                    className={game.homeDisplayId === selectedPenguin.id ? "active" : ""}
+                    onClick={() => setDetailRole(selectedPenguin.id, "home")}
+                    type="button"
+                  >
+                    <i className="detailIcon detailIconHome" />
+                    <span>{game.homeDisplayId === selectedPenguin.id ? "ホーム設定中" : "ホームにする"}</span>
+                  </button>
+                  <button
+                    className={game.activeCareId === selectedPenguin.id ? "active" : ""}
+                    onClick={() => setDetailRole(selectedPenguin.id, "care")}
+                    type="button"
+                  >
+                    <i className="detailIcon detailIconCare" />
+                    <span>{game.activeCareId === selectedPenguin.id ? "育成中" : "育成する"}</span>
+                  </button>
                 </div>
                 <div className="penguinDetailStats">
                   <DetailStat label="Lv" value={selectedPenguin.level} max={100} />
