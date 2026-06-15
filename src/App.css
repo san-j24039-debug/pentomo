@@ -956,13 +956,14 @@ p {
 }
 
 .bubbleSortTrigger {
+  position: relative;
   width: 100%;
-  min-height: 42px;
+  min-height: 48px;
   display: grid;
   grid-template-columns: 1fr auto;
   align-items: center;
   gap: 10px;
-  padding: 7px 13px;
+  padding: 16px 14px 8px;
   border: 3px solid #8ed8ff;
   border-radius: 999px;
   background:
@@ -972,17 +973,20 @@ p {
   color: #12608f;
 }
 
-.bubbleSortTrigger span {
+.bubbleSortTrigger > span {
   position: absolute;
-  top: -8px;
+  top: 6px;
   left: 16px;
-  padding: 4px 9px;
+  display: block;
+  padding: 0;
   border-radius: 999px;
-  border: 1px solid #b9e7ff;
-  background: #ffffff;
-  color: #3d7898;
+  border: 0;
+  background: transparent;
+  color: #5b8aa6;
   font-size: 10px;
-  box-shadow: 0 3px 8px rgba(62, 143, 198, 0.12);
+  font-weight: 900;
+  line-height: 1;
+  box-shadow: none;
 }
 
 .bubbleSortTrigger b {
@@ -1069,7 +1073,7 @@ p {
   cursor: pointer;
 }
 
-.sortBar span {
+.sortSelectLabel span {
   position: relative;
   display: inline-flex;
   align-items: center;
@@ -1089,11 +1093,6 @@ p {
   border-bottom: 3px solid #2380b4;
   pointer-events: none;
   transform: rotate(45deg) translateY(-2px);
-}
-
-.sortBar button {
-  min-height: 32px;
-  padding: 6px 12px;
 }
 
 .penguinGrid,
