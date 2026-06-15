@@ -935,6 +935,7 @@ p {
 }
 
 .sortBar {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -948,10 +949,94 @@ p {
   box-shadow: 0 6px 0 rgba(151, 213, 244, 0.72), 0 12px 22px rgba(63, 148, 205, 0.13);
 }
 
+.bubbleSort {
+  position: relative;
+  z-index: 5;
+  width: 100%;
+}
+
+.bubbleSortTrigger {
+  width: 100%;
+  min-height: 48px;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border: 3px solid #8ed8ff;
+  border-radius: 999px;
+  background:
+    radial-gradient(circle at 16% 24%, #ffffff 0 16%, transparent 17%),
+    linear-gradient(135deg, #ffffff 0 47%, #c5f0ff 48% 100%);
+  box-shadow: 0 5px 0 #79c6ed, 0 12px 18px rgba(53, 137, 196, 0.14);
+  color: #12608f;
+}
+
+.bubbleSortTrigger span {
+  padding: 4px 9px;
+  border-radius: 999px;
+  background: #d9f7ff;
+  color: #3d7898;
+  font-size: 10px;
+}
+
+.bubbleSortTrigger b {
+  text-align: left;
+  font-size: 13px;
+}
+
+.bubbleSortTrigger i {
+  width: 10px;
+  height: 10px;
+  border-right: 3px solid #2480b6;
+  border-bottom: 3px solid #2480b6;
+  transform: rotate(45deg) translateY(-2px);
+}
+
+.bubbleSort.open .bubbleSortTrigger i {
+  transform: rotate(225deg) translate(-1px, -1px);
+}
+
+.bubbleSortMenu {
+  position: absolute;
+  z-index: 20;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  display: grid;
+  gap: 7px;
+  padding: 10px;
+  border: 2px solid #a7e1ff;
+  border-radius: 22px;
+  background:
+    radial-gradient(circle at 16% 12%, rgba(255,255,255,0.95), transparent 18%),
+    linear-gradient(#eefbff, #ffffff);
+  box-shadow: 0 8px 0 rgba(126, 202, 239, 0.65), 0 22px 34px rgba(35, 104, 153, 0.24);
+}
+
+.bubbleSortMenu button {
+  min-height: 38px;
+  padding: 8px 12px;
+  border: 2px solid #b9e8ff;
+  border-radius: 999px;
+  background: linear-gradient(#ffffff, #def7ff);
+  box-shadow: 0 3px 0 #9bd8f4;
+  color: #236990;
+  font-size: 12px;
+  text-align: left;
+}
+
+.bubbleSortMenu button.active {
+  border-color: #5fbdff;
+  background: linear-gradient(#81d8ff, #43a9f2);
+  box-shadow: 0 3px 0 #2381c2;
+  color: #fff;
+}
+
 .sortSelectLabel {
+  display: none;
   position: relative;
   width: 100%;
-  display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 8px;

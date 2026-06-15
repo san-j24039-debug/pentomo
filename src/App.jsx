@@ -781,6 +781,15 @@ function PenguinList({ game, setGame, setHatchModal, setActive }) {
   const [tab, setTab] = useState("penguins");
   const [selectedPenguinId, setSelectedPenguinId] = useState("");
   const [sortMode, setSortMode] = useState("book");
+  const [sortOpen, setSortOpen] = useState(false);
+  const sortOptions = [
+    ["book", "図鑑順"],
+    ["level", "Lv順"],
+    ["love", "愛情順"],
+    ["newest", "入手順"],
+    ["favorite", "お気に入り優先"],
+  ];
+  const selectedSortLabel = sortOptions.find(([value]) => value === sortMode)?.[1] || "図鑑順";
   const capacity = BASE_CAPACITY + game.capacityBonus;
   const selectedPenguin = game.penguins.find((p) => p.id === selectedPenguinId);
   const sortedPenguins = [...game.penguins].sort((a, b) => {
@@ -811,6 +820,30 @@ function PenguinList({ game, setGame, setHatchModal, setActive }) {
       {tab === "penguins" && (
         <>
           <div className="sortBar">
+            <div className={`bubbleSort ${sortOpen ? "open" : ""}`}>
+              <button className="bubbleSortTrigger" onClick={() => setSortOpen((open) => !open)} type="button">
+                <span>ならび</span>
+                <b>{selectedSortLabel}</b>
+                <i />
+              </button>
+              {sortOpen && (
+                <div className="bubbleSortMenu">
+                  {sortOptions.map(([value, label]) => (
+                    <button
+                      className={sortMode === value ? "active" : ""}
+                      key={value}
+                      onClick={() => {
+                        setSortMode(value);
+                        setSortOpen(false);
+                      }}
+                      type="button"
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
             <label className="sortSelectLabel">
               <span>並び替え</span>
               <select value={sortMode} onChange={(event) => setSortMode(event.target.value)} aria-label="ペンギンの並び替え">
