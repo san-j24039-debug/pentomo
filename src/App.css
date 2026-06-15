@@ -975,6 +975,20 @@ p {
   text-align: center;
 }
 
+.penguinCard {
+  width: 100%;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  letter-spacing: 0;
+}
+
+.penguinCard.selected {
+  border-color: #45aef5;
+  background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(224,245,255,0.94));
+  box-shadow: 0 0 0 3px rgba(65, 169, 239, 0.2), 0 10px 20px rgba(53, 134, 192, 0.18);
+}
+
 .penguinCard img,
 .bookCard img {
   width: 68px;
@@ -1037,6 +1051,82 @@ p {
   font-size: 8px;
   font-style: normal;
   font-weight: 900;
+}
+
+.penguinDetailPanel {
+  margin-top: 10px;
+}
+
+.penguinDetailHero {
+  position: relative;
+  display: grid;
+  grid-template-columns: 84px minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+  min-height: 96px;
+  padding: 10px;
+  border-radius: 12px;
+  background: linear-gradient(180deg, rgba(220, 246, 255, 0.92), rgba(255, 255, 255, 0.9));
+}
+
+.penguinDetailHero img {
+  width: 82px;
+  height: 82px;
+  object-fit: contain;
+}
+
+.penguinDetailHero h2 {
+  margin: 0 0 4px;
+  color: #083f68;
+  font-size: 18px;
+  line-height: 1.15;
+}
+
+.penguinDetailHero p {
+  margin: 0;
+  color: #315f7b;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.penguinDetailStats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.detailStat {
+  padding: 8px;
+  border-radius: 10px;
+  background: rgba(235, 248, 255, 0.86);
+}
+
+.detailStat div,
+.penguinDetailLove {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  color: #285c7e;
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.detailStat i {
+  display: block;
+  height: 8px;
+  margin-top: 6px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #45aef5 var(--value), rgba(199, 224, 237, 0.78) var(--value));
+}
+
+.penguinDetailLove {
+  margin-top: 10px;
+  padding: 9px 10px;
+  border-radius: 10px;
+  background: rgba(255, 240, 247, 0.9);
+  color: #b83f72;
 }
 
 .gachaVisual {

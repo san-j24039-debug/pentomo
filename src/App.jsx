@@ -779,15 +779,9 @@ function Care({ activePenguin, careAction, game, setOutfitOpen, setEditOpen }) {
 
 function PenguinList({ game, setGame, setHatchModal, setActive }) {
   const [tab, setTab] = useState("penguins");
+  const [selectedPenguinId, setSelectedPenguinId] = useState(game.penguins[0]?.id || "");
   const capacity = BASE_CAPACITY + game.capacityBonus;
-  const setRole = (id, role) => {
-    setGame((current) => ({
-      ...current,
-      activeCareId: role === "care" ? id : current.activeCareId,
-      homeDisplayId: role === "home" ? id : current.homeDisplayId,
-      profileDisplayId: role === "profile" ? id : current.profileDisplayId,
-    }));
-  };
+  const selectedPenguin = game.penguins.find((p) => p.id === selectedPenguinId) || game.penguins[0];
 
   return (
     <Screen className="listScreen">
@@ -801,24 +795,47 @@ function PenguinList({ game, setGame, setHatchModal, setActive }) {
           </div>
           <div className="penguinGrid">
             {game.penguins.map((p) => (
-              <article className="penguinCard" key={p.id}>
+              <button
+                className={`penguinCard ${selectedPenguin?.id === p.id ? "selected" : ""}`}
+                key={p.id}
+                onClick={() => setSelectedPenguinId(p.id)}
+                type="button"
+              >
                 <Rarity index={p.speciesId} />
                 <img src={penguin} alt="" />
                 <b>{p.name}</b>
                 <span>{p.speciesName}<br />Lv.{p.level} / 愛情{p.loveLevel}</span>
-                <div className="cardBadges">
-                  {p.favorite && <em>お気に入り</em>}
-                  {game.homeDisplayId === p.id && <em>ホーム</em>}
-                  {game.activeCareId === p.id && <em>育成中</em>}
-                </div>
-                <div className="miniActions">
-                  <button onClick={() => setRole(p.id, "home")}>ホーム</button>
-                  <button onClick={() => setRole(p.id, "care")}>育成</button>
-                  <button onClick={() => setRole(p.id, "profile")}>プロフ</button>
-                </div>
-              </article>
+              </button>
             ))}
           </div>
+          {selectedPenguin && (
+            <Panel className="penguinDetailPanel">
+              <div className="penguinDetailHero">
+                <Rarity index={selectedPenguin.speciesId} />
+                <img src={penguin} alt="" />
+                <div>
+                  <h2>{selectedPenguin.name}</h2>
+                  <p>{selectedPenguin.speciesName} / {selectedPenguin.stage === "adult" ? "大人" : "ヒナ"}</p>
+                </div>
+              </div>
+              <div className="penguinDetailStats">
+                <DetailStat label="Lv" value={selectedPenguin.level} max={100} />
+                <DetailStat label="EXP" value={selectedPenguin.exp} max={100} />
+                <DetailStat label="満腹度" value={selectedPenguin.hunger} max={100} />
+                <DetailStat label="機嫌" value={selectedPenguin.mood} max={100} />
+                <DetailStat label="仲良し度" value={selectedPenguin.friendship} max={100} />
+              </div>
+              <div className="penguinDetailLove">
+                <b>愛情Lv.{selectedPenguin.loveLevel}</b>
+                <span>{selectedPenguin.lovePoint} / {loveThresholds[9]} pt</span>
+              </div>
+              <div className="hearts">
+                {Array.from({ length: 10 }).map((_, index) => (
+                  <span className={index < selectedPenguin.loveLevel ? "filled" : ""} key={index} />
+                ))}
+              </div>
+            </Panel>
+          )}
         </>
       )}
       {tab === "eggs" && <EggStorage game={game} setHatchModal={setHatchModal} setActive={setActive} embedded />}
@@ -2015,6 +2032,19 @@ function PageHeader({ title, sub }) {
 
 function Panel({ children, className = "" }) {
   return <div className={`panel ${className}`}>{children}</div>;
+}
+
+function DetailStat({ label, value, max }) {
+  const percent = Math.max(0, Math.min(100, (value / max) * 100));
+  return (
+    <div className="detailStat">
+      <div>
+        <b>{label}</b>
+        <span>{value} / {max}</span>
+      </div>
+      <i style={{ "--value": `${percent}%` }} />
+    </div>
+  );
 }
 
 function Currency({ type, value }) {
