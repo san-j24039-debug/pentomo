@@ -779,9 +779,9 @@ function Care({ activePenguin, careAction, game, setOutfitOpen, setEditOpen }) {
 
 function PenguinList({ game, setGame, setHatchModal, setActive }) {
   const [tab, setTab] = useState("penguins");
-  const [selectedPenguinId, setSelectedPenguinId] = useState(game.penguins[0]?.id || "");
+  const [selectedPenguinId, setSelectedPenguinId] = useState("");
   const capacity = BASE_CAPACITY + game.capacityBonus;
-  const selectedPenguin = game.penguins.find((p) => p.id === selectedPenguinId) || game.penguins[0];
+  const selectedPenguin = game.penguins.find((p) => p.id === selectedPenguinId);
 
   return (
     <Screen className="listScreen">
@@ -798,7 +798,7 @@ function PenguinList({ game, setGame, setHatchModal, setActive }) {
               <button
                 className={`penguinCard ${selectedPenguin?.id === p.id ? "selected" : ""}`}
                 key={p.id}
-                onClick={() => setSelectedPenguinId(p.id)}
+                onClick={() => setSelectedPenguinId((current) => (current === p.id ? "" : p.id))}
                 type="button"
               >
                 <Rarity index={p.speciesId} />
