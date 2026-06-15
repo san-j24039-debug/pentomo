@@ -736,8 +736,13 @@ function Care({ activePenguin, careAction, game, setOutfitOpen, setEditOpen }) {
       </div>
       <div className="inventoryChips">
         {Object.entries(feedItems).map(([key, item]) => (
-          <button className="whiteButton" key={key} onClick={() => careAction("feed", key)}>
-            {item.name} x{game.inventory[key]}
+          <button className={`feedChip feed-${key}`} key={key} onClick={() => careAction("feed", key)}>
+            <FeedIcon type={key} />
+            <span>
+              <b>{key === "normal" ? "N" : key === "premium" ? "R" : "SR"}</b>
+              {item.name}
+            </span>
+            <em>x{game.inventory[key]}</em>
           </button>
         ))}
       </div>
@@ -2044,6 +2049,16 @@ function SideDock({ items }) {
 
 function CareButton({ label, icon, className = "", ...buttonProps }) {
   return <button className={`careButton ${className}`} {...buttonProps}><CareIcon name={icon} /><span>{label}</span></button>;
+}
+
+function FeedIcon({ type }) {
+  return (
+    <i className={`feedIcon feedIcon-${type}`} aria-hidden="true">
+      <span />
+      {type !== "normal" && <span />}
+      {type === "special" && <span />}
+    </i>
+  );
 }
 
 function Segmented({ active, options, onChange }) {
