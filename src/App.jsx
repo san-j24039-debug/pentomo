@@ -780,8 +780,16 @@ function Care({ activePenguin, careAction, game, setOutfitOpen, setEditOpen }) {
 function PenguinList({ game, setGame, setHatchModal, setActive }) {
   const [tab, setTab] = useState("penguins");
   const [selectedPenguinId, setSelectedPenguinId] = useState("");
+  const [sortMode, setSortMode] = useState("book");
   const capacity = BASE_CAPACITY + game.capacityBonus;
   const selectedPenguin = game.penguins.find((p) => p.id === selectedPenguinId);
+  const sortedPenguins = [...game.penguins].sort((a, b) => {
+    if (sortMode === "level") return b.level - a.level || b.exp - a.exp || a.speciesId - b.speciesId;
+    if (sortMode === "love") return b.loveLevel - a.loveLevel || b.lovePoint - a.lovePoint || a.speciesId - b.speciesId;
+    if (sortMode === "newest") return new Date(b.obtainedAt || 0).getTime() - new Date(a.obtainedAt || 0).getTime();
+    if (sortMode === "favorite") return Number(b.favorite) - Number(a.favorite) || a.speciesId - b.speciesId;
+    return a.speciesId - b.speciesId || new Date(a.obtainedAt || 0).getTime() - new Date(b.obtainedAt || 0).getTime();
+  });
   const toggleFavorite = (id) => {
     setGame((current) => ({
       ...current,
@@ -803,11 +811,19 @@ function PenguinList({ game, setGame, setHatchModal, setActive }) {
       {tab === "penguins" && (
         <>
           <div className="sortBar">
-            <span>図鑑順は固定。表示だけ並び替えできます。</span>
-            <button onClick={() => setGame((g) => ({ ...g, penguins: [...g.penguins].sort((a, b) => b.level - a.level) }))}>Lv順</button>
+            <label className="sortSelectLabel">
+              <span>並び替え</span>
+              <select value={sortMode} onChange={(event) => setSortMode(event.target.value)} aria-label="ペンギンの並び替え">
+                <option value="book">図鑑順</option>
+                <option value="level">Lv順</option>
+                <option value="love">愛情順</option>
+                <option value="newest">入手順</option>
+                <option value="favorite">お気に入り優先</option>
+              </select>
+            </label>
           </div>
           <div className="penguinGrid">
-            {game.penguins.map((p) => (
+            {sortedPenguins.map((p) => (
               <button
                 className={`penguinCard ${selectedPenguin?.id === p.id ? "selected" : ""}`}
                 key={p.id}

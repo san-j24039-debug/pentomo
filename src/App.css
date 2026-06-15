@@ -945,6 +945,28 @@ p {
   background: rgba(255,255,255,0.86);
 }
 
+.sortSelectLabel {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.sortSelectLabel select {
+  min-width: 150px;
+  height: 36px;
+  padding: 0 34px 0 12px;
+  border: 1px solid #add8f2;
+  border-radius: 999px;
+  background: linear-gradient(#ffffff, #edf9ff);
+  color: #215a80;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 900;
+  box-shadow: 0 4px 0 #c7e4f3;
+}
+
 .sortBar span {
   color: #365f7b;
   font-size: 12px;
