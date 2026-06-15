@@ -1157,6 +1157,18 @@ p {
   color: #fff;
 }
 
+.detailRoleActions button.favoriteAction.active {
+  border-color: #f3c247;
+}
+
+.detailRoleActions button.homeAction.active {
+  border-color: #54c6dd;
+}
+
+.detailRoleActions button.careAction.active {
+  border-color: #ff7ca8;
+}
+
 .detailIcon {
   position: relative;
   width: 26px;
@@ -1171,6 +1183,11 @@ p {
 
 .detailRoleActions button.active .detailIconStar {
   background: #fff3a7;
+}
+
+.detailRoleActions button.homeAction.active .detailIconHome {
+  color: #c7fff7;
+  filter: drop-shadow(0 2px 0 rgba(12, 97, 127, 0.24));
 }
 
 .detailIconHome::before {
@@ -1196,30 +1213,19 @@ p {
   transform: rotate(45deg);
 }
 
-.detailIconCare::before,
-.detailIconCare::after {
-  content: "";
-  position: absolute;
-  top: 5px;
-  width: 14px;
-  height: 21px;
-  border-radius: 14px 14px 5px 5px;
-  background: #f8669c;
-}
-
 .detailIconCare::before {
-  left: 4px;
-  transform: rotate(-42deg);
+  content: "♥";
+  position: absolute;
+  inset: -2px 0 0;
+  color: #f8669c;
+  font-size: 30px;
+  line-height: 1;
+  text-align: center;
 }
 
-.detailIconCare::after {
-  right: 4px;
-  transform: rotate(42deg);
-}
-
-.detailRoleActions button.active .detailIconCare::before,
-.detailRoleActions button.active .detailIconCare::after {
-  background: #fff;
+.detailRoleActions button.careAction.active .detailIconCare::before {
+  color: #ffd5e6;
+  filter: drop-shadow(0 2px 0 rgba(154, 33, 88, 0.22));
 }
 
 .penguinDetailStats {

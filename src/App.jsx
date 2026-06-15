@@ -835,7 +835,7 @@ function PenguinList({ game, setGame, setHatchModal, setActive }) {
                 </div>
                 <div className="detailRoleActions">
                   <button
-                    className={selectedPenguin.favorite ? "active" : ""}
+                    className={`favoriteAction ${selectedPenguin.favorite ? "active" : ""}`}
                     onClick={() => toggleFavorite(selectedPenguin.id)}
                     type="button"
                   >
@@ -843,7 +843,7 @@ function PenguinList({ game, setGame, setHatchModal, setActive }) {
                     <span>{selectedPenguin.favorite ? "お気に入り中" : "お気に入り"}</span>
                   </button>
                   <button
-                    className={game.homeDisplayId === selectedPenguin.id ? "active" : ""}
+                    className={`homeAction ${game.homeDisplayId === selectedPenguin.id ? "active" : ""}`}
                     onClick={() => setDetailRole(selectedPenguin.id, "home")}
                     type="button"
                   >
@@ -851,7 +851,7 @@ function PenguinList({ game, setGame, setHatchModal, setActive }) {
                     <span>{game.homeDisplayId === selectedPenguin.id ? "ホーム設定中" : "ホームにする"}</span>
                   </button>
                   <button
-                    className={game.activeCareId === selectedPenguin.id ? "active" : ""}
+                    className={`careAction ${game.activeCareId === selectedPenguin.id ? "active" : ""}`}
                     onClick={() => setDetailRole(selectedPenguin.id, "care")}
                     type="button"
                   >
