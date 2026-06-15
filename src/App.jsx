@@ -809,32 +809,35 @@ function PenguinList({ game, setGame, setHatchModal, setActive }) {
             ))}
           </div>
           {selectedPenguin && (
-            <Panel className="penguinDetailPanel">
-              <div className="penguinDetailHero">
-                <Rarity index={selectedPenguin.speciesId} />
-                <img src={penguin} alt="" />
-                <div>
-                  <h2>{selectedPenguin.name}</h2>
-                  <p>{selectedPenguin.speciesName} / {selectedPenguin.stage === "adult" ? "大人" : "ヒナ"}</p>
+            <div className="listDetailOverlay" onClick={() => setSelectedPenguinId("")}>
+              <div className="penguinDetailSheet" onClick={(event) => event.stopPropagation()}>
+                <button className="detailCloseButton" onClick={() => setSelectedPenguinId("")} aria-label="Close" type="button">×</button>
+                <div className="penguinDetailHero">
+                  <Rarity index={selectedPenguin.speciesId} />
+                  <img src={penguin} alt="" />
+                  <div>
+                    <h2>{selectedPenguin.name}</h2>
+                    <p>{selectedPenguin.speciesName} / {selectedPenguin.stage === "adult" ? "大人" : "ヒナ"}</p>
+                  </div>
+                </div>
+                <div className="penguinDetailStats">
+                  <DetailStat label="Lv" value={selectedPenguin.level} max={100} />
+                  <DetailStat label="EXP" value={selectedPenguin.exp} max={100} />
+                  <DetailStat label="満腹度" value={selectedPenguin.hunger} max={100} />
+                  <DetailStat label="機嫌" value={selectedPenguin.mood} max={100} />
+                  <DetailStat label="仲良し度" value={selectedPenguin.friendship} max={100} />
+                </div>
+                <div className="penguinDetailLove">
+                  <b>愛情Lv.{selectedPenguin.loveLevel}</b>
+                  <span>{selectedPenguin.lovePoint} / {loveThresholds[9]} pt</span>
+                </div>
+                <div className="hearts">
+                  {Array.from({ length: 10 }).map((_, index) => (
+                    <span className={index < selectedPenguin.loveLevel ? "filled" : ""} key={index} />
+                  ))}
                 </div>
               </div>
-              <div className="penguinDetailStats">
-                <DetailStat label="Lv" value={selectedPenguin.level} max={100} />
-                <DetailStat label="EXP" value={selectedPenguin.exp} max={100} />
-                <DetailStat label="満腹度" value={selectedPenguin.hunger} max={100} />
-                <DetailStat label="機嫌" value={selectedPenguin.mood} max={100} />
-                <DetailStat label="仲良し度" value={selectedPenguin.friendship} max={100} />
-              </div>
-              <div className="penguinDetailLove">
-                <b>愛情Lv.{selectedPenguin.loveLevel}</b>
-                <span>{selectedPenguin.lovePoint} / {loveThresholds[9]} pt</span>
-              </div>
-              <div className="hearts">
-                {Array.from({ length: 10 }).map((_, index) => (
-                  <span className={index < selectedPenguin.loveLevel ? "filled" : ""} key={index} />
-                ))}
-              </div>
-            </Panel>
+            </div>
           )}
         </>
       )}

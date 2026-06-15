@@ -1057,6 +1057,44 @@ p {
   margin-top: 10px;
 }
 
+.listDetailOverlay {
+  position: fixed;
+  z-index: 80;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(18, 53, 76, 0.42);
+  backdrop-filter: blur(8px);
+}
+
+.penguinDetailSheet {
+  position: relative;
+  width: min(360px, calc(100vw - 28px));
+  max-height: min(660px, calc(100vh - 40px));
+  overflow: hidden auto;
+  padding: 14px;
+  border: 1px solid rgba(177, 222, 247, 0.98);
+  border-radius: 20px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(231,248,255,0.98));
+  box-shadow: 0 24px 70px rgba(20, 69, 103, 0.38);
+}
+
+.detailCloseButton {
+  position: absolute;
+  z-index: 2;
+  top: 8px;
+  right: 8px;
+  width: 38px;
+  min-height: 38px;
+  padding: 0;
+  border-radius: 50%;
+  background: linear-gradient(#ffffff, #e9f8ff);
+  box-shadow: 0 4px 0 #b9dced, 0 10px 18px rgba(42, 108, 154, 0.22);
+  color: #25638c;
+  font-size: 22px;
+}
+
 .penguinDetailHero {
   position: relative;
   display: grid;
