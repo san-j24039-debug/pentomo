@@ -955,6 +955,22 @@ p {
   width: 100%;
 }
 
+.bubbleSort::before {
+  content: "ならび";
+  position: absolute;
+  left: 4px;
+  top: 50%;
+  z-index: 2;
+  min-width: 58px;
+  color: #427b9b;
+  font-size: 12px;
+  font-weight: 900;
+  line-height: 1;
+  text-align: center;
+  pointer-events: none;
+  transform: translateY(-50%);
+}
+
 .bubbleSortTrigger {
   position: relative;
   width: calc(100% - 72px);
@@ -975,23 +991,7 @@ p {
 }
 
 .bubbleSortTrigger > span {
-  position: absolute;
-  left: -72px;
-  top: 50%;
-  transform: translateY(-50%);
-  display: inline-grid;
-  place-items: center;
-  min-width: 58px;
-  min-height: 28px;
-  padding: 0 8px;
-  border-radius: 999px;
-  border: 0;
-  background: transparent;
-  color: #427b9b;
-  font-size: 12px;
-  font-weight: 900;
-  line-height: 1;
-  box-shadow: none;
+  display: none;
 }
 
 .bubbleSortTrigger b {
