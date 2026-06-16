@@ -1663,8 +1663,8 @@ p {
 
 .eggStorageGrid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 8px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 7px;
 }
 
 .embeddedEggStorage {
@@ -1754,9 +1754,9 @@ p {
   position: relative;
   display: grid;
   place-items: center;
-  gap: 5px;
-  min-height: 142px;
-  padding: 12px 9px 10px;
+  gap: 4px;
+  min-height: 122px;
+  padding: 10px 7px 8px;
   border-color: #b6e1f8;
   background:
     radial-gradient(ellipse at 50% 28%, rgba(255,255,255,0.96), transparent 28%),
@@ -1765,9 +1765,10 @@ p {
 
 .storedEgg b {
   color: #234e6b;
-  font-size: 13px;
-  line-height: 1.35;
+  font-size: 11px;
+  line-height: 1.25;
   text-align: center;
+  word-break: keep-all;
 }
 
 .storedEgg .eggRank {
@@ -1780,6 +1781,11 @@ p {
   color: #a46c00;
   font-size: 9px;
   font-weight: 900;
+}
+
+.storedEgg .egg.small {
+  width: 38px;
+  height: 50px;
 }
 
 .storedEgg .eggRank.rainbow {
@@ -1798,7 +1804,7 @@ p {
 }
 
 .embeddedEggStorage .eggStorageGrid {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
 .storageNote {
@@ -2470,9 +2476,10 @@ p {
 }
 
 .storedEgg button {
-  min-height: 28px;
-  padding: 4px 7px;
-  font-size: 10px;
+  min-height: 25px;
+  padding: 3px 8px;
+  border-radius: 10px;
+  font-size: 9px;
 }
 
 .fishGame {
