@@ -991,6 +991,20 @@ function Gacha({ game, setGame, setMessage }) {
 }
 
 function EggStorage({ game, setHatchModal, setActive, embedded = false }) {
+  const [eggSortMode, setEggSortMode] = useState("newest");
+  const eggSortOptions = [
+    ["newest", "入手順"],
+    ["book", "図鑑順"],
+    ["type", "卵タイプ順"],
+  ];
+  const eggTypeRank = { rainbow: 0, gold: 1, white: 2 };
+  const sortedEggs = game.eggs
+    .map((egg, index) => ({ ...egg, storageIndex: index }))
+    .sort((a, b) => {
+      if (eggSortMode === "book") return a.speciesId - b.speciesId || a.storageIndex - b.storageIndex;
+      if (eggSortMode === "type") return (eggTypeRank[a.type] ?? 9) - (eggTypeRank[b.type] ?? 9) || a.speciesId - b.speciesId;
+      return b.storageIndex - a.storageIndex;
+    });
   const content = (
     <>
       {!embedded && <PageHeader title="卵保管庫" sub={`${game.eggs.length} / 999`} />}
@@ -1003,10 +1017,31 @@ function EggStorage({ game, setHatchModal, setActive, embedded = false }) {
           <button onClick={() => setActive("gacha")}>ガチャへ</button>
         </Panel>
       )}
+      {game.eggs.length > 0 && (
+        <Panel className="eggSortPanel">
+          <div>
+            <b>ならび</b>
+            <span>卵を探しやすく整理できます。</span>
+          </div>
+          <div className="eggSortChips">
+            {eggSortOptions.map(([value, label]) => (
+              <button
+                className={eggSortMode === value ? "active" : ""}
+                key={value}
+                onClick={() => setEggSortMode(value)}
+                type="button"
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        </Panel>
+      )}
       <div className="eggStorageGrid">
-        {game.eggs.map((egg) => (
+        {sortedEggs.map((egg) => (
           <Panel className="storedEgg" key={egg.id}>
             <Egg type={egg.type} small />
+            <span className={`eggRank ${egg.type}`}>{egg.type === "rainbow" ? "SSR" : egg.type === "gold" ? "SR" : "N"}</span>
             <b>{species[clampSpecies(egg.speciesId)]}</b>
             <button onClick={() => setHatchModal(egg)}>孵化</button>
           </Panel>
