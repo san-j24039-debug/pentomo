@@ -1010,15 +1010,6 @@ function EggStorage({ game, setHatchModal, setActive, embedded = false }) {
   const content = (
     <>
       {!embedded && <PageHeader title="卵保管庫" sub={`${game.eggs.length} / 999`} />}
-      {embedded && (
-        <Panel className="eggSummary">
-          <div>
-            <b>卵保管庫</b>
-            <span>ガチャで手に入れた卵をここで確認できます。</span>
-          </div>
-          <button onClick={() => setActive("gacha")}>ガチャへ</button>
-        </Panel>
-      )}
       {game.eggs.length > 0 && (
         <div className="sortBar eggSortBar">
           <div className={`bubbleSort ${eggSortOpen ? "open" : ""}`}>

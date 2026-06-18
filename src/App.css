@@ -1672,33 +1672,6 @@ p {
   gap: 10px;
 }
 
-.eggSummary {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  align-items: center;
-  gap: 10px;
-  padding: 11px 12px;
-}
-
-.eggSummary b {
-  display: block;
-  color: #174d77;
-  font-size: 15px;
-}
-
-.eggSummary span {
-  display: block;
-  margin-top: 2px;
-  color: #587a92;
-  font-size: 11px;
-  font-weight: 800;
-}
-
-.eggSummary button {
-  min-height: 36px;
-  padding-inline: 12px;
-}
-
 .storedEgg {
   position: relative;
   display: grid;
