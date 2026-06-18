@@ -1414,11 +1414,14 @@ p {
 }
 
 .gachaVisual {
+  position: relative;
   min-height: 176px;
   margin-bottom: 10px;
 }
 
 .sparkleCard {
+  position: relative;
+  overflow: hidden;
   height: 176px;
   display: grid;
   place-items: center;
@@ -1430,7 +1433,80 @@ p {
     linear-gradient(160deg, #d8f3ff, #fff 65%);
 }
 
+.gachaRays {
+  position: absolute;
+  inset: -45%;
+  opacity: 0;
+  background: conic-gradient(from 0deg, transparent 0 9deg, rgba(255,255,255,0.92) 10deg 17deg, transparent 18deg 36deg);
+  transform: scale(0.65) rotate(0deg);
+  pointer-events: none;
+}
+
+.gachaVisual.playing .gachaRays {
+  animation: gachaRays 1.05s ease-out;
+}
+
+.gachaVisual.playing .eggPreview .egg {
+  animation: gachaEggPop 0.86s ease-out;
+}
+
+.gachaVisual.playing .eggPreview .egg:nth-child(2) {
+  animation-delay: 0.08s;
+}
+
+.gachaVisual.playing .eggPreview .egg:nth-child(3) {
+  animation-delay: 0.16s;
+}
+
+.rateHelpButton {
+  position: absolute;
+  z-index: 8;
+  top: 8px;
+  right: 8px;
+  width: 34px;
+  min-height: 34px;
+  padding: 0;
+  border-radius: 50%;
+  border: 2px solid #9edaff;
+  background: linear-gradient(#ffffff, #daf6ff);
+  box-shadow: 0 4px 0 #8acded, 0 10px 16px rgba(45, 121, 174, 0.18);
+  color: #1f75a7;
+  font-size: 18px;
+  font-weight: 900;
+}
+
+.ratePopover {
+  position: absolute;
+  z-index: 9;
+  top: 48px;
+  right: 8px;
+  width: 190px;
+  display: grid;
+  gap: 6px;
+  padding: 11px;
+  border: 2px solid #aee4ff;
+  border-radius: 16px;
+  background: linear-gradient(#ffffff, #effbff);
+  box-shadow: 0 8px 0 rgba(138, 205, 237, 0.65), 0 18px 28px rgba(35, 104, 153, 0.22);
+}
+
+.ratePopover b {
+  color: #15567f;
+  font-size: 13px;
+}
+
+.ratePopover span {
+  padding: 6px 8px;
+  border-radius: 999px;
+  background: #e7f8ff;
+  color: #245d81;
+  font-size: 11px;
+  font-weight: 900;
+}
+
 .eggPreview {
+  position: relative;
+  z-index: 1;
   display: flex;
   align-items: end;
   justify-content: center;
@@ -1490,6 +1566,14 @@ p {
   background: rgba(255,255,255,0.62);
 }
 
+.openEggs.hasResults {
+  border-style: solid;
+  background:
+    radial-gradient(circle at 20% 18%, rgba(255,255,255,0.95), transparent 16%),
+    linear-gradient(#ffffff, #effbff);
+  animation: resultPanelPop 0.45s ease-out;
+}
+
 .openEggs.ten {
   grid-template-columns: repeat(5, 1fr);
   gap: 7px;
@@ -1510,12 +1594,67 @@ p {
 .openEgg.opened {
   border-radius: 8px;
   background: #fff;
+  animation: resultItemPop 0.38s ease-out both;
 }
 
 .gachaButtons {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 8px;
+}
+
+@keyframes gachaRays {
+  0% {
+    opacity: 0;
+    transform: scale(0.35) rotate(0deg);
+  }
+  35% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.05) rotate(55deg);
+  }
+}
+
+@keyframes gachaEggPop {
+  0% {
+    transform: translateY(0) scale(1);
+    filter: brightness(1);
+  }
+  35% {
+    transform: translateY(-12px) scale(1.12);
+    filter: brightness(1.28);
+  }
+  70% {
+    transform: translateY(3px) scale(0.96);
+  }
+  100% {
+    transform: translateY(0) scale(1);
+    filter: brightness(1);
+  }
+}
+
+@keyframes resultPanelPop {
+  from {
+    opacity: 0.3;
+    transform: translateY(8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes resultItemPop {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.88);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 .segmented {

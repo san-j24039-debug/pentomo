@@ -936,6 +936,8 @@ function PenguinList({ game, setGame, setHatchModal, setActive }) {
 
 function Gacha({ game, setGame, setMessage }) {
   const [results, setResults] = useState([]);
+  const [ratesOpen, setRatesOpen] = useState(false);
+  const [gachaAnimating, setGachaAnimating] = useState(false);
 
   const pull = (count) => {
     const cost = count === 10 ? 1000 : 100;
@@ -945,6 +947,9 @@ function Gacha({ game, setGame, setMessage }) {
     }
     const next = makeGachaEggs(count, game.pity);
     const gotSsr = next.some((item) => item.prizeType === "ssrEgg");
+    setGachaAnimating(false);
+    window.setTimeout(() => setGachaAnimating(true), 0);
+    window.setTimeout(() => setGachaAnimating(false), 1200);
     setResults(next);
     setGame((current) => ({
       ...current,
@@ -962,8 +967,19 @@ function Gacha({ game, setGame, setMessage }) {
   return (
     <Screen className="gachaScreen">
       <PageHeader title="ペンギン卵ガチャ" sub={`SSR確定まであと ${game.pity} 回`} />
-      <div className="gachaVisual">
+      <div className={`gachaVisual ${gachaAnimating ? "playing" : ""}`}>
+        <button className="rateHelpButton" onClick={() => setRatesOpen((open) => !open)} type="button" aria-label="排出率">?</button>
+        {ratesOpen && (
+          <div className="ratePopover">
+            <b>排出率</b>
+            <span>魚のエサ...60%</span>
+            <span>高級魚...30%</span>
+            <span>特製魚セット...8%</span>
+            <span>ペンギン卵...2%</span>
+          </div>
+        )}
         <div className="sparkleCard">
+          <div className="gachaRays" />
           <div className="eggPreview">
             <Egg type="white" />
             <Egg type="gold" />
@@ -973,7 +989,7 @@ function Gacha({ game, setGame, setMessage }) {
           <p>N 魚のエサ60% / R 高級魚30% / SR 特製魚セット8% / SSR 卵2%</p>
         </div>
       </div>
-      <div className={`openEggs ${results.length > 1 ? "ten" : ""}`}>
+      <div className={`openEggs ${results.length > 1 ? "ten" : ""} ${results.length ? "hasResults" : ""}`}>
         {results.length === 0 && <p>ガチャを引くとここに結果が表示されます。</p>}
         {results.map((result) => (
           <button className={`openEgg ${result.type} opened`} key={result.id}>
@@ -984,7 +1000,6 @@ function Gacha({ game, setGame, setMessage }) {
       <div className="gachaButtons">
         <button className="yellow" onClick={() => pull(1)}>1回 100ダイヤ</button>
         <button className="pink" onClick={() => pull(10)}>10連 1000ダイヤ</button>
-        <button className="whiteButton" onClick={() => setResults([])}>結果をしまう</button>
       </div>
     </Screen>
   );
