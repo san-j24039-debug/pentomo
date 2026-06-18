@@ -987,6 +987,11 @@ function Gacha({ game, setGame, setMessage }) {
     }));
   };
 
+  const closeResults = () => {
+    setResults([]);
+    setOpenedResults({});
+  };
+
   const unopenedCount = results.filter((result) => !openedResults[result.id]).length;
 
   return (
@@ -1013,24 +1018,9 @@ function Gacha({ game, setGame, setMessage }) {
           <h2>SSRはペンギン卵</h2>
         </div>
       </div>
-      <div className={`openEggs ${results.length > 1 ? "ten" : ""} ${results.length ? "hasResults" : ""}`}>
-        {results.length === 0 && <p>ガチャを引くとここに結果が表示されます。</p>}
-        {results.map((result, index) => (
-          <button
-            className={`openEgg ${result.type} ${openedResults[result.id] ? "opened" : ""}`}
-            key={result.id}
-            onClick={() => openResult(result.id)}
-            style={{ "--delay": `${index * 0.035}s` }}
-            type="button"
-          >
-            <i />
-            <span>{openedResults[result.id] ? result.reward : "TAP"}</span>
-          </button>
-        ))}
+      <div className="gachaEmptyResult">
+        <p>ガチャを引くと結果確認画面が開きます。</p>
       </div>
-      {results.length > 0 && unopenedCount > 0 && (
-        <button className="openAllButton" onClick={openAllResults}>すべて開く 残り{unopenedCount}個</button>
-      )}
       <div className="gachaButtons">
         <button className="yellow" onClick={() => pull(1)} disabled={!!gachaCinematic}>1回 100ダイヤ</button>
         <button className="pink" onClick={() => pull(10)} disabled={!!gachaCinematic}>10連 1000ダイヤ</button>
@@ -1070,6 +1060,34 @@ function Gacha({ game, setGame, setMessage }) {
             <b>{gachaCinematic.count === 10 ? "10連ガチャ" : "ガチャ開始"}</b>
             <span>{gachaCinematic.gotSsr ? "虹色の卵がきらめいた！" : "氷の扉がひらく..."}</span>
           </div>
+        </div>
+      )}
+      {results.length > 0 && !gachaCinematic && (
+        <div className="gachaResultOverlay" role="dialog" aria-modal="true" aria-label="ガチャ結果">
+          <div className="gachaResultHeader">
+            <div>
+              <h2>ガチャ結果</h2>
+              <p>{unopenedCount > 0 ? "卵をタップして中身を確認しよう。" : "すべて確認しました。"}</p>
+            </div>
+            <button className="profileCloseButton" onClick={closeResults} type="button" aria-label="閉じる">×</button>
+          </div>
+          <div className={`openEggs resultModalEggs ${results.length > 1 ? "ten" : ""} hasResults`}>
+            {results.map((result, index) => (
+              <button
+                className={`openEgg ${result.type} ${openedResults[result.id] ? "opened" : ""}`}
+                key={result.id}
+                onClick={() => openResult(result.id)}
+                style={{ "--delay": `${index * 0.035}s` }}
+                type="button"
+              >
+                <i />
+                <span>{openedResults[result.id] ? result.reward : "TAP"}</span>
+              </button>
+            ))}
+          </div>
+          {unopenedCount > 0 && (
+            <button className="openAllButton" onClick={openAllResults} type="button">すべて開く 残り{unopenedCount}個</button>
+          )}
         </div>
       )}
     </Screen>

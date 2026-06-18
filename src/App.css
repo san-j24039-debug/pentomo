@@ -1584,6 +1584,93 @@ p {
   background: rgba(255,255,255,0.62);
 }
 
+.gachaEmptyResult {
+  min-height: 106px;
+  display: grid;
+  place-items: center;
+  margin-bottom: 10px;
+  padding: 10px;
+  border: 1px dashed #93cdec;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.62);
+  text-align: center;
+}
+
+.gachaResultOverlay {
+  position: fixed;
+  z-index: 240;
+  top: 50%;
+  left: 50%;
+  width: min(402px, calc(100vw - 36px));
+  height: min(832px, calc(100vh - 36px));
+  min-height: min(720px, 100vh);
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: 12px;
+  padding: 24px 14px 18px;
+  overflow: hidden auto;
+  border: 7px solid #151a20;
+  border-radius: 38px;
+  background:
+    radial-gradient(circle at 18% 16%, rgba(255,255,255,0.92), transparent 16%),
+    linear-gradient(180deg, #c9f0ff 0%, #f5fdff 58%, #ffffff 100%);
+  box-shadow: 0 26px 72px rgba(31, 81, 116, 0.36);
+  transform: translate(-50%, -50%);
+}
+
+.gachaResultOverlay::before {
+  content: "";
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  width: 76px;
+  height: 8px;
+  border-radius: 999px;
+  background: #151a20;
+  transform: translateX(-50%);
+}
+
+.gachaResultHeader {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding-top: 12px;
+}
+
+.gachaResultHeader p {
+  margin-top: 4px;
+}
+
+.gachaResultOverlay .profileCloseButton {
+  position: static;
+  flex: 0 0 auto;
+}
+
+.resultModalEggs {
+  align-self: start;
+  min-height: 320px;
+  align-content: center;
+}
+
+.resultModalEggs.ten {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.resultModalEggs.ten .openEgg:not(.opened) {
+  justify-self: center;
+}
+
+.resultModalEggs.ten .openEgg.opened {
+  min-height: 64px;
+}
+
+.gachaResultOverlay .openAllButton {
+  align-self: end;
+}
+
 .openEggs.hasResults {
   border-style: solid;
   background:
@@ -1704,15 +1791,21 @@ p {
 }
 
 .gachaCinematic {
-  position: absolute;
-  z-index: 120;
-  inset: 0;
+  position: fixed;
+  z-index: 230;
+  top: 50%;
+  left: 50%;
+  width: min(402px, calc(100vw - 36px));
+  height: min(832px, calc(100vh - 36px));
   display: grid;
   place-items: center;
   overflow: hidden;
+  border: 7px solid #151a20;
+  border-radius: 38px;
   background:
     radial-gradient(circle at 72% 18%, rgba(255,255,255,0.78) 0 8%, transparent 9%),
     linear-gradient(180deg, #58aef3 0%, #9ddcff 42%, #e7fbff 78%, #ffffff 100%);
+  transform: translate(-50%, -50%);
   animation: cinematicFade var(--cinematic-duration, 2.6s) ease-in-out forwards;
 }
 
@@ -3083,6 +3176,25 @@ p {
   }
 
   .deviceCamera {
+    display: none;
+  }
+
+  .gachaResultOverlay {
+    width: 100%;
+    height: 100vh;
+    min-height: 100vh;
+    border: 0;
+    border-radius: 0;
+  }
+
+  .gachaCinematic {
+    width: 100%;
+    height: 100vh;
+    border: 0;
+    border-radius: 0;
+  }
+
+  .gachaResultOverlay::before {
     display: none;
   }
 }
