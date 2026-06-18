@@ -2063,9 +2063,20 @@ function Achievements({ game, setGame, setMessage }) {
 
 function Menu({ game, setGame, setMessage }) {
   const [achievementTab, setAchievementTab] = useState("daily");
+  const [helpOpen, setHelpOpen] = useState(false);
+  const [debugPassword, setDebugPassword] = useState("");
   const claimAll = () => {
     setGame((current) => ({ ...current, diamonds: current.diamonds + 20, coins: current.coins + 500 }));
     setMessage("実績報酬を受け取ったよ。");
+  };
+  const addDebugDiamonds = () => {
+    if (debugPassword !== "penguin") {
+      setMessage("パスワードが違います。");
+      return;
+    }
+    setGame((current) => ({ ...current, diamonds: current.diamonds + 100000 }));
+    setDebugPassword("");
+    setMessage("確認用ダイヤを100000追加しました。");
   };
   return (
     <Screen className="menuScreen">
@@ -2075,11 +2086,29 @@ function Menu({ game, setGame, setMessage }) {
           ["持ち物", "bag"], ["称号", "star"], ["設定", "gear"], ["ヘルプ", "help"],
           ["お問い合わせ", "mail"], ["利用規約", "doc"], ["データ連携", "link"],
         ].map(([label, icon]) => (
-          <button className="menuButton" key={label} onClick={() => setMessage(`${label}を開きました。`)}>
+          <button className="menuButton" key={label} onClick={() => (label === "ヘルプ" ? setHelpOpen((open) => !open) : setMessage(`${label}を開きました。`))}>
             <Icon name={icon} /><span>{label}</span>
           </button>
         ))}
       </div>
+      {helpOpen && (
+        <Panel className="helpPanel">
+          <div className="menuSectionTitle">
+            <h2>ヘルプ</h2>
+            <button className="whiteButton" onClick={() => setHelpOpen(false)}>閉じる</button>
+          </div>
+          <p>確認用メニューです。パスワードを入力するとガチャ確認用のダイヤを追加できます。</p>
+          <div className="debugDiamondBox">
+            <input
+              type="password"
+              value={debugPassword}
+              onChange={(event) => setDebugPassword(event.target.value)}
+              placeholder="パスワード"
+            />
+            <button className="yellow" onClick={addDebugDiamonds}>ダイヤ100000</button>
+          </div>
+        </Panel>
+      )}
       <Panel className="menuAchievements">
         <div className="menuSectionTitle">
           <h2>実績</h2>
