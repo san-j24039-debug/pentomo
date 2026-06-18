@@ -972,10 +972,10 @@ function Gacha({ game, setGame, setMessage }) {
         {ratesOpen && (
           <div className="ratePopover">
             <b>排出率</b>
-            <span>魚のエサ...60%</span>
-            <span>高級魚...30%</span>
-            <span>特製魚セット...8%</span>
-            <span>ペンギン卵...2%</span>
+            <span><em>魚のエサ</em><strong>60%</strong></span>
+            <span><em>高級魚</em><strong>30%</strong></span>
+            <span><em>特製魚セット</em><strong>8%</strong></span>
+            <span><em>ペンギン卵</em><strong>2%</strong></span>
           </div>
         )}
         <div className="sparkleCard">
