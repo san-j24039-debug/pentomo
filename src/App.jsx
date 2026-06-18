@@ -996,15 +996,12 @@ function EggStorage({ game, setHatchModal, setActive, embedded = false }) {
   const eggSortOptions = [
     ["book", "図鑑順"],
     ["newest", "入手順"],
-    ["rarity", "卵レア度順"],
   ];
   const selectedEggSortLabel = eggSortOptions.find(([value]) => value === eggSortMode)?.[1] || "図鑑順";
-  const eggTypeRank = { rainbow: 0, gold: 1, white: 2 };
   const sortedEggs = game.eggs
     .map((egg, index) => ({ ...egg, storageIndex: index }))
     .sort((a, b) => {
       if (eggSortMode === "book") return a.speciesId - b.speciesId || a.storageIndex - b.storageIndex;
-      if (eggSortMode === "rarity") return (eggTypeRank[a.type] ?? 9) - (eggTypeRank[b.type] ?? 9) || a.speciesId - b.speciesId;
       return b.storageIndex - a.storageIndex;
     });
   const content = (
