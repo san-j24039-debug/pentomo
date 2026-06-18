@@ -936,6 +936,7 @@ function PenguinList({ game, setGame, setHatchModal, setActive }) {
 
 function Gacha({ game, setGame, setMessage }) {
   const [results, setResults] = useState([]);
+  const [openedResults, setOpenedResults] = useState({});
   const [ratesOpen, setRatesOpen] = useState(false);
   const [gachaAnimating, setGachaAnimating] = useState(false);
   const [gachaCinematic, setGachaCinematic] = useState(null);
@@ -953,8 +954,12 @@ function Gacha({ game, setGame, setMessage }) {
     window.setTimeout(() => setGachaAnimating(true), 0);
     window.setTimeout(() => setGachaAnimating(false), 1200);
     setResults([]);
+    setOpenedResults({});
     setGachaCinematic({ count, gotSsr });
-    window.setTimeout(() => setResults(next), 2100);
+    window.setTimeout(() => {
+      setResults(next);
+      setOpenedResults({});
+    }, 2100);
     window.setTimeout(() => setGachaCinematic(null), 2500);
     setGame((current) => ({
       ...current,
@@ -968,6 +973,19 @@ function Gacha({ game, setGame, setMessage }) {
     }));
     setMessage(gotSsr ? "SSRペンギン卵を入手！卵画面で孵化しよう。" : "ガチャ報酬を受け取ったよ。");
   };
+
+  const openResult = (id) => {
+    setOpenedResults((current) => ({ ...current, [id]: true }));
+  };
+
+  const openAllResults = () => {
+    setOpenedResults((current) => ({
+      ...current,
+      ...Object.fromEntries(results.filter((result) => !current[result.id]).map((result) => [result.id, true])),
+    }));
+  };
+
+  const unopenedCount = results.filter((result) => !openedResults[result.id]).length;
 
   return (
     <Screen className="gachaScreen">
@@ -996,12 +1014,22 @@ function Gacha({ game, setGame, setMessage }) {
       </div>
       <div className={`openEggs ${results.length > 1 ? "ten" : ""} ${results.length ? "hasResults" : ""}`}>
         {results.length === 0 && <p>ガチャを引くとここに結果が表示されます。</p>}
-        {results.map((result) => (
-          <button className={`openEgg ${result.type} opened`} key={result.id}>
-            <span>{result.reward}</span>
+        {results.map((result, index) => (
+          <button
+            className={`openEgg ${result.type} ${openedResults[result.id] ? "opened" : ""}`}
+            key={result.id}
+            onClick={() => openResult(result.id)}
+            style={{ "--delay": `${index * 0.035}s` }}
+            type="button"
+          >
+            <i />
+            <span>{openedResults[result.id] ? result.reward : "TAP"}</span>
           </button>
         ))}
       </div>
+      {results.length > 0 && unopenedCount > 0 && (
+        <button className="openAllButton" onClick={openAllResults}>すべて開く 残り{unopenedCount}個</button>
+      )}
       <div className="gachaButtons">
         <button className="yellow" onClick={() => pull(1)} disabled={!!gachaCinematic}>1回 100ダイヤ</button>
         <button className="pink" onClick={() => pull(10)} disabled={!!gachaCinematic}>10連 1000ダイヤ</button>
@@ -1009,6 +1037,8 @@ function Gacha({ game, setGame, setMessage }) {
       {gachaCinematic && (
         <div className={`gachaCinematic ${gachaCinematic.gotSsr ? "ssr" : ""}`}>
           <div className="cinematicSky" />
+          <div className="cinematicSlide" />
+          <div className="cinematicPenguin"><PenguinFigure size="collection" /></div>
           <div className="cinematicBurst" />
           <div className="cinematicSnow snowA" />
           <div className="cinematicSnow snowB" />
