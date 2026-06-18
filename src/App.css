@@ -1612,10 +1612,38 @@ p {
   border: 7px solid #151a20;
   border-radius: 38px;
   background:
-    radial-gradient(circle at 18% 16%, rgba(255,255,255,0.92), transparent 16%),
-    linear-gradient(180deg, #c9f0ff 0%, #f5fdff 58%, #ffffff 100%);
+    radial-gradient(circle at 18% 12%, rgba(255,255,255,0.96), transparent 16%),
+    radial-gradient(circle at 82% 18%, rgba(255,236,153,0.44), transparent 20%),
+    linear-gradient(180deg, #aee7ff 0%, #dbf7ff 46%, #ffffff 100%);
   box-shadow: 0 26px 72px rgba(31, 81, 116, 0.36);
   transform: translate(-50%, -50%);
+}
+
+.gachaResultOverlay.result-rainbow {
+  background:
+    radial-gradient(circle at 72% 18%, rgba(255,245,166,0.76), transparent 22%),
+    radial-gradient(circle at 24% 16%, rgba(255,179,221,0.45), transparent 20%),
+    linear-gradient(180deg, #a6eaff 0%, #ffe9f5 54%, #ffffff 100%);
+}
+
+.gachaResultOverlay.result-gold {
+  background:
+    radial-gradient(circle at 72% 18%, rgba(255,229,109,0.7), transparent 22%),
+    linear-gradient(180deg, #bdefff 0%, #fff4ca 54%, #ffffff 100%);
+}
+
+.resultAurora {
+  position: absolute;
+  inset: 82px -34px auto;
+  height: 190px;
+  pointer-events: none;
+  opacity: 0.72;
+  background:
+    linear-gradient(115deg, transparent 0 16%, rgba(255,255,255,0.6) 17% 20%, transparent 21% 100%),
+    linear-gradient(65deg, transparent 0 52%, rgba(101,214,255,0.34) 53% 64%, transparent 65% 100%),
+    radial-gradient(circle at 50% 50%, rgba(255,255,255,0.54), transparent 56%);
+  filter: blur(0.2px);
+  transform: rotate(-7deg);
 }
 
 .gachaResultOverlay::before {
@@ -1640,6 +1668,12 @@ p {
   padding-top: 12px;
 }
 
+.gachaResultHeader h2 {
+  color: #084b78;
+  font-size: 22px;
+  text-shadow: 0 2px 0 rgba(255,255,255,0.85);
+}
+
 .gachaResultHeader p {
   margin-top: 4px;
 }
@@ -1649,10 +1683,61 @@ p {
   flex: 0 0 auto;
 }
 
+.gachaResultSummary {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 54px;
+  padding: 10px 14px;
+  border: 1px solid rgba(142, 209, 241, 0.9);
+  border-radius: 20px;
+  background:
+    linear-gradient(135deg, rgba(255,255,255,0.96), rgba(223,247,255,0.9)),
+    radial-gradient(circle at 82% 30%, rgba(255,255,255,0.96), transparent 24%);
+  box-shadow: 0 10px 22px rgba(44, 126, 184, 0.14);
+}
+
+.gachaResultSummary span {
+  padding: 6px 11px;
+  border-radius: 999px;
+  background: linear-gradient(#7bd3ff, #36a3ec);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 900;
+  box-shadow: 0 4px 0 #2380c1;
+}
+
+.gachaResultSummary b {
+  color: #17577d;
+  font-size: 15px;
+}
+
+.result-rainbow .gachaResultSummary span {
+  background: linear-gradient(135deg, #79efff, #ff8fc4 56%, #ffd95b);
+  box-shadow: 0 4px 0 #d85d94;
+}
+
+.result-gold .gachaResultSummary span {
+  background: linear-gradient(#fff0a2, #ffc645);
+  box-shadow: 0 4px 0 #db9e24;
+  color: #6a4a10;
+}
+
 .resultModalEggs {
   align-self: start;
   min-height: 320px;
   align-content: center;
+  position: relative;
+  z-index: 1;
+  border: 1px solid rgba(132, 201, 235, 0.9);
+  border-radius: 22px;
+  background:
+    radial-gradient(circle at 22% 12%, rgba(255,255,255,0.95), transparent 16%),
+    linear-gradient(180deg, rgba(255,255,255,0.94), rgba(226,248,255,0.86));
+  box-shadow: inset 0 0 0 3px rgba(255,255,255,0.42), 0 14px 28px rgba(39, 115, 173, 0.14);
 }
 
 .resultModalEggs.ten {
@@ -1669,6 +1754,8 @@ p {
 
 .gachaResultOverlay .openAllButton {
   align-self: end;
+  position: relative;
+  z-index: 1;
 }
 
 .openEggs.hasResults {
@@ -1697,7 +1784,22 @@ p {
   font-size: 9px;
   animation: resultItemPop 0.38s ease-out both;
   animation-delay: var(--delay, 0s);
-  box-shadow: inset -9px -14px 18px rgba(59, 108, 143, 0.14), 0 8px 14px rgba(45, 117, 170, 0.15);
+  box-shadow:
+    inset -9px -14px 18px rgba(59, 108, 143, 0.14),
+    inset 7px 9px 14px rgba(255,255,255,0.56),
+    0 8px 14px rgba(45, 117, 170, 0.15);
+}
+
+.openEgg::before {
+  content: "";
+  position: absolute;
+  left: 12px;
+  top: 10px;
+  width: 14px;
+  height: 24px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.58);
+  transform: rotate(22deg);
 }
 
 .openEgg.white {
@@ -1729,17 +1831,20 @@ p {
 }
 
 .openEgg:not(.opened) span {
-  padding: 2px 5px;
+  padding: 3px 7px;
   border-radius: 999px;
   background: rgba(255,255,255,0.74);
   color: #2d6f99;
+  box-shadow: 0 2px 8px rgba(42, 118, 173, 0.12);
 }
 
 .openEgg.opened {
   width: 100%;
   border-radius: 8px;
-  background: #fff;
-  box-shadow: 0 7px 14px rgba(49, 126, 183, 0.13);
+  background:
+    radial-gradient(circle at 18% 18%, rgba(255,255,255,0.96), transparent 18%),
+    linear-gradient(180deg, #ffffff, #effbff);
+  box-shadow: 0 7px 14px rgba(49, 126, 183, 0.13), inset 0 0 0 1px #d9f0fb;
   animation: crackOpen 0.42s ease-out both;
 }
 

@@ -994,6 +994,7 @@ function Gacha({ game, setGame, setMessage }) {
   };
 
   const unopenedCount = results.filter((result) => !openedResults[result.id]).length;
+  const resultBestType = results.some((result) => result.type === "rainbow") ? "rainbow" : results.some((result) => result.type === "gold") ? "gold" : "white";
 
   return (
     <Screen className="gachaScreen">
@@ -1030,13 +1031,18 @@ function Gacha({ game, setGame, setMessage }) {
         <GachaCinematic3D cinematic={gachaCinematic} />
       )}
       {results.length > 0 && !gachaCinematic && (
-        <div className="gachaResultOverlay" role="dialog" aria-modal="true" aria-label="ガチャ結果">
+        <div className={`gachaResultOverlay result-${resultBestType}`} role="dialog" aria-modal="true" aria-label="ガチャ結果">
+          <div className="resultAurora" aria-hidden="true" />
           <div className="gachaResultHeader">
             <div>
               <h2>ガチャ結果</h2>
               <p>{unopenedCount > 0 ? "卵をタップして中身を確認しよう。" : "すべて確認しました。"}</p>
             </div>
             <button className="profileCloseButton" onClick={closeResults} type="button" aria-label="閉じる">×</button>
+          </div>
+          <div className="gachaResultSummary">
+            <span>{results.length}個の卵</span>
+            <b>{resultBestType === "rainbow" ? "SSRチャンス!" : resultBestType === "gold" ? "いい予感!" : "開封しよう"}</b>
           </div>
           <div className={`openEggs resultModalEggs ${results.length > 1 ? "ten" : ""} hasResults`}>
             {results.map((result, index) => (
@@ -1098,6 +1104,9 @@ function GachaCinematic3D({ cinematic }) {
     const darkMaterial = new THREE.MeshStandardMaterial({ color: 0x14253a, roughness: 0.58 });
     const whiteMaterial = new THREE.MeshStandardMaterial({ color: 0xfffbf4, roughness: 0.52 });
     const orangeMaterial = new THREE.MeshStandardMaterial({ color: 0xffac3f, roughness: 0.46 });
+    const cheekMaterial = new THREE.MeshStandardMaterial({ color: 0xffadc0, emissive: 0xff6d95, emissiveIntensity: 0.12, roughness: 0.46 });
+    const eyeMaterial = new THREE.MeshStandardMaterial({ color: 0x071423, roughness: 0.16 });
+    const eyeHighlightMaterial = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xffffff, emissiveIntensity: 0.22, roughness: 0.08 });
     const goldMaterial = new THREE.MeshStandardMaterial({ color: 0xffd85c, emissive: 0x5c3300, emissiveIntensity: 0.12, roughness: 0.36 });
     const rainbowMaterial = new THREE.MeshStandardMaterial({ color: 0xff91ca, emissive: 0x5adfff, emissiveIntensity: 0.28, roughness: 0.32 });
 
@@ -1169,38 +1178,47 @@ function GachaCinematic3D({ cinematic }) {
     scene.add(arch);
 
     const penguinGroup = new THREE.Group();
-    const body = new THREE.Mesh(new THREE.SphereGeometry(0.42, 32, 24), darkMaterial);
-    body.scale.set(0.86, 1.18, 0.72);
-    body.position.y = 0.06;
-    const belly = new THREE.Mesh(new THREE.SphereGeometry(0.32, 32, 20), whiteMaterial);
-    belly.scale.set(0.78, 1.0, 0.35);
-    belly.position.set(0, -0.02, 0.28);
-    const head = new THREE.Mesh(new THREE.SphereGeometry(0.34, 32, 20), darkMaterial);
-    head.position.set(0, 0.48, 0.03);
-    const face = new THREE.Mesh(new THREE.SphereGeometry(0.24, 32, 16), whiteMaterial);
-    face.scale.set(1.18, 0.82, 0.34);
-    face.position.set(0, 0.48, 0.24);
-    const beak = new THREE.Mesh(new THREE.ConeGeometry(0.08, 0.14, 18), orangeMaterial);
+    const body = new THREE.Mesh(new THREE.SphereGeometry(0.46, 36, 26), darkMaterial);
+    body.scale.set(0.96, 1.05, 0.78);
+    body.position.set(0, 0.0, 0.02);
+    const belly = new THREE.Mesh(new THREE.SphereGeometry(0.36, 36, 22), whiteMaterial);
+    belly.scale.set(0.92, 0.98, 0.34);
+    belly.position.set(0, -0.08, 0.34);
+    const head = new THREE.Mesh(new THREE.SphereGeometry(0.42, 36, 24), darkMaterial);
+    head.scale.set(1.04, 0.98, 0.92);
+    head.position.set(0, 0.45, 0.06);
+    const face = new THREE.Mesh(new THREE.SphereGeometry(0.31, 36, 18), whiteMaterial);
+    face.scale.set(1.2, 0.9, 0.36);
+    face.position.set(0, 0.45, 0.34);
+    const beak = new THREE.Mesh(new THREE.ConeGeometry(0.095, 0.16, 20), orangeMaterial);
     beak.rotation.x = Math.PI / 2;
-    beak.position.set(0, 0.43, 0.48);
+    beak.position.set(0, 0.4, 0.61);
     penguinGroup.add(body, belly, head, face, beak);
-    for (const x of [-0.12, 0.12]) {
-      const eye = new THREE.Mesh(new THREE.SphereGeometry(0.036, 16, 12), new THREE.MeshStandardMaterial({ color: 0x071423, roughness: 0.18 }));
-      eye.position.set(x, 0.52, 0.47);
-      penguinGroup.add(eye);
+    for (const x of [-0.14, 0.14]) {
+      const eye = new THREE.Mesh(new THREE.SphereGeometry(0.055, 20, 14), eyeMaterial);
+      eye.scale.set(1, 1.12, 0.45);
+      eye.position.set(x, 0.51, 0.59);
+      const highlight = new THREE.Mesh(new THREE.SphereGeometry(0.018, 12, 8), eyeHighlightMaterial);
+      highlight.position.set(x - 0.015, 0.535, 0.626);
+      const cheek = new THREE.Mesh(new THREE.SphereGeometry(0.055, 16, 10), cheekMaterial);
+      cheek.scale.set(1.25, 0.72, 0.24);
+      cheek.position.set(x * 1.62, 0.34, 0.58);
+      penguinGroup.add(eye, highlight, cheek);
     }
     for (const x of [-0.42, 0.42]) {
-      const flipper = new THREE.Mesh(new THREE.SphereGeometry(0.14, 18, 12), darkMaterial);
-      flipper.scale.set(0.44, 1.35, 0.36);
-      flipper.position.set(x, 0.1, 0);
-      flipper.rotation.z = x < 0 ? 0.65 : -0.65;
+      const flipper = new THREE.Mesh(new THREE.SphereGeometry(0.15, 20, 12), darkMaterial);
+      flipper.scale.set(0.48, 1.55, 0.34);
+      flipper.position.set(x, 0.22, 0.04);
+      flipper.rotation.z = x < 0 ? 1.05 : -1.05;
+      flipper.rotation.x = x < 0 ? -0.18 : 0.18;
       penguinGroup.add(flipper);
-      const foot = new THREE.Mesh(new THREE.SphereGeometry(0.09, 16, 10), orangeMaterial);
-      foot.scale.set(1.4, 0.45, 0.82);
-      foot.position.set(x * 0.42, -0.44, 0.32);
+      const foot = new THREE.Mesh(new THREE.SphereGeometry(0.105, 18, 10), orangeMaterial);
+      foot.scale.set(1.65, 0.48, 0.9);
+      foot.position.set(x * 0.42, -0.43, 0.45);
+      foot.rotation.z = x < 0 ? 0.16 : -0.16;
       penguinGroup.add(foot);
     }
-    const sled = new THREE.Mesh(new THREE.BoxGeometry(0.86, 0.06, 0.58), new THREE.MeshStandardMaterial({ color: 0xe9fbff, roughness: 0.28, metalness: 0.05 }));
+    const sled = new THREE.Mesh(new THREE.BoxGeometry(0.98, 0.06, 0.64), new THREE.MeshStandardMaterial({ color: 0xe9fbff, roughness: 0.28, metalness: 0.05 }));
     sled.position.set(0, -0.5, 0.05);
     penguinGroup.add(sled);
     scene.add(penguinGroup);
