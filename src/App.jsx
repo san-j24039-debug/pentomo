@@ -1044,6 +1044,10 @@ function Gacha({ game, setGame, setMessage }) {
             <span>{results.length}個の卵</span>
             <b>{resultBestType === "rainbow" ? "SSRチャンス!" : resultBestType === "gold" ? "いい予感!" : "開封しよう"}</b>
           </div>
+          <div className="gachaResultMascot" aria-hidden="true">
+            <img src={penguin} alt="" />
+            <span>{unopenedCount > 0 ? "どれから開ける？" : "やったね！"}</span>
+          </div>
           <div className={`openEggs resultModalEggs ${results.length > 1 ? "ten" : ""} hasResults`}>
             {results.map((result, index) => (
               <button
