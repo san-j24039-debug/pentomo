@@ -950,17 +950,19 @@ function Gacha({ game, setGame, setMessage }) {
     }
     const next = makeGachaEggs(count, game.pity);
     const gotSsr = next.some((item) => item.prizeType === "ssrEgg");
+    const bestType = gotSsr ? "rainbow" : next.some((item) => item.type === "gold") ? "gold" : "white";
+    const cinematicDuration = count === 10 ? 3800 : 2600;
     setGachaAnimating(false);
     window.setTimeout(() => setGachaAnimating(true), 0);
     window.setTimeout(() => setGachaAnimating(false), 1200);
     setResults([]);
     setOpenedResults({});
-    setGachaCinematic({ count, gotSsr });
+    setGachaCinematic({ count, gotSsr, bestType, eggs: next.map((item) => item.type) });
     window.setTimeout(() => {
       setResults(next);
       setOpenedResults({});
-    }, 2100);
-    window.setTimeout(() => setGachaCinematic(null), 2500);
+    }, cinematicDuration - 350);
+    window.setTimeout(() => setGachaCinematic(null), cinematicDuration);
     setGame((current) => ({
       ...current,
       diamonds: current.diamonds - cost,
@@ -1009,7 +1011,6 @@ function Gacha({ game, setGame, setMessage }) {
             <Egg type="rainbow" />
           </div>
           <h2>SSRはペンギン卵</h2>
-          <p>N 魚のエサ60% / R 高級魚30% / SR 特製魚セット8% / SSR 卵2%</p>
         </div>
       </div>
       <div className={`openEggs ${results.length > 1 ? "ten" : ""} ${results.length ? "hasResults" : ""}`}>
@@ -1035,10 +1036,26 @@ function Gacha({ game, setGame, setMessage }) {
         <button className="pink" onClick={() => pull(10)} disabled={!!gachaCinematic}>10連 1000ダイヤ</button>
       </div>
       {gachaCinematic && (
-        <div className={`gachaCinematic ${gachaCinematic.gotSsr ? "ssr" : ""}`}>
+        <div className={`gachaCinematic ${gachaCinematic.gotSsr ? "ssr" : ""} rarity-${gachaCinematic.bestType}`} style={{ "--cinematic-duration": `${gachaCinematic.count === 10 ? 3.8 : 2.6}s` }}>
           <div className="cinematicSky" />
-          <div className="cinematicSlide" />
-          <div className="cinematicPenguin"><PenguinFigure size="collection" /></div>
+          <div className="cinematicMountains" />
+          <div className="cinematicSlide">
+            <span />
+          </div>
+          <div className="cinematicSledPenguin">
+            <i className="sledPenguinBody" />
+            <i className="sledPenguinFace" />
+            <i className="sledPenguinBelly" />
+            <i className="sledPenguinBeak" />
+            <i className="sledPenguinFlipper left" />
+            <i className="sledPenguinFlipper right" />
+            <i className="sledBoard" />
+          </div>
+          <div className={`cinematicEggTrail ${gachaCinematic.count > 1 ? "ten" : ""}`}>
+            {gachaCinematic.eggs.map((type, index) => (
+              <span className={`trailEgg ${type}`} key={`${type}-${index}`} style={{ "--trail-delay": `${0.75 + index * 0.12}s` }} />
+            ))}
+          </div>
           <div className="cinematicBurst" />
           <div className="cinematicSnow snowA" />
           <div className="cinematicSnow snowB" />
@@ -1047,7 +1064,7 @@ function Gacha({ game, setGame, setMessage }) {
             <span />
           </div>
           <div className="cinematicEgg">
-            <Egg type={gachaCinematic.gotSsr ? "rainbow" : "gold"} />
+            <Egg type={gachaCinematic.bestType} />
           </div>
           <div className="cinematicText">
             <b>{gachaCinematic.count === 10 ? "10連ガチャ" : "ガチャ開始"}</b>

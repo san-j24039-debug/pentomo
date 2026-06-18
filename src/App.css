@@ -1711,9 +1711,9 @@ p {
   place-items: center;
   overflow: hidden;
   background:
-    radial-gradient(circle at 50% 42%, rgba(255,255,255,0.92), transparent 18%),
-    linear-gradient(180deg, #69b8ff 0%, #bceeff 48%, #ffffff 100%);
-  animation: cinematicFade 2.5s ease-in-out forwards;
+    radial-gradient(circle at 72% 18%, rgba(255,255,255,0.78) 0 8%, transparent 9%),
+    linear-gradient(180deg, #58aef3 0%, #9ddcff 42%, #e7fbff 78%, #ffffff 100%);
+  animation: cinematicFade var(--cinematic-duration, 2.6s) ease-in-out forwards;
 }
 
 .cinematicSky {
@@ -1723,43 +1723,217 @@ p {
     radial-gradient(circle at 20% 18%, rgba(255,255,255,0.9) 0 2px, transparent 3px),
     radial-gradient(circle at 76% 22%, rgba(255,255,255,0.9) 0 3px, transparent 4px),
     radial-gradient(circle at 32% 66%, rgba(255,255,255,0.8) 0 2px, transparent 3px),
-    linear-gradient(135deg, transparent 0 44%, rgba(255,255,255,0.32) 45% 48%, transparent 49% 100%);
+    radial-gradient(circle at 62% 44%, rgba(255,255,255,0.9) 0 2px, transparent 3px);
+}
+
+.cinematicMountains {
+  position: absolute;
+  left: -10%;
+  right: -10%;
+  bottom: 0;
+  height: 42%;
+  background:
+    linear-gradient(135deg, transparent 0 38%, rgba(255,255,255,0.66) 39% 52%, transparent 53%) 8% 18% / 130px 150px no-repeat,
+    linear-gradient(225deg, transparent 0 38%, rgba(255,255,255,0.58) 39% 52%, transparent 53%) 80% 8% / 150px 170px no-repeat,
+    linear-gradient(180deg, rgba(221,248,255,0.34), rgba(255,255,255,0.92));
+  opacity: 0.9;
 }
 
 .cinematicSlide {
   position: absolute;
-  z-index: 2;
-  left: -12%;
-  top: 33%;
-  width: 128%;
-  height: 108px;
-  border-radius: 999px;
+  z-index: 3;
+  left: -30%;
+  top: 21%;
+  width: 160%;
+  height: 190px;
+  border-radius: 999px 999px 52px 52px;
   background:
-    linear-gradient(100deg, transparent 0 8%, rgba(255,255,255,0.78) 9% 16%, transparent 17% 24%, rgba(255,255,255,0.68) 25% 32%, transparent 33% 100%),
-    linear-gradient(180deg, rgba(255,255,255,0.88), rgba(151,226,255,0.66));
-  box-shadow: inset 0 -16px 22px rgba(62, 151, 201, 0.16), 0 20px 28px rgba(27, 95, 146, 0.18);
-  transform: rotate(-18deg) translateY(-42px);
-  animation: slideShine 2.2s ease-in-out forwards;
+    linear-gradient(105deg, rgba(255,255,255,0.95) 0 13%, rgba(168,232,255,0.5) 14% 18%, transparent 19% 100%),
+    linear-gradient(180deg, rgba(255,255,255,0.93), rgba(166,232,255,0.74) 58%, rgba(88,181,232,0.52));
+  border: 6px solid rgba(255,255,255,0.58);
+  box-shadow:
+    inset 0 -24px 26px rgba(52, 144, 194, 0.24),
+    inset 0 14px 18px rgba(255,255,255,0.88),
+    0 28px 40px rgba(22, 89, 139, 0.24);
+  transform: rotate(-17deg) translateY(-28px);
+  animation: slideShine 2.5s ease-in-out forwards;
 }
 
-.gachaCinematic.ssr .cinematicSlide {
-  background:
-    linear-gradient(100deg, transparent 0 8%, rgba(255,255,255,0.78) 9% 16%, transparent 17% 24%, rgba(255,255,255,0.68) 25% 32%, transparent 33% 100%),
-    linear-gradient(100deg, rgba(128,236,255,0.72), rgba(255,159,215,0.66), rgba(255,229,111,0.72));
-}
-
-.cinematicPenguin {
+.cinematicSlide::before,
+.cinematicSlide::after,
+.cinematicSlide span {
+  content: "";
   position: absolute;
-  z-index: 4;
-  left: -72px;
-  top: 23%;
-  transform: rotate(-18deg);
-  animation: penguinSlideIn 1.25s cubic-bezier(.16,.72,.21,1) forwards;
+  left: 6%;
+  right: 6%;
+  height: 16px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.52);
+  filter: blur(0.3px);
 }
 
-.cinematicPenguin .penguinFigure.collection {
+.cinematicSlide::before {
+  top: 28px;
+}
+
+.cinematicSlide::after {
+  bottom: 34px;
+}
+
+.cinematicSlide span {
+  top: 82px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.86), transparent);
+  animation: slideGlint 1.15s ease-out infinite;
+}
+
+.gachaCinematic.rarity-rainbow .cinematicSlide {
+  background:
+    linear-gradient(105deg, rgba(255,255,255,0.95) 0 13%, rgba(168,232,255,0.5) 14% 18%, transparent 19% 100%),
+    linear-gradient(105deg, rgba(142,240,255,0.8), rgba(255,158,215,0.72), rgba(255,229,105,0.78));
+}
+
+.gachaCinematic.rarity-gold .cinematicSlide {
+  background:
+    linear-gradient(105deg, rgba(255,255,255,0.95) 0 13%, rgba(168,232,255,0.5) 14% 18%, transparent 19% 100%),
+    linear-gradient(180deg, rgba(255,252,218,0.94), rgba(255,221,105,0.62), rgba(113,204,255,0.58));
+}
+
+.cinematicSledPenguin {
+  position: absolute;
+  z-index: 5;
+  left: -96px;
+  top: 18%;
   width: 76px;
-  height: 76px;
+  height: 72px;
+  transform: rotate(-17deg);
+  animation: sledPenguinRun 1.38s cubic-bezier(.12,.8,.2,1) forwards;
+}
+
+.sledPenguinBody {
+  position: absolute;
+  left: 18px;
+  top: 11px;
+  width: 38px;
+  height: 48px;
+  border-radius: 54% 54% 48% 48%;
+  background: linear-gradient(150deg, #142d4b 0 45%, #213c5f 46% 100%);
+  box-shadow: 0 8px 12px rgba(23, 76, 118, 0.2);
+}
+
+.sledPenguinFace {
+  position: absolute;
+  left: 25px;
+  top: 19px;
+  width: 24px;
+  height: 23px;
+  border-radius: 50%;
+  background: #fffdf8;
+}
+
+.sledPenguinFace::before,
+.sledPenguinFace::after {
+  content: "";
+  position: absolute;
+  top: 8px;
+  width: 5px;
+  height: 6px;
+  border-radius: 50%;
+  background: #132a3f;
+}
+
+.sledPenguinFace::before {
+  left: 6px;
+}
+
+.sledPenguinFace::after {
+  right: 6px;
+}
+
+.sledPenguinBelly {
+  position: absolute;
+  left: 26px;
+  top: 36px;
+  width: 22px;
+  height: 18px;
+  border-radius: 50%;
+  background: #f4f8fb;
+}
+
+.sledPenguinBeak {
+  position: absolute;
+  left: 34px;
+  top: 31px;
+  width: 9px;
+  height: 7px;
+  border-radius: 60% 60% 50% 50%;
+  background: #ff8b54;
+}
+
+.sledPenguinFlipper {
+  position: absolute;
+  top: 34px;
+  width: 12px;
+  height: 24px;
+  border-radius: 999px;
+  background: #193454;
+}
+
+.sledPenguinFlipper.left {
+  left: 11px;
+  transform: rotate(34deg);
+}
+
+.sledPenguinFlipper.right {
+  right: 10px;
+  transform: rotate(-42deg);
+}
+
+.sledBoard {
+  position: absolute;
+  left: 3px;
+  bottom: 2px;
+  width: 70px;
+  height: 13px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #ffffff, #9eeaff);
+  box-shadow: inset 0 -4px 0 rgba(53, 143, 198, 0.22), 0 7px 10px rgba(21, 82, 130, 0.18);
+}
+
+.cinematicEggTrail {
+  position: absolute;
+  z-index: 6;
+  inset: 0;
+  pointer-events: none;
+}
+
+.trailEgg {
+  position: absolute;
+  left: 50%;
+  top: 46%;
+  width: 38px;
+  height: 50px;
+  border-radius: 50% 50% 44% 44%;
+  opacity: 0;
+  box-shadow: inset -7px -10px 12px rgba(58, 105, 142, 0.14), 0 0 18px rgba(255,255,255,0.9);
+  animation: trailEggFlow 1.35s ease-out both;
+  animation-delay: var(--trail-delay, 0.8s);
+}
+
+.trailEgg.white {
+  background: linear-gradient(135deg, #fff, #edf7ff);
+}
+
+.trailEgg.gold {
+  background: linear-gradient(135deg, #fff4ad, #ffc43c);
+}
+
+.trailEgg.rainbow {
+  background: linear-gradient(135deg, #fff, #9eeeff 30%, #ff9dd2 62%, #ffe36d);
+}
+
+.cinematicEggTrail.ten .trailEgg {
+  width: 30px;
+  height: 40px;
 }
 
 .cinematicBurst {
@@ -1788,7 +1962,7 @@ p {
     radial-gradient(circle, rgba(255,255,255,0.95) 0 2px, transparent 3px),
     radial-gradient(circle, rgba(255,255,255,0.8) 0 1px, transparent 2px);
   background-size: 48px 48px, 31px 31px;
-  animation: cinematicSnow 2.5s linear infinite;
+  animation: cinematicSnow var(--cinematic-duration, 2.6s) linear infinite;
 }
 
 .cinematicSnow.snowB {
@@ -1800,6 +1974,7 @@ p {
 
 .cinematicGate {
   position: absolute;
+  z-index: 1;
   inset: 0;
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -1808,9 +1983,9 @@ p {
 
 .cinematicGate span {
   background:
-    linear-gradient(135deg, rgba(255,255,255,0.34), transparent 35%),
-    linear-gradient(180deg, rgba(7,57,97,0.54), rgba(89,171,221,0.24));
-  backdrop-filter: blur(2px);
+    linear-gradient(135deg, rgba(255,255,255,0.32), transparent 35%),
+    linear-gradient(180deg, rgba(255,255,255,0.18), rgba(89,171,221,0.08));
+  backdrop-filter: blur(1px);
   animation: cinematicGateLeft 1.65s ease-in-out forwards;
 }
 
@@ -1823,7 +1998,7 @@ p {
   z-index: 3;
   display: grid;
   place-items: center;
-  animation: cinematicEgg 2.2s cubic-bezier(.18,.86,.22,1) forwards;
+  animation: cinematicEgg 2.25s cubic-bezier(.18,.86,.22,1) forwards;
 }
 
 .cinematicEgg .egg {
@@ -2037,32 +2212,67 @@ p {
 @keyframes slideShine {
   0% {
     opacity: 0;
-    transform: rotate(-18deg) translateY(-42px) translateX(-24px);
+    transform: rotate(-17deg) translateY(-28px) translateX(-36px);
   }
   16%, 80% {
     opacity: 1;
   }
   100% {
     opacity: 0;
-    transform: rotate(-18deg) translateY(-42px) translateX(18px);
+    transform: rotate(-17deg) translateY(-28px) translateX(18px);
   }
 }
 
-@keyframes penguinSlideIn {
+@keyframes slideGlint {
+  0% {
+    transform: translateX(-22%);
+    opacity: 0;
+  }
+  36%, 70% {
+    opacity: 0.82;
+  }
+  100% {
+    transform: translateX(22%);
+    opacity: 0;
+  }
+}
+
+@keyframes sledPenguinRun {
   0% {
     opacity: 0;
-    transform: translate(-40px, -20px) rotate(-18deg) scale(0.82);
+    transform: translate(-28px, -6px) rotate(-18deg) scale(0.82);
   }
-  18% {
+  14% {
     opacity: 1;
   }
-  76% {
+  42% {
+    transform: translate(176px, 74px) rotate(-8deg) scale(1);
+  }
+  72% {
     opacity: 1;
-    transform: translate(250px, 116px) rotate(16deg) scale(1.08);
+    transform: translate(330px, 142px) rotate(14deg) scale(1.08);
   }
   100% {
     opacity: 0;
-    transform: translate(330px, 150px) rotate(22deg) scale(0.92);
+    transform: translate(410px, 180px) rotate(18deg) scale(0.94);
+  }
+}
+
+@keyframes trailEggFlow {
+  0% {
+    opacity: 0;
+    transform: translate(-180px, -120px) rotate(-18deg) scale(0.55);
+  }
+  12% {
+    opacity: 1;
+  }
+  62% {
+    opacity: 1;
+    transform: translate(-22px, 10px) rotate(8deg) scale(1.08);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(72px, 70px) rotate(15deg) scale(0.7);
   }
 }
 
