@@ -938,8 +938,10 @@ function Gacha({ game, setGame, setMessage }) {
   const [results, setResults] = useState([]);
   const [ratesOpen, setRatesOpen] = useState(false);
   const [gachaAnimating, setGachaAnimating] = useState(false);
+  const [gachaCinematic, setGachaCinematic] = useState(null);
 
   const pull = (count) => {
+    if (gachaCinematic) return;
     const cost = count === 10 ? 1000 : 100;
     if (game.diamonds < cost) {
       setMessage("ダイヤが足りません。おでかけや実績で集めよう。");
@@ -950,7 +952,10 @@ function Gacha({ game, setGame, setMessage }) {
     setGachaAnimating(false);
     window.setTimeout(() => setGachaAnimating(true), 0);
     window.setTimeout(() => setGachaAnimating(false), 1200);
-    setResults(next);
+    setResults([]);
+    setGachaCinematic({ count, gotSsr });
+    window.setTimeout(() => setResults(next), 2100);
+    window.setTimeout(() => setGachaCinematic(null), 2500);
     setGame((current) => ({
       ...current,
       diamonds: current.diamonds - cost,
@@ -998,9 +1003,28 @@ function Gacha({ game, setGame, setMessage }) {
         ))}
       </div>
       <div className="gachaButtons">
-        <button className="yellow" onClick={() => pull(1)}>1回 100ダイヤ</button>
-        <button className="pink" onClick={() => pull(10)}>10連 1000ダイヤ</button>
+        <button className="yellow" onClick={() => pull(1)} disabled={!!gachaCinematic}>1回 100ダイヤ</button>
+        <button className="pink" onClick={() => pull(10)} disabled={!!gachaCinematic}>10連 1000ダイヤ</button>
       </div>
+      {gachaCinematic && (
+        <div className={`gachaCinematic ${gachaCinematic.gotSsr ? "ssr" : ""}`}>
+          <div className="cinematicSky" />
+          <div className="cinematicBurst" />
+          <div className="cinematicSnow snowA" />
+          <div className="cinematicSnow snowB" />
+          <div className="cinematicGate">
+            <span />
+            <span />
+          </div>
+          <div className="cinematicEgg">
+            <Egg type={gachaCinematic.gotSsr ? "rainbow" : "gold"} />
+          </div>
+          <div className="cinematicText">
+            <b>{gachaCinematic.count === 10 ? "10連ガチャ" : "ガチャ開始"}</b>
+            <span>{gachaCinematic.gotSsr ? "虹色の卵がきらめいた！" : "氷の扉がひらく..."}</span>
+          </div>
+        </div>
+      )}
     </Screen>
   );
 }
