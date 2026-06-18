@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import * as THREE from "three";
 import "./App.css";
 import penguin from "./assets/penguin.png";
 
@@ -1026,41 +1027,7 @@ function Gacha({ game, setGame, setMessage }) {
         <button className="pink" onClick={() => pull(10)} disabled={!!gachaCinematic}>10連 1000ダイヤ</button>
       </div>
       {gachaCinematic && (
-        <div className={`gachaCinematic ${gachaCinematic.gotSsr ? "ssr" : ""} rarity-${gachaCinematic.bestType}`} style={{ "--cinematic-duration": `${gachaCinematic.count === 10 ? 3.8 : 2.6}s` }}>
-          <div className="cinematicSky" />
-          <div className="cinematicMountains" />
-          <div className="cinematicSlide">
-            <span />
-          </div>
-          <div className="cinematicSledPenguin">
-            <i className="sledPenguinBody" />
-            <i className="sledPenguinFace" />
-            <i className="sledPenguinBelly" />
-            <i className="sledPenguinBeak" />
-            <i className="sledPenguinFlipper left" />
-            <i className="sledPenguinFlipper right" />
-            <i className="sledBoard" />
-          </div>
-          <div className={`cinematicEggTrail ${gachaCinematic.count > 1 ? "ten" : ""}`}>
-            {gachaCinematic.eggs.map((type, index) => (
-              <span className={`trailEgg ${type}`} key={`${type}-${index}`} style={{ "--trail-delay": `${0.75 + index * 0.12}s` }} />
-            ))}
-          </div>
-          <div className="cinematicBurst" />
-          <div className="cinematicSnow snowA" />
-          <div className="cinematicSnow snowB" />
-          <div className="cinematicGate">
-            <span />
-            <span />
-          </div>
-          <div className="cinematicEgg">
-            <Egg type={gachaCinematic.bestType} />
-          </div>
-          <div className="cinematicText">
-            <b>{gachaCinematic.count === 10 ? "10連ガチャ" : "ガチャ開始"}</b>
-            <span>{gachaCinematic.gotSsr ? "虹色の卵がきらめいた！" : "氷の扉がひらく..."}</span>
-          </div>
-        </div>
+        <GachaCinematic3D cinematic={gachaCinematic} />
       )}
       {results.length > 0 && !gachaCinematic && (
         <div className="gachaResultOverlay" role="dialog" aria-modal="true" aria-label="ガチャ結果">
@@ -1091,6 +1058,267 @@ function Gacha({ game, setGame, setMessage }) {
         </div>
       )}
     </Screen>
+  );
+}
+
+function GachaCinematic3D({ cinematic }) {
+  const mountRef = useRef(null);
+
+  useEffect(() => {
+    const mount = mountRef.current;
+    if (!mount) return undefined;
+
+    const scene = new THREE.Scene();
+    scene.fog = new THREE.Fog(0x9edfff, 7, 15);
+
+    const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 60);
+    camera.position.set(0, 2.35, 8.4);
+    camera.lookAt(0, 0.35, -1.8);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+    mount.appendChild(renderer.domElement);
+
+    const iceMaterial = new THREE.MeshPhysicalMaterial({
+      color: 0x8ee8ff,
+      roughness: 0.18,
+      metalness: 0,
+      transmission: 0.38,
+      transparent: true,
+      opacity: 0.72,
+      thickness: 0.9,
+      clearcoat: 0.75,
+      clearcoatRoughness: 0.16,
+    });
+    const sideIceMaterial = iceMaterial.clone();
+    sideIceMaterial.color.setHex(0xbdf5ff);
+    sideIceMaterial.opacity = 0.82;
+    const snowMaterial = new THREE.MeshStandardMaterial({ color: 0xf7fdff, roughness: 0.82 });
+    const darkMaterial = new THREE.MeshStandardMaterial({ color: 0x14253a, roughness: 0.58 });
+    const whiteMaterial = new THREE.MeshStandardMaterial({ color: 0xfffbf4, roughness: 0.52 });
+    const orangeMaterial = new THREE.MeshStandardMaterial({ color: 0xffac3f, roughness: 0.46 });
+    const goldMaterial = new THREE.MeshStandardMaterial({ color: 0xffd85c, emissive: 0x5c3300, emissiveIntensity: 0.12, roughness: 0.36 });
+    const rainbowMaterial = new THREE.MeshStandardMaterial({ color: 0xff91ca, emissive: 0x5adfff, emissiveIntensity: 0.28, roughness: 0.32 });
+
+    scene.add(new THREE.AmbientLight(0xffffff, 1.65));
+    const sun = new THREE.DirectionalLight(0xffffff, 2.5);
+    sun.position.set(-3.5, 6.2, 5.4);
+    scene.add(sun);
+    const gateLight = new THREE.PointLight(cinematic.gotSsr ? 0xffd768 : 0xa7efff, cinematic.gotSsr ? 7 : 4.6, 9);
+    gateLight.position.set(0, 2.25, -5.15);
+    scene.add(gateLight);
+
+    const floor = new THREE.Mesh(new THREE.CircleGeometry(8, 64), snowMaterial);
+    floor.rotation.x = -Math.PI / 2;
+    floor.position.y = -2.22;
+    scene.add(floor);
+
+    const slidePath = new THREE.CatmullRomCurve3([
+      new THREE.Vector3(0, 1.65, -5.25),
+      new THREE.Vector3(0.16, 0.85, -3.5),
+      new THREE.Vector3(-0.12, -0.35, -1.5),
+      new THREE.Vector3(0.02, -1.25, 1.2),
+      new THREE.Vector3(0, -1.58, 3.2),
+    ]);
+
+    const slideGroup = new THREE.Group();
+    for (let i = 0; i < 22; i += 1) {
+      const t = i / 21;
+      const point = slidePath.getPoint(t);
+      const nextPoint = slidePath.getPoint(Math.min(1, t + 0.035));
+      const width = 2.15 + t * 1.05;
+      const plate = new THREE.Mesh(new THREE.BoxGeometry(width, 0.11, 0.62), iceMaterial);
+      plate.position.copy(point);
+      plate.lookAt(nextPoint);
+      plate.rotation.x += 0.18;
+      slideGroup.add(plate);
+
+      const leftRail = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.28, 0.62), sideIceMaterial);
+      const rightRail = leftRail.clone();
+      leftRail.position.copy(point).add(new THREE.Vector3(-width / 2, 0.22, 0));
+      rightRail.position.copy(point).add(new THREE.Vector3(width / 2, 0.22, 0));
+      leftRail.lookAt(nextPoint);
+      rightRail.lookAt(nextPoint);
+      leftRail.rotation.x += 0.18;
+      rightRail.rotation.x += 0.18;
+      slideGroup.add(leftRail, rightRail);
+    }
+    scene.add(slideGroup);
+
+    const arch = new THREE.Group();
+    const blockGeometry = new THREE.BoxGeometry(0.56, 0.48, 0.7);
+    for (let i = 0; i <= 13; i += 1) {
+      const angle = Math.PI - (i / 13) * Math.PI;
+      const x = Math.cos(angle) * 1.58;
+      const y = Math.sin(angle) * 1.42 + 1.2;
+      const block = new THREE.Mesh(blockGeometry, sideIceMaterial);
+      block.position.set(x, y, -5.45);
+      block.rotation.z = -angle + Math.PI / 2;
+      block.rotation.y = (i % 2 ? 0.08 : -0.08);
+      arch.add(block);
+    }
+    for (const x of [-1.78, 1.78]) {
+      for (let j = 0; j < 4; j += 1) {
+        const pillar = new THREE.Mesh(new THREE.BoxGeometry(0.72, 0.62, 0.78), sideIceMaterial);
+        pillar.position.set(x, -0.58 + j * 0.56, -5.48);
+        pillar.rotation.z = x < 0 ? -0.05 : 0.05;
+        arch.add(pillar);
+      }
+    }
+    scene.add(arch);
+
+    const penguinGroup = new THREE.Group();
+    const body = new THREE.Mesh(new THREE.SphereGeometry(0.42, 32, 24), darkMaterial);
+    body.scale.set(0.86, 1.18, 0.72);
+    body.position.y = 0.06;
+    const belly = new THREE.Mesh(new THREE.SphereGeometry(0.32, 32, 20), whiteMaterial);
+    belly.scale.set(0.78, 1.0, 0.35);
+    belly.position.set(0, -0.02, 0.28);
+    const head = new THREE.Mesh(new THREE.SphereGeometry(0.34, 32, 20), darkMaterial);
+    head.position.set(0, 0.48, 0.03);
+    const face = new THREE.Mesh(new THREE.SphereGeometry(0.24, 32, 16), whiteMaterial);
+    face.scale.set(1.18, 0.82, 0.34);
+    face.position.set(0, 0.48, 0.24);
+    const beak = new THREE.Mesh(new THREE.ConeGeometry(0.08, 0.14, 18), orangeMaterial);
+    beak.rotation.x = Math.PI / 2;
+    beak.position.set(0, 0.43, 0.48);
+    penguinGroup.add(body, belly, head, face, beak);
+    for (const x of [-0.12, 0.12]) {
+      const eye = new THREE.Mesh(new THREE.SphereGeometry(0.036, 16, 12), new THREE.MeshStandardMaterial({ color: 0x071423, roughness: 0.18 }));
+      eye.position.set(x, 0.52, 0.47);
+      penguinGroup.add(eye);
+    }
+    for (const x of [-0.42, 0.42]) {
+      const flipper = new THREE.Mesh(new THREE.SphereGeometry(0.14, 18, 12), darkMaterial);
+      flipper.scale.set(0.44, 1.35, 0.36);
+      flipper.position.set(x, 0.1, 0);
+      flipper.rotation.z = x < 0 ? 0.65 : -0.65;
+      penguinGroup.add(flipper);
+      const foot = new THREE.Mesh(new THREE.SphereGeometry(0.09, 16, 10), orangeMaterial);
+      foot.scale.set(1.4, 0.45, 0.82);
+      foot.position.set(x * 0.42, -0.44, 0.32);
+      penguinGroup.add(foot);
+    }
+    const sled = new THREE.Mesh(new THREE.BoxGeometry(0.86, 0.06, 0.58), new THREE.MeshStandardMaterial({ color: 0xe9fbff, roughness: 0.28, metalness: 0.05 }));
+    sled.position.set(0, -0.5, 0.05);
+    penguinGroup.add(sled);
+    scene.add(penguinGroup);
+
+    const eggMaterialFor = (type) => {
+      if (type === "rainbow") return rainbowMaterial;
+      if (type === "gold") return goldMaterial;
+      return whiteMaterial;
+    };
+    const eggGroups = cinematic.eggs.map((type, index) => {
+      const group = new THREE.Group();
+      const egg = new THREE.Mesh(new THREE.SphereGeometry(0.22, 32, 20), eggMaterialFor(type));
+      egg.scale.set(0.78, 1.16, 0.78);
+      group.add(egg);
+      const glow = new THREE.PointLight(type === "rainbow" ? 0xff9ddb : type === "gold" ? 0xffd34e : 0xcff8ff, type === "white" ? 0.8 : 1.35, 2.4);
+      glow.position.set(0, 0.15, 0);
+      group.add(glow);
+      group.userData.delay = 1.0 + index * (cinematic.count > 1 ? 0.13 : 0.02);
+      group.visible = false;
+      scene.add(group);
+      return group;
+    });
+
+    const particleGeometry = new THREE.BufferGeometry();
+    const particleCount = 130;
+    const positions = new Float32Array(particleCount * 3);
+    for (let i = 0; i < particleCount; i += 1) {
+      positions[i * 3] = (Math.random() - 0.5) * 8;
+      positions[i * 3 + 1] = Math.random() * 6 - 1.4;
+      positions[i * 3 + 2] = Math.random() * 9 - 5.8;
+    }
+    particleGeometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+    const particles = new THREE.Points(
+      particleGeometry,
+      new THREE.PointsMaterial({ color: 0xffffff, size: 0.05, transparent: true, opacity: 0.75 }),
+    );
+    scene.add(particles);
+
+    const sparkleGeometry = new THREE.BufferGeometry();
+    const sparkleCount = cinematic.gotSsr ? 36 : 20;
+    const sparklePositions = new Float32Array(sparkleCount * 3);
+    for (let i = 0; i < sparkleCount; i += 1) {
+      sparklePositions[i * 3] = (Math.random() - 0.5) * 4.6;
+      sparklePositions[i * 3 + 1] = Math.random() * 3.4 - 0.4;
+      sparklePositions[i * 3 + 2] = Math.random() * 5.5 - 4.6;
+    }
+    sparkleGeometry.setAttribute("position", new THREE.BufferAttribute(sparklePositions, 3));
+    scene.add(new THREE.Points(sparkleGeometry, new THREE.PointsMaterial({ color: cinematic.gotSsr ? 0xffe272 : 0xffffff, size: 0.09, transparent: true, opacity: 0.95 })));
+
+    const ease = (value) => 1 - Math.pow(1 - Math.min(1, Math.max(0, value)), 3);
+    const clock = new THREE.Clock();
+    let frameId = 0;
+
+    const resize = () => {
+      const rect = mount.getBoundingClientRect();
+      const width = Math.max(1, rect.width);
+      const height = Math.max(1, rect.height);
+      renderer.setSize(width, height, false);
+      camera.aspect = width / height;
+      camera.updateProjectionMatrix();
+    };
+    const observer = new ResizeObserver(resize);
+    observer.observe(mount);
+    resize();
+
+    const animate = () => {
+      const elapsed = clock.getElapsedTime();
+      const slideT = ease(elapsed / 1.55);
+      const point = slidePath.getPoint(Math.min(0.92, slideT * 0.92));
+      const tangent = slidePath.getTangent(Math.min(0.95, slideT * 0.92));
+      penguinGroup.position.copy(point).add(new THREE.Vector3(0, 0.38, 0.12));
+      penguinGroup.rotation.y = Math.sin(elapsed * 5) * 0.1;
+      penguinGroup.rotation.x = -0.18 + tangent.y * 0.55;
+      penguinGroup.rotation.z = Math.sin(elapsed * 8) * 0.08;
+      penguinGroup.scale.setScalar(0.78 + slideT * 0.24);
+      if (elapsed > 1.85) penguinGroup.visible = false;
+
+      eggGroups.forEach((group, index) => {
+        const localT = ease((elapsed - group.userData.delay) / 1.05);
+        group.visible = localT > 0 && localT < 1;
+        if (!group.visible) return;
+        const eggPoint = slidePath.getPoint(Math.min(1, localT));
+        const spread = cinematic.count > 1 ? ((index % 5) - 2) * 0.16 : 0;
+        group.position.copy(eggPoint).add(new THREE.Vector3(spread, 0.45 + localT * 0.1, 0.08));
+        group.rotation.x += 0.08;
+        group.rotation.y += 0.12;
+        group.scale.setScalar(0.72 + localT * 0.55);
+      });
+
+      slideGroup.rotation.z = Math.sin(elapsed * 1.7) * 0.006;
+      arch.rotation.y = Math.sin(elapsed * 0.9) * 0.025;
+      gateLight.intensity = (cinematic.gotSsr ? 6.8 : 4.4) + Math.sin(elapsed * 8) * 0.9;
+      particles.position.y = -((elapsed * 0.42) % 1);
+      camera.position.x = Math.sin(elapsed * 0.45) * 0.12;
+      camera.lookAt(0, 0.26, -1.8);
+
+      renderer.render(scene, camera);
+      frameId = requestAnimationFrame(animate);
+    };
+    animate();
+
+    return () => {
+      cancelAnimationFrame(frameId);
+      observer.disconnect();
+      renderer.dispose();
+      mount.removeChild(renderer.domElement);
+    };
+  }, [cinematic]);
+
+  return (
+    <div className={`gachaCinematic gachaCinematic3d ${cinematic.gotSsr ? "ssr" : ""}`} style={{ "--cinematic-duration": `${cinematic.count === 10 ? 3.8 : 2.6}s` }}>
+      <div className="gacha3dCanvas" ref={mountRef} />
+      <div className="gacha3dRareText" aria-hidden="true">{cinematic.gotSsr ? "レア!" : "ガチャ!"}</div>
+      <div className="gacha3dText">
+        <b>{cinematic.count === 10 ? "10連ガチャ" : "ガチャ開始"}</b>
+        <span>{cinematic.gotSsr ? "氷のゲートが黄金に輝いた！" : "氷の滑り台から卵がすべる！"}</span>
+      </div>
+    </div>
   );
 }
 

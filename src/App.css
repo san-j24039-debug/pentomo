@@ -1809,6 +1809,78 @@ p {
   animation: cinematicFade var(--cinematic-duration, 2.6s) ease-in-out forwards;
 }
 
+.gachaCinematic3d {
+  background:
+    radial-gradient(circle at 28% 16%, rgba(255, 238, 163, 0.58), transparent 22%),
+    linear-gradient(180deg, #237bc2 0%, #66c4ff 34%, #dff8ff 78%, #ffffff 100%);
+}
+
+.gacha3dCanvas {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.gacha3dCanvas canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.gacha3dRareText {
+  position: absolute;
+  z-index: 3;
+  top: 72px;
+  left: 24px;
+  color: #fff2a4;
+  font-size: 50px;
+  font-weight: 1000;
+  line-height: 1;
+  text-shadow:
+    0 3px 0 #8a4d08,
+    0 7px 0 #5d3608,
+    0 0 18px rgba(255, 235, 121, 0.95),
+    0 0 44px rgba(255, 255, 255, 0.9);
+  transform: rotate(-8deg);
+  animation: rareTextPop var(--cinematic-duration, 2.6s) ease-in-out forwards;
+}
+
+.gachaCinematic3d:not(.ssr) .gacha3dRareText {
+  color: #ffffff;
+  font-size: 38px;
+  text-shadow:
+    0 3px 0 #2770a5,
+    0 7px 0 #19537f,
+    0 0 24px rgba(255,255,255,0.9);
+}
+
+.gacha3dText {
+  position: absolute;
+  z-index: 3;
+  left: 20px;
+  right: 20px;
+  bottom: 76px;
+  display: grid;
+  gap: 8px;
+  text-align: center;
+  color: #063d66;
+  animation: cinematicText var(--cinematic-duration, 2.6s) ease-out forwards;
+}
+
+.gacha3dText b {
+  font-size: 24px;
+  text-shadow: 0 2px 0 rgba(255,255,255,0.82);
+}
+
+.gacha3dText span {
+  padding: 10px 14px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.82);
+  font-size: 13px;
+  font-weight: 900;
+  box-shadow: 0 8px 22px rgba(40, 113, 166, 0.18);
+}
+
 .cinematicSky {
   position: absolute;
   inset: 0;
@@ -2229,6 +2301,24 @@ p {
   100% {
     opacity: 0;
     transform: translateY(-10px);
+  }
+}
+
+@keyframes rareTextPop {
+  0%, 10% {
+    opacity: 0;
+    transform: rotate(-8deg) scale(0.58);
+    filter: brightness(1);
+  }
+  28%, 76% {
+    opacity: 1;
+    transform: rotate(-8deg) scale(1);
+    filter: brightness(1.16);
+  }
+  100% {
+    opacity: 0;
+    transform: rotate(-8deg) scale(1.08) translateY(-12px);
+    filter: brightness(1);
   }
 }
 
