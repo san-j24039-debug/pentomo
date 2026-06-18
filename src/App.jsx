@@ -992,11 +992,13 @@ function Gacha({ game, setGame, setMessage }) {
 
 function EggStorage({ game, setHatchModal, setActive, embedded = false }) {
   const [eggSortMode, setEggSortMode] = useState("newest");
+  const [eggSortOpen, setEggSortOpen] = useState(false);
   const eggSortOptions = [
     ["newest", "入手順"],
     ["book", "図鑑順"],
     ["type", "卵タイプ順"],
   ];
+  const selectedEggSortLabel = eggSortOptions.find(([value]) => value === eggSortMode)?.[1] || "入手順";
   const eggTypeRank = { rainbow: 0, gold: 1, white: 2 };
   const sortedEggs = game.eggs
     .map((egg, index) => ({ ...egg, storageIndex: index }))
@@ -1018,24 +1020,31 @@ function EggStorage({ game, setHatchModal, setActive, embedded = false }) {
         </Panel>
       )}
       {game.eggs.length > 0 && (
-        <Panel className="eggSortPanel">
-          <div>
-            <b>ならび</b>
-            <span>卵を探しやすく整理できます。</span>
+        <div className="sortBar eggSortBar">
+          <div className={`bubbleSort ${eggSortOpen ? "open" : ""}`}>
+            <button className="bubbleSortTrigger" onClick={() => setEggSortOpen((open) => !open)} type="button">
+              <b>{selectedEggSortLabel}</b>
+              <i />
+            </button>
+            {eggSortOpen && (
+              <div className="bubbleSortMenu">
+                {eggSortOptions.map(([value, label]) => (
+                  <button
+                    className={eggSortMode === value ? "active" : ""}
+                    key={value}
+                    onClick={() => {
+                      setEggSortMode(value);
+                      setEggSortOpen(false);
+                    }}
+                    type="button"
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
-          <div className="eggSortChips">
-            {eggSortOptions.map(([value, label]) => (
-              <button
-                className={eggSortMode === value ? "active" : ""}
-                key={value}
-                onClick={() => setEggSortMode(value)}
-                type="button"
-              >
-                {label}
-              </button>
-            ))}
-          </div>
-        </Panel>
+        </div>
       )}
       <div className="eggStorageGrid">
         {sortedEggs.map((egg) => (
