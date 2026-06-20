@@ -504,7 +504,7 @@ function Home({ game, homePenguin, message, setActive, setMessage, setGame }) {
         <div className="igloo right" />
         <div className="iceberg one" />
         <div className="iceberg two" />
-        <PenguinFigure penguin={homePenguin} size="hero" />
+        <PentomoHome3D penguinData={homePenguin} />
       </div>
       <Speech>{message}</Speech>
       <div className="primaryActions">
@@ -523,6 +523,203 @@ function Home({ game, homePenguin, message, setActive, setMessage, setGame }) {
       </div>
     </Screen>
   );
+}
+
+function PentomoHome3D({ penguinData }) {
+  const mountRef = useRef(null);
+
+  useEffect(() => {
+    const mount = mountRef.current;
+    if (!mount) return undefined;
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(38, 1, 0.1, 40);
+    camera.position.set(0, 1.15, 6.4);
+    camera.lookAt(0, 0.18, 0);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+    mount.appendChild(renderer.domElement);
+
+    scene.add(new THREE.AmbientLight(0xffffff, 1.85));
+    const keyLight = new THREE.DirectionalLight(0xffffff, 2.25);
+    keyLight.position.set(-3.2, 4.8, 4.2);
+    scene.add(keyLight);
+    const rimLight = new THREE.PointLight(0xbff4ff, 1.8, 8);
+    rimLight.position.set(3.1, 1.8, 3.6);
+    scene.add(rimLight);
+
+    const materials = {
+      black: new THREE.MeshStandardMaterial({ color: 0x2a2a31, roughness: 0.48 }),
+      white: new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.58 }),
+      fur: new THREE.MeshStandardMaterial({ color: 0xd9dde6, roughness: 0.82 }),
+      cheek: new THREE.MeshStandardMaterial({ color: 0xffb7b7, emissive: 0xff7e92, emissiveIntensity: 0.08, roughness: 0.52 }),
+      mouth: new THREE.MeshStandardMaterial({ color: 0xff6b6b, emissive: 0x5b0000, emissiveIntensity: 0.08, roughness: 0.42 }),
+      eye: new THREE.MeshStandardMaterial({ color: 0x1c1c1e, roughness: 0.12 }),
+      eyeLight: new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xffffff, emissiveIntensity: 0.28, roughness: 0.06 }),
+      foot: new THREE.MeshStandardMaterial({ color: 0x2a2a31, roughness: 0.54 }),
+      shadow: new THREE.MeshBasicMaterial({ color: 0x5c9fc2, transparent: true, opacity: 0.22 }),
+    };
+
+    const model = createPentomoModel(materials);
+    const { group, head, face, beak, flippers, feet, eyes, fuzz } = model;
+    scene.add(group);
+
+    const shadow = new THREE.Mesh(new THREE.CircleGeometry(1.2, 56), materials.shadow);
+    shadow.rotation.x = -Math.PI / 2;
+    shadow.position.set(0, -0.98, 0.26);
+    scene.add(shadow);
+
+    const nameTag = document.createElement("div");
+    nameTag.className = "pentomo3dName";
+    nameTag.textContent = penguinData?.name || "ペントモ";
+    mount.appendChild(nameTag);
+
+    const clock = new THREE.Clock();
+    let frameId = 0;
+
+    const resize = () => {
+      const rect = mount.getBoundingClientRect();
+      const width = Math.max(1, rect.width);
+      const height = Math.max(1, rect.height);
+      renderer.setSize(width, height, false);
+      camera.aspect = width / height;
+      camera.updateProjectionMatrix();
+    };
+    const observer = new ResizeObserver(resize);
+    observer.observe(mount);
+    resize();
+
+    const animate = () => {
+      const t = clock.getElapsedTime();
+      const pace = t * 2.1;
+      const travel = Math.sin(t * 0.72);
+      const step = Math.sin(pace * 2.0);
+      group.position.x = travel * 0.55;
+      group.position.y = Math.abs(step) * 0.038;
+      group.rotation.y = -travel * 0.24;
+      group.rotation.z = Math.sin(pace) * 0.035;
+      group.scale.setScalar(1 + Math.sin(pace * 2) * 0.012);
+
+      head.rotation.y = Math.sin(t * 1.15) * 0.11;
+      head.rotation.z = Math.sin(t * 1.4) * 0.035;
+      face.rotation.copy(head.rotation);
+      beak.rotation.y = head.rotation.y;
+
+      flippers[0].rotation.z = 0.5 + Math.sin(pace) * 0.3;
+      flippers[1].rotation.z = -0.5 - Math.sin(pace) * 0.3;
+      flippers[0].rotation.x = -0.12 + Math.cos(pace) * 0.08;
+      flippers[1].rotation.x = 0.12 - Math.cos(pace) * 0.08;
+
+      feet[0].position.y = -0.88 + Math.max(0, step) * 0.07;
+      feet[1].position.y = -0.88 + Math.max(0, -step) * 0.07;
+      feet[0].rotation.z = 0.12 + Math.max(0, step) * 0.22;
+      feet[1].rotation.z = -0.12 - Math.max(0, -step) * 0.22;
+
+      eyes.forEach((eye) => {
+        eye.scale.y = Math.sin(t * 1.2) > 0.988 ? 0.12 : 1.15;
+      });
+      fuzz.rotation.z = Math.sin(t * 1.6) * 0.018;
+      shadow.scale.set(1 + Math.abs(travel) * 0.06, 1 + Math.abs(step) * 0.04, 1);
+
+      renderer.render(scene, camera);
+      frameId = requestAnimationFrame(animate);
+    };
+    animate();
+
+    return () => {
+      cancelAnimationFrame(frameId);
+      observer.disconnect();
+      renderer.dispose();
+      mount.removeChild(renderer.domElement);
+      mount.removeChild(nameTag);
+    };
+  }, [penguinData?.name]);
+
+  return <div className="pentomoHome3d" ref={mountRef} aria-label={`${penguinData?.name || "ペントモ"}の3D表示`} />;
+}
+
+function createPentomoModel(materials) {
+  const group = new THREE.Group();
+  const fuzz = new THREE.Group();
+  group.add(fuzz);
+
+  const body = new THREE.Mesh(new THREE.SphereGeometry(0.76, 48, 34), materials.fur);
+  body.scale.set(1.02, 1.05, 0.78);
+  body.position.set(0, -0.1, 0);
+  fuzz.add(body);
+
+  const head = new THREE.Mesh(new THREE.SphereGeometry(0.58, 48, 32), materials.black);
+  head.scale.set(1.08, 1.0, 0.94);
+  head.position.set(0, 0.68, 0.05);
+  group.add(head);
+
+  const face = new THREE.Mesh(new THREE.SphereGeometry(0.43, 42, 24), materials.white);
+  face.scale.set(1.26, 0.9, 0.34);
+  face.position.set(0, 0.68, 0.5);
+  group.add(face);
+
+  const belly = new THREE.Mesh(new THREE.SphereGeometry(0.58, 42, 26), materials.white);
+  belly.scale.set(0.96, 1.0, 0.32);
+  belly.position.set(0, -0.12, 0.46);
+  fuzz.add(belly);
+
+  const beak = new THREE.Group();
+  const upperBeak = new THREE.Mesh(new THREE.ConeGeometry(0.13, 0.2, 24), materials.black);
+  upperBeak.rotation.x = Math.PI / 2;
+  upperBeak.position.set(0, 0.63, 0.86);
+  upperBeak.scale.set(1.25, 0.8, 0.65);
+  const mouth = new THREE.Mesh(new THREE.SphereGeometry(0.085, 18, 10), materials.mouth);
+  mouth.scale.set(1.1, 0.72, 0.34);
+  mouth.position.set(0, 0.53, 0.83);
+  beak.add(upperBeak, mouth);
+  group.add(beak);
+
+  const eyes = [];
+  for (const x of [-0.2, 0.2]) {
+    const eye = new THREE.Mesh(new THREE.SphereGeometry(0.09, 24, 16), materials.eye);
+    eye.scale.set(1, 1.15, 0.42);
+    eye.position.set(x, 0.8, 0.82);
+    const light = new THREE.Mesh(new THREE.SphereGeometry(0.028, 12, 8), materials.eyeLight);
+    light.position.set(x - 0.028, 0.845, 0.862);
+    const cheek = new THREE.Mesh(new THREE.SphereGeometry(0.075, 18, 10), materials.cheek);
+    cheek.scale.set(1.5, 0.72, 0.22);
+    cheek.position.set(x * 1.55, 0.55, 0.8);
+    group.add(eye, light, cheek);
+    eyes.push(eye, light);
+  }
+
+  const flippers = [];
+  for (const x of [-0.65, 0.65]) {
+    const flipper = new THREE.Mesh(new THREE.SphereGeometry(0.18, 24, 14), materials.fur);
+    flipper.scale.set(0.48, 1.68, 0.34);
+    flipper.position.set(x, 0.1, 0.02);
+    flipper.rotation.z = x < 0 ? 0.5 : -0.5;
+    group.add(flipper);
+    flippers.push(flipper);
+  }
+
+  const feet = [];
+  for (const x of [-0.24, 0.24]) {
+    const foot = new THREE.Mesh(new THREE.SphereGeometry(0.14, 20, 12), materials.foot);
+    foot.scale.set(1.85, 0.5, 0.9);
+    foot.position.set(x, -0.88, 0.48);
+    foot.rotation.z = x < 0 ? 0.12 : -0.12;
+    group.add(foot);
+    feet.push(foot);
+  }
+
+  for (let i = 0; i < 24; i += 1) {
+    const tuft = new THREE.Mesh(new THREE.ConeGeometry(0.025, 0.12, 6), materials.white);
+    const angle = (i / 24) * Math.PI * 2;
+    tuft.position.set(Math.cos(angle) * 0.5, -0.08 + Math.sin(i * 1.7) * 0.22, 0.54 + Math.sin(angle) * 0.05);
+    tuft.rotation.z = angle;
+    fuzz.add(tuft);
+  }
+
+  group.scale.setScalar(1.08);
+  return { group, head, face, beak, flippers, feet, eyes, fuzz };
 }
 
 function Care({ activePenguin, careAction, game, setOutfitOpen, setEditOpen }) {
