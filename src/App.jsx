@@ -2,6 +2,12 @@ import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import "./App.css";
 import penguin from "./assets/penguin.png";
+import pentomoArmLeft from "./assets/pentomo-parts/arm-left.png";
+import pentomoArmRight from "./assets/pentomo-parts/arm-right.png";
+import pentomoBody from "./assets/pentomo-parts/body.png";
+import pentomoFace from "./assets/pentomo-parts/face.png";
+import pentomoLegLeft from "./assets/pentomo-parts/leg-left.png";
+import pentomoLegRight from "./assets/pentomo-parts/leg-right.png";
 
 const STORAGE_KEY = "pentomo-save-v4";
 const BASE_CAPACITY = 54;
@@ -504,7 +510,7 @@ function Home({ game, homePenguin, message, setActive, setMessage, setGame }) {
         <div className="igloo right" />
         <div className="iceberg one" />
         <div className="iceberg two" />
-        <PenguinFigure penguin={homePenguin} size="hero" />
+        <RiggedPentomo penguin={homePenguin} />
       </div>
       <Speech>{message}</Speech>
       <div className="primaryActions">
@@ -522,6 +528,21 @@ function Home({ game, homePenguin, message, setActive, setMessage, setGame }) {
         </button>
       </div>
     </Screen>
+  );
+}
+
+function RiggedPentomo({ penguin: p }) {
+  return (
+    <div className="riggedPentomo" aria-label={`${p?.name || "ペンギン"}のアニメーション`}>
+      <img className="rigPart rigArm rigArmLeft" src={pentomoArmLeft} alt="" draggable="false" />
+      <img className="rigPart rigArm rigArmRight" src={pentomoArmRight} alt="" draggable="false" />
+      <img className="rigPart rigLeg rigLegLeft" src={pentomoLegLeft} alt="" draggable="false" />
+      <img className="rigPart rigLeg rigLegRight" src={pentomoLegRight} alt="" draggable="false" />
+      <img className="rigPart rigBody" src={pentomoBody} alt="" draggable="false" />
+      <img className="rigPart rigFace" src={pentomoFace} alt="" draggable="false" />
+      <span className="rigShadow" />
+      <span className="rigName">{p?.name || "ペンギン"}</span>
+    </div>
   );
 }
 
