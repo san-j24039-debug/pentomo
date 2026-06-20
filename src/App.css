@@ -502,41 +502,6 @@ p {
   margin-bottom: 16px;
 }
 
-.pentomoHome3d {
-  position: relative;
-  z-index: 3;
-  width: 276px;
-  height: 312px;
-  margin-bottom: 0;
-  pointer-events: none;
-}
-
-.pentomoHome3d canvas {
-  width: 100%;
-  height: 100%;
-  display: block;
-  filter: drop-shadow(0 18px 18px rgba(26, 77, 109, 0.2));
-}
-
-.pentomo3dName {
-  position: absolute;
-  left: 50%;
-  bottom: 17px;
-  max-width: 138px;
-  padding: 5px 13px;
-  overflow: hidden;
-  border-radius: 999px;
-  background: rgba(255,255,255,0.88);
-  color: #4e7693;
-  font-size: 10px;
-  font-weight: 900;
-  text-align: center;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  box-shadow: 0 6px 16px rgba(42, 124, 184, 0.12);
-  transform: translateX(-50%);
-}
-
 .penguinFigure.large {
   width: 204px;
   height: 228px;
@@ -7456,4 +7421,155 @@ svg.pettingHand::after {
 
 .inventoryChips .feedChip .feedIcon span {
   display: block;
+}
+
+/* Home penguin animation using the original penguin image */
+.homeScreen .penguinFigure.hero {
+  animation: homePenguinWalk 7.2s cubic-bezier(.42, 0, .26, 1) infinite;
+  transform-origin: 50% 92%;
+}
+
+.homeScreen .penguinFigure.hero img {
+  animation: homePenguinWaddle 1.05s cubic-bezier(.38, 0, .24, 1) infinite;
+  transform-origin: 50% 88%;
+}
+
+.homeScreen .penguinFigure.hero::before,
+.homeScreen .penguinFigure.hero::after {
+  content: "";
+  position: absolute;
+  z-index: 2;
+  bottom: 23px;
+  width: 26px;
+  height: 9px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.74);
+  box-shadow: 0 4px 9px rgba(80, 142, 177, 0.12);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.homeScreen .penguinFigure.hero::before {
+  left: 78px;
+  animation: homePenguinFootLeft 1.05s ease-in-out infinite;
+}
+
+.homeScreen .penguinFigure.hero::after {
+  right: 78px;
+  animation: homePenguinFootRight 1.05s ease-in-out infinite;
+}
+
+.homeScreen .penguinFigure.hero .shadow {
+  animation: homePenguinShadow 7.2s cubic-bezier(.42, 0, .26, 1) infinite;
+}
+
+@keyframes homePenguinWalk {
+  0% {
+    transform: translateX(-34px) translateY(0) rotate(-1.4deg) scaleX(1);
+  }
+  8% {
+    transform: translateX(-34px) translateY(1px) rotate(-2.4deg) scaleX(1.01);
+  }
+  18% {
+    transform: translateX(-18px) translateY(-2px) rotate(1.8deg) scaleX(0.995);
+  }
+  30% {
+    transform: translateX(2px) translateY(0) rotate(-1.2deg) scaleX(1);
+  }
+  42% {
+    transform: translateX(23px) translateY(-2px) rotate(2.1deg) scaleX(0.992);
+  }
+  52% {
+    transform: translateX(36px) translateY(1px) rotate(0.6deg) scaleX(1);
+  }
+  60% {
+    transform: translateX(36px) translateY(0) rotate(1.8deg) scaleX(-1);
+  }
+  70% {
+    transform: translateX(18px) translateY(-2px) rotate(-1.6deg) scaleX(-0.995);
+  }
+  82% {
+    transform: translateX(-4px) translateY(0) rotate(1.4deg) scaleX(-1);
+  }
+  94% {
+    transform: translateX(-28px) translateY(-1px) rotate(-1.8deg) scaleX(-0.995);
+  }
+  100% {
+    transform: translateX(-34px) translateY(0) rotate(-1.4deg) scaleX(1);
+  }
+}
+
+@keyframes homePenguinWaddle {
+  0%, 100% {
+    transform: translateY(0) rotate(-1.5deg) scale(1, 1);
+  }
+  18% {
+    transform: translateY(2px) rotate(-3.2deg) scale(1.018, 0.992);
+  }
+  38% {
+    transform: translateY(-8px) rotate(2.8deg) scale(0.992, 1.012);
+  }
+  58% {
+    transform: translateY(1px) rotate(3.4deg) scale(1.016, 0.994);
+  }
+  78% {
+    transform: translateY(-6px) rotate(-2.6deg) scale(0.996, 1.01);
+  }
+}
+
+@keyframes homePenguinFootLeft {
+  0%, 100% {
+    opacity: 0;
+    transform: translate(0, 0) scale(0.75);
+  }
+  14% {
+    opacity: 0.72;
+    transform: translate(-6px, 2px) scale(1);
+  }
+  50% {
+    opacity: 0;
+    transform: translate(-14px, 4px) scale(1.24);
+  }
+}
+
+@keyframes homePenguinFootRight {
+  0%, 44%, 100% {
+    opacity: 0;
+    transform: translate(0, 0) scale(0.75);
+  }
+  58% {
+    opacity: 0.72;
+    transform: translate(6px, 2px) scale(1);
+  }
+  88% {
+    opacity: 0;
+    transform: translate(14px, 4px) scale(1.24);
+  }
+}
+
+@keyframes homePenguinShadow {
+  0% {
+    transform: translateX(-18px) scaleX(0.9);
+    opacity: 0.17;
+  }
+  18% {
+    transform: translateX(-8px) scaleX(0.96);
+    opacity: 0.22;
+  }
+  42% {
+    transform: translateX(10px) scaleX(1.08);
+    opacity: 0.2;
+  }
+  60% {
+    transform: translateX(18px) scaleX(0.9);
+    opacity: 0.17;
+  }
+  82% {
+    transform: translateX(0) scaleX(1.06);
+    opacity: 0.22;
+  }
+  100% {
+    transform: translateX(-18px) scaleX(0.9);
+    opacity: 0.17;
+  }
 }
