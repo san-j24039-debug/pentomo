@@ -505,9 +505,9 @@ p {
 .riggedPentomo {
   position: relative;
   z-index: 3;
-  width: 310px;
-  height: 360px;
-  margin-bottom: -8px;
+  width: 382px;
+  height: 438px;
+  margin-bottom: -42px;
   transform-origin: 50% 92%;
   animation: rigPentomoWalk 7.6s cubic-bezier(.42, 0, .26, 1) infinite;
   pointer-events: none;
@@ -536,9 +536,9 @@ p {
 .rigFoot {
   position: absolute;
   z-index: 2;
-  bottom: 44px;
-  width: 52px;
-  height: 16px;
+  bottom: 60px;
+  width: 64px;
+  height: 18px;
   border-radius: 999px;
   background: rgba(255, 191, 74, 0.56);
   box-shadow: 0 4px 8px rgba(99, 83, 48, 0.12);
@@ -546,22 +546,22 @@ p {
 }
 
 .rigFootLeft {
-  left: 108px;
+  left: 136px;
   animation: rigFootLeftStep 1.18s ease-in-out infinite;
 }
 
 .rigFootRight {
-  right: 103px;
+  right: 130px;
   animation: rigFootRightStep 1.18s ease-in-out infinite;
 }
 
 .rigShadow {
   position: absolute;
   z-index: 0;
-  left: 38px;
-  right: 38px;
-  bottom: 42px;
-  height: 42px;
+  left: 56px;
+  right: 56px;
+  bottom: 56px;
+  height: 52px;
   border-radius: 50%;
   background: rgba(66, 123, 158, 0.18);
   animation: rigShadowWalk 7.6s cubic-bezier(.42, 0, .26, 1) infinite;
@@ -571,8 +571,8 @@ p {
   position: absolute;
   z-index: 8;
   left: 50%;
-  bottom: 18px;
-  max-width: 158px;
+  bottom: 24px;
+  max-width: 176px;
   padding: 6px 14px;
   overflow: hidden;
   border-radius: 999px;
@@ -7540,16 +7540,16 @@ svg.pettingHand::after {
 
 @keyframes rigImageWaddle {
   0%, 100% {
-    transform: translateY(0) rotate(-1deg) scale(1, 1);
+    transform: translateY(-10px) rotate(-1deg) scale(1.18, 1.18);
   }
   22% {
-    transform: translateY(2px) rotate(-2.2deg) scale(1.012, 0.996);
+    transform: translateY(-7px) rotate(-2.2deg) scale(1.2, 1.17);
   }
   48% {
-    transform: translateY(-5px) rotate(1.8deg) scale(0.996, 1.012);
+    transform: translateY(-16px) rotate(1.8deg) scale(1.17, 1.2);
   }
   72% {
-    transform: translateY(2px) rotate(2.2deg) scale(1.012, 0.996);
+    transform: translateY(-7px) rotate(2.2deg) scale(1.2, 1.17);
   }
 }
 
