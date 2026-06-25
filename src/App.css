@@ -1898,7 +1898,11 @@ p {
 }
 
 .resultModalEggs.ten .openEgg.opened {
-  min-height: 64px;
+  height: 74px;
+  min-height: 74px;
+  place-items: center;
+  padding: 4px;
+  overflow: hidden;
 }
 
 .resultModalEggs:not(.ten) .openEgg.opened {
@@ -2088,6 +2092,48 @@ p {
   color: #2375a8;
   font-size: 9px;
   font-weight: 900;
+}
+
+.resultModalEggs.ten .gachaPrizeVisual {
+  height: 100%;
+  grid-template-columns: 1fr;
+  grid-template-rows: 29px minmax(0, 1fr);
+  justify-items: center;
+  align-content: center;
+  gap: 3px;
+  padding: 5px 3px 4px;
+  border-radius: 10px;
+}
+
+.resultModalEggs.ten .gachaPrizeVisual .feedIcon {
+  width: 31px;
+  height: 27px;
+}
+
+.resultModalEggs.ten .gachaPrizeVisual .egg.small {
+  width: 25px;
+  height: 33px;
+  margin-top: -2px;
+}
+
+.resultModalEggs.ten .gachaPrizeVisual b {
+  justify-self: center;
+  max-width: 48px;
+  font-size: 8px;
+  line-height: 1.15;
+  white-space: normal;
+}
+
+.resultModalEggs.ten .gachaPrizeVisual small {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  padding: 1px 4px;
+  font-size: 8px;
+}
+
+.resultModalEggs.ten .eggPrize small {
+  display: none;
 }
 
 .feedPrize-premium {
