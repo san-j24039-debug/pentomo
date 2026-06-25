@@ -1990,14 +1990,14 @@ p {
   pointer-events: none;
 }
 
-.openEgg span {
+.openEgg > span {
   position: relative;
   z-index: 2;
   font-weight: 900;
   text-align: center;
 }
 
-.openEgg:not(.opened) span {
+.openEgg:not(.opened) > span {
   padding: 3px 7px;
   border-radius: 999px;
   background: rgba(255,255,255,0.74);
