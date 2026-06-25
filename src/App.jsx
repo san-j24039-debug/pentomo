@@ -1070,7 +1070,11 @@ function Gacha({ game, setGame, setMessage }) {
                 type="button"
               >
                 <i />
-                <span>{openedResults[result.id] ? result.reward : "TAP"}</span>
+                {openedResults[result.id] ? (
+                  <GachaPrizeVisual result={result} />
+                ) : (
+                  <span>TAP</span>
+                )}
               </button>
             ))}
           </div>
@@ -2392,6 +2396,7 @@ function Menu({ game, setGame, setMessage }) {
   const [achievementTab, setAchievementTab] = useState("daily");
   const [helpOpen, setHelpOpen] = useState(false);
   const [debugPassword, setDebugPassword] = useState("");
+  const [activePanel, setActivePanel] = useState("bag");
   const claimAll = () => {
     setGame((current) => ({ ...current, diamonds: current.diamonds + 20, coins: current.coins + 500 }));
     setMessage("実績報酬を受け取ったよ。");
@@ -2410,14 +2415,24 @@ function Menu({ game, setGame, setMessage }) {
       <PageHeader title="メニュー" sub="実績・設定・ヘルプ・データ連携" />
       <div className="menuGrid">
         {[
-          ["持ち物", "bag"], ["称号", "star"], ["設定", "gear"], ["ヘルプ", "help"],
-          ["お問い合わせ", "mail"], ["利用規約", "doc"], ["データ連携", "link"],
-        ].map(([label, icon]) => (
-          <button className="menuButton" key={label} onClick={() => (label === "ヘルプ" ? setHelpOpen((open) => !open) : setMessage(`${label}を開きました。`))}>
+          ["持ち物", "bag", "bag"], ["称号", "star", "titles"], ["設定", "gear", "settings"], ["ヘルプ", "help", "help"],
+          ["お問い合わせ", "mail", "contact"], ["利用規約", "doc", "terms"], ["データ連携", "link", "link"],
+        ].map(([label, icon, panel]) => (
+          <button
+            className={`menuButton ${activePanel === panel ? "active" : ""}`}
+            key={label}
+            onClick={() => {
+              setActivePanel(panel);
+              setHelpOpen(panel === "help");
+              setMessage(`${label}を開きました。`);
+            }}
+            type="button"
+          >
             <Icon name={icon} /><span>{label}</span>
           </button>
         ))}
       </div>
+      <MenuPanel activePanel={activePanel} game={game} setGame={setGame} setMessage={setMessage} />
       {helpOpen && (
         <Panel className="helpPanel">
           <div className="menuSectionTitle">
@@ -2453,6 +2468,76 @@ function Menu({ game, setGame, setMessage }) {
         <p>各ボタンは反応します。今後、詳細画面を追加する前提の入口です。</p>
       </Panel>
     </Screen>
+  );
+}
+
+function MenuPanel({ activePanel, game, setGame, setMessage }) {
+  const feedRows = Object.entries(feedItems).map(([key, item]) => ({ key, item, count: game.inventory[key] || 0 }));
+  const title = {
+    bag: "持ち物",
+    titles: "称号",
+    settings: "設定",
+    help: "ヘルプ",
+    contact: "お問い合わせ",
+    terms: "利用規約",
+    link: "データ連携",
+  }[activePanel] || "メニュー";
+
+  const resetNotice = () => {
+    setGame((current) => ({ ...current, noticeCount: 0 }));
+    setMessage("通知を確認済みにしました。");
+  };
+
+  return (
+    <Panel className={`menuDetailPanel menuDetail-${activePanel}`}>
+      <div className="menuSectionTitle">
+        <h2>{title}</h2>
+      </div>
+      {activePanel === "bag" && (
+        <div className="menuInventoryGrid">
+          {feedRows.map(({ key, item, count }) => (
+            <div className="menuInventoryItem" key={key}>
+              <FeedIcon type={key} />
+              <div>
+                <b>{item.name}</b>
+                <span>所持 {count}個 / 満腹度 +{item.hunger}</span>
+              </div>
+            </div>
+          ))}
+          <div className="menuInventoryItem">
+            <Egg type="rainbow" small />
+            <div>
+              <b>ペンギン卵</b>
+              <span>保管中 {game.eggs.length}個</span>
+            </div>
+          </div>
+          <div className="menuInventoryItem">
+            <Icon name="gift" />
+            <div>
+              <b>おみやげ</b>
+              <span>{game.souvenirs} / 150</span>
+            </div>
+          </div>
+        </div>
+      )}
+      {activePanel === "titles" && (
+        <div className="titleList">
+          {game.ownedTitles.map((ownedTitle) => <span key={ownedTitle}>{ownedTitle}</span>)}
+          {game.ownedTitles.length === 0 && <p>まだ称号を持っていません。</p>}
+        </div>
+      )}
+      {activePanel === "settings" && (
+        <div className="settingList">
+          <button className="whiteButton" onClick={resetNotice} type="button">通知バッジを消す</button>
+          <button className="whiteButton" onClick={() => setMessage("音量設定は今後追加予定です。")} type="button">音量 確認</button>
+          <button className="whiteButton" onClick={() => setMessage("セーブデータはこの端末に保存されています。")} type="button">保存状態を確認</button>
+        </div>
+      )}
+      {activePanel === "help" && <p>分からない項目を押すと、ここに説明が表示されます。確認用ダイヤは下のヘルプ欄から追加できます。</p>}
+      {activePanel === "contact" && <p>困ったことや改善したいところは、制作者メモとして残しておきましょう。</p>}
+      {activePanel === "terms" && <p>この作品は学習・制作課題用のペンギン育成ゲームです。</p>}
+      {activePanel === "link" && <p>データは端末のブラウザに保存されます。別端末への連携は今後追加予定です。</p>}
+    </Panel>
   );
 }
 
@@ -2720,6 +2805,25 @@ function CareIcon({ name }) {
 
 function Egg({ type, small = false }) {
   return <div className={`egg ${type} ${small ? "small" : ""}`} />;
+}
+
+function GachaPrizeVisual({ result }) {
+  if (result.prizeType === "ssrEgg") {
+    return (
+      <span className="gachaPrizeVisual eggPrize">
+        <Egg type="rainbow" small />
+        <b>ペンギン卵</b>
+        <small>{result.reward}</small>
+      </span>
+    );
+  }
+  return (
+    <span className={`gachaPrizeVisual feedPrize feedPrize-${result.feedKey}`}>
+      <FeedIcon type={result.feedKey} />
+      <b>{result.reward}</b>
+      <small>+1</small>
+    </span>
+  );
 }
 
 function Rarity({ index }) {
