@@ -1768,6 +1768,12 @@ p {
   flex: 0 0 auto;
 }
 
+.gachaResultOverlay .profileCloseButton:disabled {
+  opacity: 0.38;
+  cursor: not-allowed;
+  filter: grayscale(0.35);
+}
+
 .gachaResultSummary {
   position: relative;
   z-index: 1;

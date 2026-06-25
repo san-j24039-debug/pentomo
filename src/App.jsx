@@ -1032,9 +1032,6 @@ function Gacha({ game, setGame, setMessage }) {
           <h2>SSRはペンギン卵</h2>
         </div>
       </div>
-      <div className="gachaEmptyResult">
-        <p>ガチャを引くと結果確認画面が開きます。</p>
-      </div>
       <div className="gachaButtons">
         <button className="yellow" onClick={() => pull(1)} disabled={!!gachaCinematic}>1回 100ダイヤ</button>
         <button className="pink" onClick={() => pull(10)} disabled={!!gachaCinematic}>10連 1000ダイヤ</button>
@@ -1050,7 +1047,15 @@ function Gacha({ game, setGame, setMessage }) {
               <h2>ガチャ結果</h2>
               <p>{unopenedCount > 0 ? "卵をタップして中身を確認しよう。" : "すべて確認しました。"}</p>
             </div>
-            <button className="profileCloseButton" onClick={closeResults} type="button" aria-label="閉じる">×</button>
+            <button
+              className="profileCloseButton"
+              onClick={closeResults}
+              disabled={unopenedCount > 0}
+              type="button"
+              aria-label="閉じる"
+            >
+              ×
+            </button>
           </div>
           <div className="gachaResultSummary">
             <span>{results.length}個の卵</span>
