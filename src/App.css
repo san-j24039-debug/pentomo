@@ -1891,6 +1891,8 @@ p {
 .resultModalEggs.ten {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   min-height: 334px;
+  align-content: start;
+  overflow: auto;
 }
 
 .resultModalEggs.ten .openEgg:not(.opened) {
@@ -1898,10 +1900,10 @@ p {
 }
 
 .resultModalEggs.ten .openEgg.opened {
-  height: 74px;
-  min-height: 74px;
+  height: 86px;
+  min-height: 86px;
   place-items: center;
-  padding: 4px;
+  padding: 6px;
   overflow: hidden;
 }
 
@@ -1934,8 +1936,8 @@ p {
 }
 
 .openEggs.ten {
-  grid-template-columns: repeat(5, 1fr);
-  gap: 7px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 9px;
 }
 
 .openEgg {
@@ -2048,10 +2050,10 @@ p {
   width: 100%;
   min-width: 0;
   display: grid;
-  grid-template-columns: 38px minmax(0, 1fr) auto;
+  grid-template-columns: 46px minmax(0, 1fr) auto;
   align-items: center;
-  gap: 7px;
-  padding: 7px 8px;
+  gap: 9px;
+  padding: 9px 10px;
   border-radius: 13px;
   background:
     radial-gradient(circle at 16% 18%, rgba(255,255,255,0.95), transparent 20%),
@@ -2061,13 +2063,15 @@ p {
 }
 
 .gachaPrizeVisual .feedIcon {
-  width: 34px;
-  height: 30px;
+  width: 44px;
+  height: 38px;
+  justify-self: center;
 }
 
 .gachaPrizeVisual .egg.small {
-  width: 30px;
-  height: 40px;
+  width: 36px;
+  height: 48px;
+  justify-self: center;
 }
 
 .gachaPrizeVisual b,
@@ -2080,8 +2084,9 @@ p {
 
 .gachaPrizeVisual b {
   justify-self: start;
-  font-size: 10px;
-  line-height: 1.15;
+  font-size: 12px;
+  line-height: 1.25;
+  white-space: normal;
 }
 
 .gachaPrizeVisual small {
@@ -2096,44 +2101,37 @@ p {
 
 .resultModalEggs.ten .gachaPrizeVisual {
   height: 100%;
-  grid-template-columns: 1fr;
-  grid-template-rows: 29px minmax(0, 1fr);
-  justify-items: center;
-  align-content: center;
-  gap: 3px;
-  padding: 5px 3px 4px;
-  border-radius: 10px;
+  grid-template-columns: 40px minmax(0, 1fr);
+  grid-template-rows: 1fr auto;
+  gap: 5px 7px;
+  padding: 8px;
+  border-radius: 12px;
 }
 
 .resultModalEggs.ten .gachaPrizeVisual .feedIcon {
-  width: 31px;
-  height: 27px;
+  grid-row: 1 / 3;
+  width: 38px;
+  height: 34px;
 }
 
 .resultModalEggs.ten .gachaPrizeVisual .egg.small {
-  width: 25px;
-  height: 33px;
-  margin-top: -2px;
+  grid-row: 1 / 3;
+  width: 32px;
+  height: 42px;
 }
 
 .resultModalEggs.ten .gachaPrizeVisual b {
-  justify-self: center;
-  max-width: 48px;
-  font-size: 8px;
-  line-height: 1.15;
-  white-space: normal;
+  align-self: end;
+  max-width: none;
+  font-size: 11px;
+  line-height: 1.2;
 }
 
 .resultModalEggs.ten .gachaPrizeVisual small {
-  position: absolute;
-  top: 3px;
-  right: 3px;
-  padding: 1px 4px;
-  font-size: 8px;
-}
-
-.resultModalEggs.ten .eggPrize small {
-  display: none;
+  justify-self: start;
+  align-self: start;
+  padding: 2px 7px;
+  font-size: 9px;
 }
 
 .feedPrize-premium {
