@@ -96,6 +96,77 @@ function createId() {
   return `id-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
 }
 
+function usePentomoBgm(enabled, volume) {
+  const audioRef = useRef(null);
+
+  useEffect(() => {
+    if (!enabled) {
+      audioRef.current?.stop?.();
+      audioRef.current = null;
+      return undefined;
+    }
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContextClass) return undefined;
+    const context = new AudioContextClass();
+    const master = context.createGain();
+    master.gain.value = 0;
+    master.connect(context.destination);
+    const notes = [261.63, 329.63, 392.0, 523.25, 392.0, 329.63, 293.66, 349.23];
+    let step = 0;
+    let stopped = false;
+
+    const playNote = () => {
+      if (stopped) return;
+      const now = context.currentTime;
+      const oscillator = context.createOscillator();
+      const gain = context.createGain();
+      oscillator.type = "sine";
+      oscillator.frequency.value = notes[step % notes.length];
+      gain.gain.setValueAtTime(0, now);
+      gain.gain.linearRampToValueAtTime(0.08, now + 0.04);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.86);
+      oscillator.connect(gain);
+      gain.connect(master);
+      oscillator.start(now);
+      oscillator.stop(now + 0.9);
+      step += 1;
+    };
+
+    const timer = window.setInterval(playNote, 520);
+    playNote();
+    const resumeAudio = () => {
+      if (context.state === "suspended") {
+        context.resume().catch(() => {});
+      }
+    };
+    resumeAudio();
+    window.addEventListener("pointerdown", resumeAudio);
+    audioRef.current = {
+      context,
+      master,
+      stop: () => {
+        stopped = true;
+        window.clearInterval(timer);
+        window.removeEventListener("pointerdown", resumeAudio);
+        if (context.state !== "closed") context.close();
+      },
+    };
+    return () => {
+      stopped = true;
+      window.clearInterval(timer);
+      window.removeEventListener("pointerdown", resumeAudio);
+      if (context.state !== "closed") context.close();
+      if (audioRef.current?.context === context) audioRef.current = null;
+    };
+  }, [enabled]);
+
+  useEffect(() => {
+    if (audioRef.current?.master) {
+      audioRef.current.master.gain.setTargetAtTime((clampRange(volume, 0, 100) / 100) * 0.22, audioRef.current.context.currentTime, 0.06);
+    }
+  }, [volume, enabled]);
+}
+
 function getDailyGiftKey(date = new Date()) {
   const resetDate = new Date(date);
   if (resetDate.getHours() < 6) {
@@ -161,6 +232,8 @@ function createDefaultGame() {
     supportMemo: "",
     achievements: { daily: 20, normal: 8, special: 2 },
     missionClaims: {},
+    bgmEnabled: false,
+    bgmVolume: 35,
     miniGameExpToday: 0,
     claimedToday: false,
     dailyGiftKey: "",
@@ -210,6 +283,8 @@ function normalizeGame(game) {
     photos: Array.isArray(game.photos) ? game.photos : [],
     supportMemo: validText(game.supportMemo, ""),
     missionClaims: game.missionClaims && typeof game.missionClaims === "object" ? game.missionClaims : {},
+    bgmEnabled: Boolean(game.bgmEnabled),
+    bgmVolume: clampRange(Number.isFinite(game.bgmVolume) ? game.bgmVolume : 35, 0, 100),
     dailyGiftKey: savedGiftKey,
     claimedToday: savedGiftKey === currentGiftKey ? Boolean(game.claimedToday) : false,
   };
@@ -229,6 +304,7 @@ function App() {
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify({ ...game, lastMessage: message }));
   }, [game, message]);
+  usePentomoBgm(game.bgmEnabled, game.bgmVolume);
 
   const activePenguin = getPenguin(game, game.activeCareId) || game.penguins[0];
   const homePenguin = getPenguin(game, game.homeDisplayId) || activePenguin;
@@ -483,6 +559,7 @@ function Home({ game, homePenguin, message, setActive, setMessage, setGame }) {
     return () => clearInterval(timer);
   }, []);
   const giftClaimed = game.claimedToday && game.dailyGiftKey === giftKey;
+  const homeMessage = message === "実績を開きました。" ? statusMessage(homePenguin) : message;
   const claimGift = () => {
     const currentGiftKey = getDailyGiftKey();
     if (game.claimedToday && game.dailyGiftKey === currentGiftKey) {
@@ -517,7 +594,7 @@ function Home({ game, homePenguin, message, setActive, setMessage, setGame }) {
       </div>
       <SideDock
         items={[
-          ["ミッション", "gift", () => setActive("missions")],
+          ["ミッション", "mission", () => setActive("missions")],
           ["ショップ", "shop", () => setActive("shop")],
           [giftClaimed ? "受取済み" : "プレゼント", "gift", claimGift],
         ]}
@@ -530,7 +607,7 @@ function Home({ game, homePenguin, message, setActive, setMessage, setGame }) {
         <div className="iceberg two" />
         <HomeWalkingPenguin penguin={homePenguin} />
       </div>
-      <Speech>{message}</Speech>
+      <Speech>{homeMessage}</Speech>
       <div className="primaryActions">
         <button className="roundAction blue" onClick={() => setActive("mini")}>
           <HomeIcon name="game" />
@@ -553,8 +630,6 @@ function HomeWalkingPenguin({ penguin: p }) {
   return (
     <div className="riggedPentomo" aria-label={`${p?.name || "ペンギン"}のアニメーション`}>
       <img className="rigPart rigImage" src={penguin} alt={p?.name || ""} draggable="false" />
-      <span className="rigFoot rigFootLeft" />
-      <span className="rigFoot rigFootRight" />
       <span className="rigShadow" />
       <span className="rigName">{p?.name || "ペンギン"}</span>
     </div>
@@ -2615,6 +2690,13 @@ function MenuSettingsScreen({ game, setGame, setMessage, setActive }) {
     setGame((current) => ({ ...current, noticeCount: 0 }));
     setMessage("通知を確認済みにしました。");
   };
+  const setBgmEnabled = (enabled) => {
+    setGame((current) => ({ ...current, bgmEnabled: enabled }));
+    setMessage(enabled ? "BGMを再生しました。" : "BGMを停止しました。");
+  };
+  const setBgmVolume = (value) => {
+    setGame((current) => ({ ...current, bgmVolume: clampRange(Number(value), 0, 100) }));
+  };
 
   return (
     <MenuPageShell title="設定" sub="保存状態や通知を確認" setActive={setActive}>
@@ -2624,6 +2706,23 @@ function MenuSettingsScreen({ game, setGame, setMessage, setActive }) {
           <div><span>通知</span><b>{game.noticeCount > 0 ? `${game.noticeCount}件` : "なし"}</b></div>
           <div><span>毎日更新</span><b>朝6時</b></div>
           <div><span>写真</span><b>{game.photos.length} / 30</b></div>
+        </div>
+        <div className="bgmSettingPanel">
+          <div>
+            <b>BGM</b>
+            <span>{game.bgmEnabled ? "再生中" : "停止中"} / 音量 {game.bgmVolume}</span>
+          </div>
+          <button className={game.bgmEnabled ? "whiteButton" : "yellow"} onClick={() => setBgmEnabled(!game.bgmEnabled)} type="button">
+            {game.bgmEnabled ? "OFF" : "ON"}
+          </button>
+          <input
+            type="range"
+            min="0"
+            max="100"
+            value={game.bgmVolume}
+            onChange={(event) => setBgmVolume(event.target.value)}
+            aria-label="BGM音量"
+          />
         </div>
         <div className="settingList">
           <button className="whiteButton" onClick={resetNotice} type="button">通知バッジを消す</button>
@@ -2929,6 +3028,13 @@ function HomeIcon({ name }) {
         <path d="M8 14h24v5H8v-5ZM10 19h20v12H10V19Z" fill="#2f729b" />
         <path d="M20 14v17M8 19h24" stroke="#eaf8ff" strokeWidth="3" />
         <path d="M20 13c-5-6-10-2-8 1 2.1 2.9 6.5 1.2 8-1Zm0 0c5-6 10-2 8 1-2.1 2.9-6.5 1.2-8-1Z" fill="none" stroke="#2f729b" strokeWidth="2.4" strokeLinecap="round" />
+      </>
+    ),
+    mission: (
+      <>
+        <path d="M11 7h18c1.7 0 3 1.3 3 3v20H8V10c0-1.7 1.3-3 3-3Z" fill="#2f729b" />
+        <path d="M14 14h12M14 20h9M14 26h6" stroke="#eaf8ff" strokeWidth="2.7" strokeLinecap="round" />
+        <path d="M27 23l2.2 2.2L34 19" fill="none" stroke="#eaf8ff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
       </>
     ),
     look: (

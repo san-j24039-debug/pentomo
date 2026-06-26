@@ -3644,9 +3644,9 @@ p {
 
 .titleDetailPanel.locked {
   background:
-    radial-gradient(circle at 78% 20%, rgba(255,255,255,0.09), transparent 18%),
-    linear-gradient(145deg, #111b23, #253848);
-  color: #f2fbff;
+    radial-gradient(circle at 82% 16%, rgba(255,255,255,0.9), transparent 22%),
+    linear-gradient(145deg, #e8f7ff, #c9e6f3);
+  color: #24536f;
 }
 
 .titleDetailPanel span {
@@ -3657,7 +3657,7 @@ p {
 
 .titleDetailPanel.locked span,
 .titleDetailPanel.locked p {
-  color: #c7dce8;
+  color: #496f86;
 }
 
 .titleDetailPanel h2 {
@@ -3667,7 +3667,7 @@ p {
 }
 
 .titleDetailPanel.locked h2 {
-  color: #ffffff;
+  color: #214c66;
   letter-spacing: 2px;
 }
 
@@ -3796,6 +3796,47 @@ p {
   min-height: 50px;
   padding-inline: 6px;
   font-size: 10px;
+}
+
+.bgmSettingPanel {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 74px;
+  gap: 10px;
+  align-items: center;
+  padding: 12px;
+  border: 1px solid #bfe8fa;
+  border-radius: 18px;
+  background:
+    radial-gradient(circle at 18% 16%, rgba(255,255,255,0.95), transparent 22%),
+    linear-gradient(135deg, #ffffff, #e9f9ff);
+  box-shadow: 0 5px 0 #d2eef9, 0 10px 18px rgba(44, 121, 176, 0.11);
+}
+
+.bgmSettingPanel b,
+.bgmSettingPanel span {
+  display: block;
+}
+
+.bgmSettingPanel b {
+  color: #134d74;
+  font-size: 14px;
+}
+
+.bgmSettingPanel span {
+  margin-top: 4px;
+  color: #5b839a;
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.bgmSettingPanel button {
+  min-height: 38px;
+}
+
+.bgmSettingPanel input[type="range"] {
+  grid-column: 1 / -1;
+  width: 100%;
+  accent-color: #38a5ef;
 }
 
 .menuTextarea {
