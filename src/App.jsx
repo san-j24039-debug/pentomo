@@ -123,7 +123,7 @@ function usePentomoBgm(enabled, volume) {
       oscillator.type = "sine";
       oscillator.frequency.value = notes[step % notes.length];
       gain.gain.setValueAtTime(0, now);
-      gain.gain.linearRampToValueAtTime(0.08, now + 0.04);
+      gain.gain.linearRampToValueAtTime(0.22, now + 0.04);
       gain.gain.exponentialRampToValueAtTime(0.001, now + 0.86);
       oscillator.connect(gain);
       gain.connect(master);
@@ -162,7 +162,7 @@ function usePentomoBgm(enabled, volume) {
 
   useEffect(() => {
     if (audioRef.current?.master) {
-      audioRef.current.master.gain.setTargetAtTime((clampRange(volume, 0, 100) / 100) * 0.58, audioRef.current.context.currentTime, 0.06);
+      audioRef.current.master.gain.setTargetAtTime((clampRange(volume, 0, 100) / 100) * 1.45, audioRef.current.context.currentTime, 0.06);
     }
   }, [volume, enabled]);
 }
