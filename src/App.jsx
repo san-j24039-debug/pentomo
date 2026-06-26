@@ -46,6 +46,15 @@ const feedItems = {
   special: { name: "特製魚セット", price: 3000, hunger: 60 },
 };
 
+const titleCatalog = [
+  { id: "keeper", name: "氷海の飼育員", condition: "ゲーム開始時から使える基本称号です。" },
+  { id: "fish-catcher", name: "魚キャッチ名人", condition: "魚キャッチで100点を達成すると解放されます。" },
+  { id: "friend", name: "ペンとも仲良し隊", condition: "愛情Lv10のペンギンを1匹育てると解放されます。" },
+  { id: "collector", name: "図鑑研究員", condition: "ペンギン図鑑を10種類以上発見すると解放されます。" },
+  { id: "traveler", name: "南極おみやげ係", condition: "おみやげを50個集めると解放されます。" },
+  { id: "master", name: "ペンギンマスター", condition: "ペンギンLv100を1匹達成すると解放されます。" },
+];
+
 const outfits = [
   { id: "none", name: "なし", price: 0 },
   { id: "red-scarf", name: "赤マフラー", price: 800 },
@@ -418,6 +427,13 @@ function App() {
           {active === "profile" && <Profile {...context} />}
           {active === "achieve" && <Achievements {...context} />}
           {active === "menu" && <Menu {...context} />}
+          {active === "menu-bag" && <MenuBagScreen {...context} />}
+          {active === "menu-titles" && <MenuTitlesScreen {...context} />}
+          {active === "menu-settings" && <MenuSettingsScreen {...context} />}
+          {active === "menu-help" && <MenuHelpScreen {...context} />}
+          {active === "menu-contact" && <MenuContactScreen {...context} />}
+          {active === "menu-terms" && <MenuTermsScreen {...context} />}
+          {active === "menu-link" && <MenuLinkScreen {...context} />}
         </main>
         <BottomTabs active={active} onChange={setActive} />
         {!game.tutorialDone && (
@@ -2358,7 +2374,7 @@ function ShopCollectionItem({ item, owned, onBuy }) {
 function Profile({ game, profilePenguin, setActive }) {
   const capacity = BASE_CAPACITY + game.capacityBonus;
   const rows = [
-    ["称号", "氷海の飼育員"],
+    ["称号", game.activeTitle || game.ownedTitles[0] || "氷海の飼育員"],
     ["飼育員Lv", game.keeperLevel],
     ["ログイン日数", `${game.loginDays}日`],
     ["Lv100達成数", game.penguins.filter((p) => p.level >= 100).length],
@@ -2401,14 +2417,173 @@ function Achievements({ game, setGame, setMessage }) {
   );
 }
 
-function Menu({ game, setGame, setMessage, setActive }) {
-  const [achievementTab, setAchievementTab] = useState("daily");
-  const [debugPassword, setDebugPassword] = useState("");
-  const [activePanel, setActivePanel] = useState("bag");
-  const claimAll = () => {
-    setGame((current) => ({ ...current, diamonds: current.diamonds + 20, coins: current.coins + 500 }));
-    setMessage("実績報酬を受け取ったよ。");
+function Menu({ setActive, setMessage }) {
+  const items = [
+    ["持ち物", "bag", "menu-bag", "エサ・卵・おみやげを確認"],
+    ["称号", "star", "menu-titles", "称号の確認と変更"],
+    ["設定", "gear", "menu-settings", "保存状態や通知の確認"],
+    ["ヘルプ", "help", "menu-help", "遊び方と困った時の説明"],
+    ["実績", "gift", "achieve", "報酬つきの目標"],
+    ["お問い合わせ", "mail", "menu-contact", "後で送信対応予定"],
+    ["利用規約", "doc", "menu-terms", "それっぽい規約"],
+    ["データ連携", "link", "menu-link", "後で連携対応予定"],
+  ];
+  return (
+    <Screen className="menuScreen">
+      <PageHeader title="メニュー" sub="必要な項目を選んで開きます" />
+      <div className="menuGrid">
+        {items.map(([label, icon, route, text]) => (
+          <button
+            className="menuButton menuNavButton"
+            key={label}
+            onClick={() => {
+              setMessage(`${label}を開きました。`);
+              setActive(route);
+            }}
+            type="button"
+          >
+            <Icon name={icon} /><span>{label}</span>
+            <small>{text}</small>
+          </button>
+        ))}
+      </div>
+    </Screen>
+  );
+}
+
+function MenuPageShell({ title, sub, setActive, children, className = "" }) {
+  return (
+    <Screen className={`menuScreen menuSubScreen ${className}`}>
+      <PageHeader title={title} sub={sub} />
+      <button className="profileCloseButton" onClick={() => setActive("menu")} aria-label="戻る" type="button">×</button>
+      {children}
+    </Screen>
+  );
+}
+
+function MenuBagScreen({ game, setActive }) {
+  const feedRows = Object.entries(feedItems).map(([key, item]) => ({ key, item, count: game.inventory[key] || 0 }));
+  const capacity = BASE_CAPACITY + game.capacityBonus;
+  return (
+    <MenuPageShell title="持ち物" sub="エサ・卵・おみやげを確認" setActive={setActive}>
+      <Panel className="menuDetailPanel">
+        <div className="menuSummaryGrid">
+          <div><b>{game.coins.toLocaleString()}</b><span>コイン</span></div>
+          <div><b>{game.diamonds.toLocaleString()}</b><span>ダイヤ</span></div>
+          <div><b>{game.penguins.length} / {capacity}</b><span>ペンギン</span></div>
+          <div><b>{game.eggs.length}</b><span>卵</span></div>
+        </div>
+        <div className="menuInventoryGrid">
+          {feedRows.map(({ key, item, count }) => (
+            <div className="menuInventoryItem" key={key}>
+              <FeedIcon type={key} />
+              <div>
+                <b>{item.name}</b>
+                <span>所持 {count}個 / 満腹度 +{item.hunger}</span>
+              </div>
+            </div>
+          ))}
+          <div className="menuInventoryItem">
+            <Egg type="rainbow" small />
+            <div>
+              <b>ペンギン卵</b>
+              <span>保管中 {game.eggs.length}個</span>
+            </div>
+          </div>
+          <div className="menuInventoryItem">
+            <Icon name="gift" />
+            <div>
+              <b>おみやげ</b>
+              <span>{game.souvenirs} / 150</span>
+            </div>
+          </div>
+        </div>
+        <div className="menuActionRow">
+          <button onClick={() => setActive("shop")} type="button">ショップへ</button>
+          <button className="whiteButton" onClick={() => setActive("list")} type="button">一覧へ</button>
+          <button className="whiteButton" onClick={() => setActive("book")} type="button">図鑑へ</button>
+        </div>
+      </Panel>
+    </MenuPageShell>
+  );
+}
+
+function MenuTitlesScreen({ game, setGame, setMessage, setActive }) {
+  const entries = titleEntries(game);
+  const [selectedId, setSelectedId] = useState(entries[0]?.id || "");
+  const selected = entries.find((entry) => entry.id === selectedId) || entries[0];
+  const setActiveTitle = (titleName) => {
+    setGame((current) => ({ ...current, activeTitle: titleName }));
+    setMessage(`${titleName}を表示称号にしました。`);
   };
+
+  return (
+    <MenuPageShell title="称号" sub="解放条件を確認して、プロフィール表示を変更" setActive={setActive} className="titleScreen">
+      <Panel className="activeTitleCard">
+        <Icon name="star" />
+        <div><span>プロフィール表示中</span><b>{game.activeTitle || game.ownedTitles[0] || "未設定"}</b></div>
+      </Panel>
+      <div className="titleCardGrid">
+        {entries.map((entry) => (
+          <button
+            className={`titleCard ${entry.unlocked ? "unlocked" : "locked"} ${selected?.id === entry.id ? "selected" : ""}`}
+            key={entry.id}
+            onClick={() => setSelectedId(entry.id)}
+            type="button"
+          >
+            <span>{entry.unlocked ? "称号" : "???"}</span>
+            <b>{entry.unlocked ? entry.name : "？？？"}</b>
+            <small>{entry.unlocked ? "解放済み" : "未解放"}</small>
+          </button>
+        ))}
+      </div>
+      {selected && (
+        <Panel className={`titleDetailPanel ${selected.unlocked ? "" : "locked"}`}>
+          <div>
+            <span>{selected.unlocked ? "称号詳細" : "未解放称号"}</span>
+            <h2>{selected.unlocked ? selected.name : "？？？"}</h2>
+            <p>{selected.condition}</p>
+          </div>
+          {selected.unlocked ? (
+            <button className="yellow" onClick={() => setActiveTitle(selected.name)} disabled={game.activeTitle === selected.name} type="button">
+              {game.activeTitle === selected.name ? "設定中" : "この称号にする"}
+            </button>
+          ) : (
+            <button className="whiteButton" disabled type="button">条件達成で解放</button>
+          )}
+        </Panel>
+      )}
+    </MenuPageShell>
+  );
+}
+
+function MenuSettingsScreen({ game, setGame, setMessage, setActive }) {
+  const resetNotice = () => {
+    setGame((current) => ({ ...current, noticeCount: 0 }));
+    setMessage("通知を確認済みにしました。");
+  };
+
+  return (
+    <MenuPageShell title="設定" sub="保存状態や通知を確認" setActive={setActive}>
+      <Panel className="menuDetailPanel">
+        <div className="settingStatusGrid">
+          <div><span>保存方式</span><b>端末保存</b></div>
+          <div><span>通知</span><b>{game.noticeCount > 0 ? `${game.noticeCount}件` : "なし"}</b></div>
+          <div><span>毎日更新</span><b>朝6時</b></div>
+          <div><span>写真</span><b>{game.photos.length} / 30</b></div>
+        </div>
+        <div className="settingList">
+          <button className="whiteButton" onClick={resetNotice} type="button">通知バッジを消す</button>
+          <button className="whiteButton" onClick={() => setMessage("セーブデータはこの端末に保存されています。")} type="button">保存状態を確認</button>
+          <button className="whiteButton" onClick={() => setActive("profile")} type="button">プロフィールへ</button>
+        </div>
+      </Panel>
+    </MenuPageShell>
+  );
+}
+
+function MenuHelpScreen({ setGame, setMessage, setActive }) {
+  const [debugPassword, setDebugPassword] = useState("");
   const addDebugDiamonds = () => {
     if (debugPassword !== "penguin") {
       setMessage("パスワードが違います。");
@@ -2418,231 +2593,79 @@ function Menu({ game, setGame, setMessage, setActive }) {
     setDebugPassword("");
     setMessage("確認用ダイヤを100000追加しました。");
   };
+
   return (
-    <Screen className="menuScreen">
-      <PageHeader title="メニュー" sub="実績・設定・ヘルプ・データ連携" />
-      <div className="menuGrid">
-        {[
-          ["持ち物", "bag", "bag"], ["称号", "star", "titles"], ["設定", "gear", "settings"], ["ヘルプ", "help", "help"],
-          ["お問い合わせ", "mail", "contact"], ["利用規約", "doc", "terms"], ["データ連携", "link", "link"],
-        ].map(([label, icon, panel]) => (
-          <button
-            className={`menuButton ${activePanel === panel ? "active" : ""}`}
-            key={label}
-            onClick={() => {
-              setActivePanel(panel);
-              setMessage(`${label}を開きました。`);
-            }}
-            type="button"
-          >
-            <Icon name={icon} /><span>{label}</span>
-          </button>
-        ))}
+    <MenuPageShell title="ヘルプ" sub="遊び方と困った時の確認" setActive={setActive}>
+      <div className="helpCardGrid full">
+        <div><b>育成の基本</b><span>餌で満腹度、なでるで機嫌、掃除で部屋の状態、写真で思い出を残せます。育成画面のペンギンを直接操作する遊びもあります。</span></div>
+        <div><b>愛情Lv</b><span>愛情Lvは最大10です。進化にはペンギンLv65と愛情Lv6が必要です。</span></div>
+        <div><b>ガチャ</b><span>単発は100ダイヤ、10連は1000ダイヤです。SSR卵の確率は2%、80連でSSR卵が確定します。</span></div>
+        <div><b>卵と孵化</b><span>ガチャで入手した卵は一覧の卵タブに入ります。孵化すると新しいペンギンが仲間になります。</span></div>
+        <div><b>おでかけ</b><span>おでかけは実時間で進みます。1時間、3時間、5時間、12時間の行き先があります。</span></div>
+        <div><b>ミニゲーム</b><span>魚キャッチ、氷スライド、記憶ゲームで報酬を獲得できます。報酬は受け取ってから次へ進みます。</span></div>
+        <div><b>データ保存</b><span>データはブラウザのlocalStorageに保存されます。ブラウザのデータ削除や別端末では引き継がれない場合があります。</span></div>
+        <div><b>スマホで遊ぶ</b><span>VercelのURLをSafariで開き、共有からホーム画面に追加するとアプリ風に起動できます。</span></div>
       </div>
-      <MenuPanel
-        activePanel={activePanel}
-        game={game}
-        setGame={setGame}
-        setMessage={setMessage}
-        setActive={setActive}
-        debugPassword={debugPassword}
-        setDebugPassword={setDebugPassword}
-        addDebugDiamonds={addDebugDiamonds}
-      />
-      <Panel className="menuAchievements">
-        <div className="menuSectionTitle">
-          <h2>実績</h2>
-          <button className="yellow" onClick={claimAll}>まとめて受け取る</button>
-        </div>
-        <Segmented active={achievementTab} options={{ daily: "デイリー", normal: "ノーマル", special: "スペシャル" }} onChange={setAchievementTab} />
-        <div className="taskPanel embedded">
-          <Task title="ログインしよう" reward="ダイヤ x10" done />
-          <Task title="ペンギンと5回お世話しよう" reward="ダイヤ x10" progress="5 / 5" done />
-          <Task title="魚キャッチで100点" reward="称号" progress={`${game.achievements[achievementTab]} / 100`} />
+      <Panel className="helpPanel">
+        <div className="menuSectionTitle"><h2>確認用</h2></div>
+        <p>ガチャ演出確認用の隠し機能です。パスワードを入力するとダイヤを追加できます。</p>
+        <div className="debugDiamondBox">
+          <input type="password" value={debugPassword} onChange={(event) => setDebugPassword(event.target.value)} placeholder="確認用パスワード" />
+          <button className="yellow" onClick={addDebugDiamonds}>ダイヤ100000</button>
         </div>
       </Panel>
-    </Screen>
+    </MenuPageShell>
   );
 }
 
-function MenuPanel({ activePanel, game, setGame, setMessage, setActive, debugPassword, setDebugPassword, addDebugDiamonds }) {
+function MenuContactScreen({ game, setGame, setMessage, setActive }) {
   const [contactDraft, setContactDraft] = useState(game.supportMemo || "");
-  const [importText, setImportText] = useState("");
-  const feedRows = Object.entries(feedItems).map(([key, item]) => ({ key, item, count: game.inventory[key] || 0 }));
-  const capacity = BASE_CAPACITY + game.capacityBonus;
-  const dataCode = JSON.stringify(game);
-  const title = {
-    bag: "持ち物",
-    titles: "称号",
-    settings: "設定",
-    help: "ヘルプ",
-    contact: "お問い合わせ",
-    terms: "利用規約",
-    link: "データ連携",
-  }[activePanel] || "メニュー";
-
-  const resetNotice = () => {
-    setGame((current) => ({ ...current, noticeCount: 0 }));
-    setMessage("通知を確認済みにしました。");
-  };
-  const setActiveTitle = (titleName) => {
-    setGame((current) => ({ ...current, activeTitle: titleName }));
-    setMessage(`${titleName}を表示称号にしました。`);
-  };
   const saveContactMemo = () => {
     setGame((current) => ({ ...current, supportMemo: contactDraft.trim() }));
     setMessage("問い合わせメモを保存しました。");
   };
-  const copySaveData = async () => {
-    try {
-      await navigator.clipboard.writeText(dataCode);
-      setMessage("バックアップコードをコピーしました。");
-    } catch {
-      setMessage("コピーできませんでした。コードを長押ししてコピーしてください。");
-    }
-  };
-  const importSaveData = () => {
-    try {
-      const parsed = JSON.parse(importText);
-      setGame(normalizeGame({ ...createDefaultGame(), ...parsed }));
-      setImportText("");
-      setMessage("バックアップコードを読み込みました。");
-    } catch {
-      setMessage("バックアップコードを読み込めませんでした。");
-    }
-  };
 
   return (
-    <Panel className={`menuDetailPanel menuDetail-${activePanel}`}>
-      <div className="menuSectionTitle">
-        <h2>{title}</h2>
-      </div>
-      {activePanel === "bag" && (
-        <>
-          <div className="menuSummaryGrid">
-            <div><b>{game.coins.toLocaleString()}</b><span>コイン</span></div>
-            <div><b>{game.diamonds.toLocaleString()}</b><span>ダイヤ</span></div>
-            <div><b>{game.penguins.length} / {capacity}</b><span>ペンギン</span></div>
-            <div><b>{game.eggs.length}</b><span>卵</span></div>
-          </div>
-          <div className="menuInventoryGrid">
-            {feedRows.map(({ key, item, count }) => (
-              <div className="menuInventoryItem" key={key}>
-                <FeedIcon type={key} />
-                <div>
-                  <b>{item.name}</b>
-                  <span>所持 {count}個 / 満腹度 +{item.hunger}</span>
-                </div>
-              </div>
-            ))}
-            <div className="menuInventoryItem">
-              <Egg type="rainbow" small />
-              <div>
-                <b>ペンギン卵</b>
-                <span>保管中 {game.eggs.length}個</span>
-              </div>
-            </div>
-            <div className="menuInventoryItem">
-              <Icon name="gift" />
-              <div>
-                <b>おみやげ</b>
-                <span>{game.souvenirs} / 150</span>
-              </div>
-            </div>
-          </div>
-          <div className="menuActionRow">
-            <button onClick={() => setActive("shop")} type="button">ショップへ</button>
-            <button className="whiteButton" onClick={() => setActive("list")} type="button">一覧へ</button>
-            <button className="whiteButton" onClick={() => setActive("book")} type="button">図鑑へ</button>
-          </div>
-        </>
-      )}
-      {activePanel === "titles" && (
-        <>
-          <div className="activeTitleCard">
-            <Icon name="star" />
-            <div><span>表示中の称号</span><b>{game.activeTitle || game.ownedTitles[0] || "未設定"}</b></div>
-          </div>
-          <div className="titleList selectable">
-            {game.ownedTitles.map((ownedTitle) => (
-              <button
-                className={game.activeTitle === ownedTitle ? "active" : ""}
-                key={ownedTitle}
-                onClick={() => setActiveTitle(ownedTitle)}
-                type="button"
-              >
-                {ownedTitle}
-              </button>
-            ))}
-            {game.ownedTitles.length === 0 && <p>まだ称号を持っていません。</p>}
-          </div>
-          <div className="unlockHintGrid">
-            <span>Lv100達成で特別称号</span>
-            <span>魚キャッチ実績で称号</span>
-          </div>
-        </>
-      )}
-      {activePanel === "settings" && (
-        <>
-          <div className="settingStatusGrid">
-            <div><span>保存方式</span><b>端末保存</b></div>
-            <div><span>通知</span><b>{game.noticeCount > 0 ? `${game.noticeCount}件` : "なし"}</b></div>
-            <div><span>毎日更新</span><b>朝6時</b></div>
-            <div><span>写真</span><b>{game.photos.length} / 30</b></div>
-          </div>
-          <div className="settingList">
-            <button className="whiteButton" onClick={resetNotice} type="button">通知バッジを消す</button>
-            <button className="whiteButton" onClick={() => setMessage("セーブデータはこの端末に保存されています。")} type="button">保存状態を確認</button>
-            <button className="whiteButton" onClick={() => setActive("profile")} type="button">プロフィールへ</button>
-          </div>
-        </>
-      )}
-      {activePanel === "help" && (
-        <>
-          <div className="helpCardGrid">
-            <div><b>育成</b><span>餌・なでる・掃除・写真で状態を整えます。</span></div>
-            <div><b>ガチャ</b><span>SSR卵は2%。80連で確定です。</span></div>
-            <div><b>おでかけ</b><span>出発後は実時間で帰還を待ちます。</span></div>
-            <div><b>図鑑</b><span>発見したペンギンやおみやげを確認できます。</span></div>
-          </div>
-          <div className="debugDiamondBox">
-            <input
-              type="password"
-              value={debugPassword}
-              onChange={(event) => setDebugPassword(event.target.value)}
-              placeholder="確認用パスワード"
-            />
-            <button className="yellow" onClick={addDebugDiamonds}>ダイヤ100000</button>
-          </div>
-        </>
-      )}
-      {activePanel === "contact" && (
-        <>
+    <MenuPageShell title="お問い合わせ" sub="送信機能は後で実装予定" setActive={setActive}>
+      <Panel className="menuDetailPanel">
           <p>改善したい点や不具合メモをここに残せます。提出前の確認メモにも使えます。</p>
           <textarea className="menuTextarea" value={contactDraft} onChange={(event) => setContactDraft(event.target.value)} placeholder="例: ガチャ結果の表示をもっと見やすくしたい" />
           <button className="yellow" onClick={saveContactMemo} type="button">メモを保存</button>
-        </>
-      )}
-      {activePanel === "terms" && (
+      </Panel>
+    </MenuPageShell>
+  );
+}
+
+function MenuTermsScreen({ setActive }) {
+  return (
+    <MenuPageShell title="利用規約" sub="それっぽい長めの規約" setActive={setActive}>
+      <Panel className="menuDetailPanel">
         <div className="termsList">
-          <div><b>利用目的</b><span>ペンともは学習・制作課題用の育成ゲームです。</span></div>
-          <div><b>保存データ</b><span>ゲームデータはこの端末のブラウザに保存されます。</span></div>
-          <div><b>注意</b><span>ブラウザのデータを削除するとセーブも消えることがあります。</span></div>
+          <div><b>第1条 利用目的</b><span>ペンともは、ペンギンとのふれあい、育成、収集、ガチャ、ミニゲームなどを楽しむためのゲームです。本サービスは学習および制作物として提供され、利用者は本規約に同意したうえで遊ぶものとします。</span></div>
+          <div><b>第2条 セーブデータ</b><span>ゲームの進行状況、所持ペンギン、卵、アイテム、称号、写真、各種設定などは、利用中のブラウザ内に保存されます。端末変更、ブラウザ変更、キャッシュ削除、プライベートブラウズ利用などにより、データが表示されなくなる場合があります。</span></div>
+          <div><b>第3条 ゲーム内アイテム</b><span>コイン、ダイヤ、エサ、卵、家具、衣装、背景、おみやげ、称号などはゲーム内でのみ使用できる仮想アイテムです。現実の金銭、物品、権利その他の価値と交換することはできません。</span></div>
+          <div><b>第4条 ガチャ</b><span>ガチャには排出率が設定されています。結果は抽選により決定され、必ず希望する報酬が得られるとは限りません。ただし、ゲーム内仕様としてSSR卵の天井が設定されている場合は、その仕様に従います。</span></div>
+          <div><b>第5条 禁止事項</b><span>不正な改造、意図しない操作、データの破損を目的とした行為、他者の端末やアカウントへの迷惑行為、ゲームの雰囲気を大きく損なう行為はしないでください。</span></div>
+          <div><b>第6条 仕様変更</b><span>ゲーム内容、画面表示、報酬、演出、機能、バランスなどは、改善のため予告なく変更される場合があります。変更後も、なるべく既存データに影響が出ないよう配慮します。</span></div>
+          <div><b>第7条 免責</b><span>本ゲームの利用により発生したデータ消失、表示不具合、通信環境による問題、端末依存の動作差などについて、制作者は可能な範囲で改善に努めますが、完全な保証は行いません。</span></div>
+          <div><b>第8条 お問い合わせ</b><span>不具合や改善要望はお問い合わせ画面に記録できます。実際に制作者へ送信する機能は、今後必要に応じて追加される予定です。</span></div>
         </div>
-      )}
-      {activePanel === "link" && (
-        <>
-          <p>バックアップコードを保存すると、別端末や再インストール時に復元できます。</p>
-          <textarea className="menuTextarea saveCode" readOnly value={dataCode} />
-          <div className="menuActionRow">
-            <button onClick={copySaveData} type="button">コピー</button>
-            <button className="whiteButton" onClick={() => setImportText(dataCode)} type="button">下に貼る</button>
-          </div>
-          <textarea className="menuTextarea importCode" value={importText} onChange={(event) => setImportText(event.target.value)} placeholder="バックアップコードを貼り付け" />
-          <button className="yellow" onClick={importSaveData} disabled={!importText.trim()} type="button">復元する</button>
-        </>
-      )}
-    </Panel>
+      </Panel>
+    </MenuPageShell>
+  );
+}
+
+function MenuLinkScreen({ setActive }) {
+  return (
+    <MenuPageShell title="データ連携" sub="お問い合わせ機能と一緒に後で対応予定" setActive={setActive}>
+      <Panel className="menuDetailPanel">
+        <p>データ連携は、実際にお問い合わせを送れる仕組みを作る時に一緒に整えます。今はこの端末のブラウザに自動保存されています。</p>
+        <div className="termsList">
+          <div><b>現在の保存</b><span>localStorageに自動保存されています。</span></div>
+          <div><b>今後の予定</b><span>別端末への引き継ぎ、問い合わせ送信、バックアップコードなどをまとめて検討します。</span></div>
+        </div>
+      </Panel>
+    </MenuPageShell>
   );
 }
 
@@ -2807,7 +2830,7 @@ function BottomTabs({ active, onChange }) {
   return (
     <nav className="bottomTabs">
       {tabs.map(([id, label, icon]) => (
-        <button className={active === id ? "active" : ""} key={id} onClick={() => onChange(id)}>
+        <button className={active === id || (id === "menu" && active.startsWith("menu-")) ? "active" : ""} key={id} onClick={() => onChange(id)}>
           <Icon name={icon} /><span>{label}</span>
         </button>
       ))}
@@ -3020,6 +3043,29 @@ function addFeedRewards(inventory, rewards) {
     if (reward.prizeType !== "feed") return next;
     return { ...next, [reward.feedKey]: next[reward.feedKey] + 1 };
   }, inventory);
+}
+
+function titleEntries(game) {
+  const unlockedByCondition = (title) => {
+    if (game.ownedTitles.includes(title.name)) return true;
+    if (title.id === "keeper") return true;
+    if (title.id === "fish-catcher") return Math.max(...Object.values(game.achievements || {})) >= 100;
+    if (title.id === "friend") return game.penguins.some((p) => p.loveLevel >= 10);
+    if (title.id === "collector") return game.discoveredSpecies.length >= 10;
+    if (title.id === "traveler") return game.souvenirs >= 50;
+    if (title.id === "master") return game.penguins.some((p) => p.level >= 100);
+    return false;
+  };
+  const base = titleCatalog.map((title) => ({ ...title, unlocked: unlockedByCondition(title) }));
+  const extra = game.ownedTitles
+    .filter((titleName) => !base.some((entry) => entry.name === titleName))
+    .map((titleName, index) => ({
+      id: `owned-${index}-${titleName}`,
+      name: titleName,
+      condition: "ペンギンの成長やイベントで獲得した特別称号です。",
+      unlocked: true,
+    }));
+  return [...base, ...extra];
 }
 
 function nextLoveLevel(point) {

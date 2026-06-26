@@ -3331,6 +3331,31 @@ p {
   color: #fff;
 }
 
+.menuNavButton {
+  align-content: center;
+  padding: 10px 7px;
+}
+
+.menuNavButton small {
+  max-width: 100%;
+  overflow: hidden;
+  color: #6d90a6;
+  font-size: 9px;
+  font-weight: 900;
+  line-height: 1.35;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.menuSubScreen {
+  position: relative;
+}
+
+.menuSubScreen > .profileCloseButton {
+  top: 14px;
+}
+
 .helpPanel {
   display: grid;
   gap: 10px;
@@ -3533,6 +3558,106 @@ p {
   color: #fff;
 }
 
+.titleCardGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.titleCard {
+  min-height: 112px;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 6px;
+  padding: 12px 8px;
+  border: 2px solid #b7e5fb;
+  border-radius: 16px;
+  background:
+    radial-gradient(circle at 18% 18%, rgba(255,255,255,0.92), transparent 24%),
+    linear-gradient(#ffffff, #eefdff);
+  box-shadow: 0 5px 0 #c5e8f8, 0 12px 20px rgba(44, 121, 176, 0.12);
+  color: #164d72;
+}
+
+.titleCard.locked {
+  border-color: #1c2e3d;
+  background:
+    radial-gradient(circle at 50% 28%, rgba(255,255,255,0.08), transparent 28%),
+    linear-gradient(145deg, #101820, #213341);
+  box-shadow: 0 5px 0 #0a1118, 0 12px 20px rgba(5, 12, 18, 0.22);
+  color: #e9f8ff;
+}
+
+.titleCard.selected {
+  outline: 3px solid rgba(83, 186, 255, 0.72);
+}
+
+.titleCard span,
+.titleCard small {
+  font-size: 10px;
+  font-weight: 900;
+}
+
+.titleCard b {
+  max-width: 100%;
+  overflow: hidden;
+  font-size: 15px;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.titleCard.locked b {
+  letter-spacing: 2px;
+}
+
+.titleDetailPanel {
+  display: grid;
+  gap: 12px;
+  padding: 14px;
+  background:
+    radial-gradient(circle at 85% 12%, rgba(255,255,255,0.9), transparent 20%),
+    linear-gradient(#ffffff, #eaf9ff);
+}
+
+.titleDetailPanel.locked {
+  background:
+    radial-gradient(circle at 78% 20%, rgba(255,255,255,0.09), transparent 18%),
+    linear-gradient(145deg, #111b23, #253848);
+  color: #f2fbff;
+}
+
+.titleDetailPanel span {
+  color: #5b85a0;
+  font-size: 10px;
+  font-weight: 900;
+}
+
+.titleDetailPanel.locked span,
+.titleDetailPanel.locked p {
+  color: #c7dce8;
+}
+
+.titleDetailPanel h2 {
+  margin: 3px 0 6px;
+  color: #104d76;
+  font-size: 20px;
+}
+
+.titleDetailPanel.locked h2 {
+  color: #ffffff;
+  letter-spacing: 2px;
+}
+
+.titleDetailPanel p {
+  margin: 0;
+  color: #315f7b;
+  font-size: 12px;
+  font-weight: 850;
+  line-height: 1.65;
+}
+
 .unlockHintGrid,
 .helpCardGrid,
 .termsList {
@@ -3559,6 +3684,10 @@ p {
 
 .helpCardGrid {
   grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.helpCardGrid.full {
+  grid-template-columns: 1fr;
 }
 
 .helpCardGrid b,
