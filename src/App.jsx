@@ -162,7 +162,7 @@ function usePentomoBgm(enabled, volume) {
 
   useEffect(() => {
     if (audioRef.current?.master) {
-      audioRef.current.master.gain.setTargetAtTime((clampRange(volume, 0, 100) / 100) * 0.22, audioRef.current.context.currentTime, 0.06);
+      audioRef.current.master.gain.setTargetAtTime((clampRange(volume, 0, 100) / 100) * 0.58, audioRef.current.context.currentTime, 0.06);
     }
   }, [volume, enabled]);
 }
@@ -233,7 +233,7 @@ function createDefaultGame() {
     achievements: { daily: 20, normal: 8, special: 2 },
     missionClaims: {},
     bgmEnabled: false,
-    bgmVolume: 35,
+    bgmVolume: 70,
     miniGameExpToday: 0,
     claimedToday: false,
     dailyGiftKey: "",
@@ -284,7 +284,7 @@ function normalizeGame(game) {
     supportMemo: validText(game.supportMemo, ""),
     missionClaims: game.missionClaims && typeof game.missionClaims === "object" ? game.missionClaims : {},
     bgmEnabled: Boolean(game.bgmEnabled),
-    bgmVolume: clampRange(Number.isFinite(game.bgmVolume) ? game.bgmVolume : 35, 0, 100),
+    bgmVolume: clampRange(Number.isFinite(game.bgmVolume) ? game.bgmVolume : 70, 0, 100),
     dailyGiftKey: savedGiftKey,
     claimedToday: savedGiftKey === currentGiftKey ? Boolean(game.claimedToday) : false,
   };
@@ -2691,11 +2691,12 @@ function MenuSettingsScreen({ game, setGame, setMessage, setActive }) {
     setMessage("通知を確認済みにしました。");
   };
   const setBgmEnabled = (enabled) => {
-    setGame((current) => ({ ...current, bgmEnabled: enabled }));
+    setGame((current) => ({ ...current, bgmEnabled: enabled, bgmVolume: enabled && current.bgmVolume === 0 ? 70 : current.bgmVolume }));
     setMessage(enabled ? "BGMを再生しました。" : "BGMを停止しました。");
   };
   const setBgmVolume = (value) => {
-    setGame((current) => ({ ...current, bgmVolume: clampRange(Number(value), 0, 100) }));
+    const nextVolume = clampRange(Number(value), 0, 100);
+    setGame((current) => ({ ...current, bgmVolume: nextVolume, bgmEnabled: nextVolume > 0 }));
   };
 
   return (
@@ -2712,8 +2713,8 @@ function MenuSettingsScreen({ game, setGame, setMessage, setActive }) {
             <b>BGM</b>
             <span>{game.bgmEnabled ? "再生中" : "停止中"} / 音量 {game.bgmVolume}</span>
           </div>
-          <button className={game.bgmEnabled ? "whiteButton" : "yellow"} onClick={() => setBgmEnabled(!game.bgmEnabled)} type="button">
-            {game.bgmEnabled ? "OFF" : "ON"}
+          <button className={game.bgmEnabled ? "yellow" : "whiteButton"} onClick={() => setBgmEnabled(!game.bgmEnabled)} type="button">
+            {game.bgmEnabled ? "ON" : "OFF"}
           </button>
           <input
             type="range"
