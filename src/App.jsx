@@ -160,6 +160,7 @@ function createDefaultGame() {
     photos: [],
     supportMemo: "",
     achievements: { daily: 20, normal: 8, special: 2 },
+    missionClaims: {},
     miniGameExpToday: 0,
     claimedToday: false,
     dailyGiftKey: "",
@@ -208,6 +209,7 @@ function normalizeGame(game) {
     capacityBonus: Number.isFinite(game.capacityBonus) ? game.capacityBonus : 0,
     photos: Array.isArray(game.photos) ? game.photos : [],
     supportMemo: validText(game.supportMemo, ""),
+    missionClaims: game.missionClaims && typeof game.missionClaims === "object" ? game.missionClaims : {},
     dailyGiftKey: savedGiftKey,
     claimedToday: savedGiftKey === currentGiftKey ? Boolean(game.claimedToday) : false,
   };
@@ -426,6 +428,7 @@ function App() {
           {active === "shop" && <Shop {...context} />}
           {active === "profile" && <Profile {...context} />}
           {active === "achieve" && <Achievements {...context} />}
+          {active === "missions" && <Missions {...context} />}
           {active === "menu" && <Menu {...context} />}
           {active === "menu-bag" && <MenuBagScreen {...context} />}
           {active === "menu-titles" && <MenuTitlesScreen {...context} />}
@@ -514,6 +517,7 @@ function Home({ game, homePenguin, message, setActive, setMessage, setGame }) {
       </div>
       <SideDock
         items={[
+          ["ミッション", "gift", () => setActive("missions")],
           ["ショップ", "shop", () => setActive("shop")],
           [giftClaimed ? "受取済み" : "プレゼント", "gift", claimGift],
         ]}
@@ -2397,15 +2401,16 @@ function Profile({ game, profilePenguin, setActive }) {
   );
 }
 
-function Achievements({ game, setGame, setMessage }) {
+function Achievements({ game, setGame, setMessage, setActive }) {
   const [tab, setTab] = useState("daily");
   const claimAll = () => {
     setGame((current) => ({ ...current, diamonds: current.diamonds + 20, coins: current.coins + 500 }));
     setMessage("実績報酬を受け取ったよ。");
   };
   return (
-    <Screen className="achieveScreen">
-      <PageHeader title="実績" sub="デイリー / ノーマル / スペシャル" />
+    <Screen className="achieveScreen menuSubScreen">
+      <PageHeader title="ミッション" sub="デイリー / ノーマル / スペシャル" />
+      <button className="profileCloseButton" onClick={() => setActive("home")} aria-label="戻る" type="button">×</button>
       <Segmented active={tab} options={{ daily: "デイリー", normal: "ノーマル", special: "スペシャル" }} onChange={setTab} />
       <Panel className="taskPanel">
         <Task title="ログインしよう" reward="ダイヤ x10" done />
@@ -2417,13 +2422,61 @@ function Achievements({ game, setGame, setMessage }) {
   );
 }
 
+function Missions({ game, setGame, setMessage, setActive }) {
+  const [tab, setTab] = useState("daily");
+  const missions = missionList(game)[tab];
+  const claimMission = (mission) => {
+    if (!mission.done || game.missionClaims?.[mission.claimKey]) return;
+    setGame((current) => ({
+      ...current,
+      coins: current.coins + mission.reward.coins,
+      diamonds: current.diamonds + mission.reward.diamonds,
+      inventory: {
+        ...current.inventory,
+        normal: current.inventory.normal + mission.reward.feed,
+      },
+      missionClaims: { ...(current.missionClaims || {}), [mission.claimKey]: true },
+    }));
+    setMessage(`${mission.title}のミッション報酬を受け取ったよ。`);
+  };
+
+  return (
+    <Screen className="missionScreen menuSubScreen">
+      <PageHeader title="ミッション" sub="デイリー / ウィークリー / マンスリー" />
+      <button className="profileCloseButton" onClick={() => setActive("home")} aria-label="戻る" type="button">×</button>
+      <Segmented active={tab} options={{ daily: "デイリー", weekly: "ウィークリー", monthly: "マンスリー" }} onChange={setTab} />
+      <Panel className="missionPanel">
+        {missions.map((mission) => {
+          const claimed = Boolean(game.missionClaims?.[mission.claimKey]);
+          return (
+            <div className={`missionItem ${mission.done ? "done" : ""} ${claimed ? "claimed" : ""}`} key={mission.id}>
+              <div>
+                <b>{mission.title}</b>
+                <p>{mission.progress}</p>
+              </div>
+              <span>コイン{mission.reward.coins} / ダイヤ{mission.reward.diamonds}{mission.reward.feed ? ` / エサ${mission.reward.feed}` : ""}</span>
+              <button
+                className={mission.done && !claimed ? "yellow" : "whiteButton"}
+                disabled={!mission.done || claimed}
+                onClick={() => claimMission(mission)}
+                type="button"
+              >
+                {claimed ? "受取済み" : mission.done ? "受け取る" : "進行中"}
+              </button>
+            </div>
+          );
+        })}
+      </Panel>
+    </Screen>
+  );
+}
+
 function Menu({ setActive, setMessage }) {
   const items = [
     ["持ち物", "bag", "menu-bag", "エサ・卵・おみやげを確認"],
     ["称号", "star", "menu-titles", "称号の確認と変更"],
     ["設定", "gear", "menu-settings", "保存状態や通知の確認"],
     ["ヘルプ", "help", "menu-help", "遊び方と困った時の説明"],
-    ["実績", "gift", "achieve", "報酬つきの目標"],
     ["お問い合わせ", "mail", "menu-contact", "後で送信対応予定"],
     ["利用規約", "doc", "menu-terms", "それっぽい規約"],
     ["データ連携", "link", "menu-link", "後で連携対応予定"],
@@ -2830,7 +2883,7 @@ function BottomTabs({ active, onChange }) {
   return (
     <nav className="bottomTabs">
       {tabs.map(([id, label, icon]) => (
-        <button className={active === id || (id === "menu" && active.startsWith("menu-")) ? "active" : ""} key={id} onClick={() => onChange(id)}>
+        <button className={active === id || (id === "menu" && active.startsWith("menu-")) || (id === "home" && active === "missions") ? "active" : ""} key={id} onClick={() => onChange(id)}>
           <Icon name={icon} /><span>{label}</span>
         </button>
       ))}
@@ -3066,6 +3119,56 @@ function titleEntries(game) {
       unlocked: true,
     }));
   return [...base, ...extra];
+}
+
+function missionList(game) {
+  const dailyKey = getDailyGiftKey();
+  const weekKey = getWeekKey();
+  const monthKey = getMonthKey();
+  const bestMini = Math.max(...Object.values(game.achievements || {}));
+  const adultCount = game.penguins.filter((p) => p.stage === "adult").length;
+  const highLoveCount = game.penguins.filter((p) => p.loveLevel >= 6).length;
+  const maxLevel = Math.max(...game.penguins.map((p) => p.level));
+  const make = (period, key, id, title, done, progress, reward) => ({
+    id,
+    title,
+    done,
+    progress,
+    reward,
+    claimKey: `${period}:${key}:${id}`,
+  });
+
+  return {
+    daily: [
+      make("daily", dailyKey, "login", "今日ログインする", true, "1 / 1", { coins: 120, diamonds: 5, feed: 1 }),
+      make("daily", dailyKey, "gift", "今日のプレゼントを受け取る", game.claimedToday && game.dailyGiftKey === dailyKey, `${game.claimedToday && game.dailyGiftKey === dailyKey ? 1 : 0} / 1`, { coins: 180, diamonds: 5, feed: 1 }),
+      make("daily", dailyKey, "care", "育成中のペンギンを確認する", Boolean(game.activeCareId), "1 / 1", { coins: 100, diamonds: 3, feed: 0 }),
+    ],
+    weekly: [
+      make("weekly", weekKey, "penguins3", "ペンギンを3匹以上仲間にする", game.penguins.length >= 3, `${Math.min(game.penguins.length, 3)} / 3`, { coins: 700, diamonds: 20, feed: 2 }),
+      make("weekly", weekKey, "mini100", "ミニゲームで100点を目指す", bestMini >= 100, `${Math.min(bestMini, 100)} / 100`, { coins: 600, diamonds: 25, feed: 1 }),
+      make("weekly", weekKey, "love6", "愛情Lv6のペンギンを育てる", highLoveCount >= 1, `${Math.min(highLoveCount, 1)} / 1`, { coins: 800, diamonds: 30, feed: 2 }),
+    ],
+    monthly: [
+      make("monthly", monthKey, "book10", "図鑑を10種類発見する", game.discoveredSpecies.length >= 10, `${Math.min(game.discoveredSpecies.length, 10)} / 10`, { coins: 2200, diamonds: 80, feed: 4 }),
+      make("monthly", monthKey, "adult", "大人ペンギンを1匹育てる", adultCount >= 1, `${Math.min(adultCount, 1)} / 1`, { coins: 2500, diamonds: 100, feed: 3 }),
+      make("monthly", monthKey, "lv65", "ペンギンLv65を達成する", maxLevel >= 65, `Lv.${Math.min(maxLevel, 65)} / 65`, { coins: 3000, diamonds: 120, feed: 5 }),
+    ],
+  };
+}
+
+function getWeekKey(date = new Date()) {
+  const resetDate = new Date(date);
+  if (resetDate.getHours() < 6) resetDate.setDate(resetDate.getDate() - 1);
+  const firstDay = new Date(resetDate.getFullYear(), 0, 1);
+  const dayOfYear = Math.floor((resetDate - firstDay) / 86400000) + 1;
+  return `${resetDate.getFullYear()}-W${Math.ceil(dayOfYear / 7)}`;
+}
+
+function getMonthKey(date = new Date()) {
+  const resetDate = new Date(date);
+  if (resetDate.getHours() < 6) resetDate.setDate(resetDate.getDate() - 1);
+  return `${resetDate.getFullYear()}-${String(resetDate.getMonth() + 1).padStart(2, "0")}`;
 }
 
 function nextLoveLevel(point) {

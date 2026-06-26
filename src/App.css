@@ -3352,8 +3352,22 @@ p {
   position: relative;
 }
 
+.menuSubScreen .pageHeader,
+.missionScreen .pageHeader {
+  min-height: 58px;
+  padding-right: 58px;
+}
+
+.menuSubScreen .pageHeader h1,
+.menuSubScreen .pageHeader span,
+.missionScreen .pageHeader h1,
+.missionScreen .pageHeader span {
+  max-width: 100%;
+}
+
 .menuSubScreen > .profileCloseButton {
   top: 14px;
+  right: 14px;
 }
 
 .helpPanel {
@@ -3565,6 +3579,7 @@ p {
 }
 
 .titleCard {
+  box-sizing: border-box;
   min-height: 112px;
   display: grid;
   place-items: center;
@@ -3590,7 +3605,11 @@ p {
 }
 
 .titleCard.selected {
-  outline: 3px solid rgba(83, 186, 255, 0.72);
+  border-color: #54bfff;
+  box-shadow:
+    inset 0 0 0 2px rgba(255,255,255,0.8),
+    0 5px 0 #41a0d9,
+    0 12px 20px rgba(44, 121, 176, 0.16);
 }
 
 .titleCard span,
@@ -3602,10 +3621,11 @@ p {
 .titleCard b {
   max-width: 100%;
   overflow: hidden;
-  font-size: 15px;
+  font-size: 14px;
+  line-height: 1.2;
   text-align: center;
   text-overflow: ellipsis;
-  white-space: nowrap;
+  white-space: normal;
 }
 
 .titleCard.locked b {
@@ -3615,6 +3635,7 @@ p {
 .titleDetailPanel {
   display: grid;
   gap: 12px;
+  margin-bottom: 12px;
   padding: 14px;
   background:
     radial-gradient(circle at 85% 12%, rgba(255,255,255,0.9), transparent 20%),
@@ -3656,6 +3677,60 @@ p {
   font-size: 12px;
   font-weight: 850;
   line-height: 1.65;
+}
+
+.missionScreen {
+  position: relative;
+}
+
+.missionPanel {
+  display: grid;
+  gap: 9px;
+  padding: 10px;
+}
+
+.missionItem {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 7px;
+  padding: 11px;
+  border: 1px solid #c2e7f8;
+  border-radius: 15px;
+  background:
+    radial-gradient(circle at 14% 16%, rgba(255,255,255,0.95), transparent 20%),
+    linear-gradient(#ffffff, #f0fbff);
+  box-shadow: 0 5px 0 #d5eff9, 0 10px 16px rgba(44, 121, 176, 0.1);
+}
+
+.missionItem.done {
+  border-color: #8dd9ff;
+}
+
+.missionItem.claimed {
+  opacity: 0.76;
+}
+
+.missionItem b {
+  color: #124c72;
+  font-size: 13px;
+}
+
+.missionItem p {
+  margin: 3px 0 0;
+  color: #6688a0;
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.missionItem > span {
+  color: #236f9c;
+  font-size: 10px;
+  font-weight: 900;
+}
+
+.missionItem button {
+  width: 100%;
+  min-height: 38px;
 }
 
 .unlockHintGrid,
