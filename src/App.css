@@ -3365,6 +3365,46 @@ p {
   line-height: 1.7;
 }
 
+.menuSummaryGrid,
+.settingStatusGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 7px;
+}
+
+.menuSummaryGrid div,
+.settingStatusGrid div {
+  min-width: 0;
+  min-height: 54px;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 3px;
+  padding: 8px 5px;
+  border-radius: 14px;
+  background:
+    radial-gradient(circle at 20% 16%, rgba(255,255,255,0.95), transparent 22%),
+    linear-gradient(#ffffff, #edfaff);
+  box-shadow: inset 0 0 0 1px #c9ecfb, 0 5px 0 #d7f0fa;
+}
+
+.menuSummaryGrid b,
+.settingStatusGrid b {
+  max-width: 100%;
+  overflow: hidden;
+  color: #144c72;
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.menuSummaryGrid span,
+.settingStatusGrid span {
+  color: #6688a0;
+  font-size: 9px;
+  font-weight: 900;
+}
+
 .menuInventoryGrid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -3423,20 +3463,123 @@ p {
   font-weight: 900;
 }
 
+.menuActionRow {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.menuActionRow button {
+  min-height: 42px;
+  padding-inline: 7px;
+  font-size: 11px;
+}
+
+.activeTitleCard {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  border-radius: 16px;
+  background:
+    radial-gradient(circle at 84% 22%, rgba(255,255,255,0.8), transparent 22%),
+    linear-gradient(135deg, #fff4b6, #ffcf67);
+  box-shadow: 0 5px 0 #d89a25, 0 12px 20px rgba(160, 113, 25, 0.14);
+  color: #704b12;
+}
+
+.activeTitleCard .icon {
+  justify-self: center;
+  color: #8f6016;
+}
+
+.activeTitleCard span,
+.activeTitleCard b {
+  display: block;
+}
+
+.activeTitleCard span {
+  font-size: 10px;
+  font-weight: 900;
+}
+
+.activeTitleCard b {
+  margin-top: 3px;
+  font-size: 15px;
+}
+
 .titleList {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
 }
 
-.titleList span {
+.titleList span,
+.titleList button {
   padding: 8px 10px;
+  border: 0;
   border-radius: 999px;
   background: linear-gradient(#fff7bd, #ffd45d);
   box-shadow: 0 4px 0 #dca52e;
   color: #7a5414;
   font-size: 11px;
   font-weight: 900;
+}
+
+.titleList button.active {
+  background: linear-gradient(#76d1ff, #3298e8);
+  box-shadow: 0 4px 0 #1b78bd;
+  color: #fff;
+}
+
+.unlockHintGrid,
+.helpCardGrid,
+.termsList {
+  display: grid;
+  gap: 8px;
+}
+
+.unlockHintGrid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.unlockHintGrid span,
+.helpCardGrid div,
+.termsList div {
+  padding: 10px;
+  border: 1px solid #c5e8f8;
+  border-radius: 14px;
+  background: linear-gradient(#ffffff, #f1fbff);
+  box-shadow: 0 4px 0 #d8f0fb;
+  color: #315f7b;
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.helpCardGrid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.helpCardGrid b,
+.helpCardGrid span,
+.termsList b,
+.termsList span {
+  display: block;
+}
+
+.helpCardGrid b,
+.termsList b {
+  color: #14527a;
+  font-size: 12px;
+}
+
+.helpCardGrid span,
+.termsList span {
+  margin-top: 4px;
+  color: #557f98;
+  font-size: 10px;
+  line-height: 1.55;
 }
 
 .settingList {
@@ -3449,6 +3592,29 @@ p {
   min-height: 50px;
   padding-inline: 6px;
   font-size: 10px;
+}
+
+.menuTextarea {
+  width: 100%;
+  min-height: 96px;
+  resize: vertical;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  border: 2px solid #b8e3fb;
+  border-radius: 16px;
+  background: #fff;
+  color: #174d77;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 850;
+  line-height: 1.55;
+}
+
+.menuTextarea.saveCode,
+.menuTextarea.importCode {
+  min-height: 78px;
+  font-size: 10px;
+  word-break: break-all;
 }
 
 .debugDiamondBox {

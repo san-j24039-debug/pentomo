@@ -145,9 +145,11 @@ function createDefaultGame() {
     ownedFurniture: ["ふかふかベッド"],
     ownedBackgrounds: ["近所の海"],
     ownedTitles: ["氷海の飼育員"],
+    activeTitle: "氷海の飼育員",
     activeFurniture: "ふかふかベッド",
     activeBackground: "近所の海",
     photos: [],
+    supportMemo: "",
     achievements: { daily: 20, normal: 8, special: 2 },
     miniGameExpToday: 0,
     claimedToday: false,
@@ -193,8 +195,10 @@ function normalizeGame(game) {
     ownedFurniture: unique([...(game.ownedFurniture || fallback.ownedFurniture)].map((name) => validText(name, "ふかふかベッド"))),
     ownedBackgrounds: unique([...(game.ownedBackgrounds || fallback.ownedBackgrounds)].map((name) => validText(name, "近所の海"))),
     ownedTitles: unique([...(game.ownedTitles || fallback.ownedTitles)].map((name) => validText(name, "氷海の飼育員"))),
+    activeTitle: validText(game.activeTitle, "氷海の飼育員"),
     capacityBonus: Number.isFinite(game.capacityBonus) ? game.capacityBonus : 0,
     photos: Array.isArray(game.photos) ? game.photos : [],
+    supportMemo: validText(game.supportMemo, ""),
     dailyGiftKey: savedGiftKey,
     claimedToday: savedGiftKey === currentGiftKey ? Boolean(game.claimedToday) : false,
   };
@@ -2397,9 +2401,8 @@ function Achievements({ game, setGame, setMessage }) {
   );
 }
 
-function Menu({ game, setGame, setMessage }) {
+function Menu({ game, setGame, setMessage, setActive }) {
   const [achievementTab, setAchievementTab] = useState("daily");
-  const [helpOpen, setHelpOpen] = useState(false);
   const [debugPassword, setDebugPassword] = useState("");
   const [activePanel, setActivePanel] = useState("bag");
   const claimAll = () => {
@@ -2428,7 +2431,6 @@ function Menu({ game, setGame, setMessage }) {
             key={label}
             onClick={() => {
               setActivePanel(panel);
-              setHelpOpen(panel === "help");
               setMessage(`${label}を開きました。`);
             }}
             type="button"
@@ -2437,25 +2439,16 @@ function Menu({ game, setGame, setMessage }) {
           </button>
         ))}
       </div>
-      <MenuPanel activePanel={activePanel} game={game} setGame={setGame} setMessage={setMessage} />
-      {helpOpen && (
-        <Panel className="helpPanel">
-          <div className="menuSectionTitle">
-            <h2>ヘルプ</h2>
-            <button className="whiteButton" onClick={() => setHelpOpen(false)}>閉じる</button>
-          </div>
-          <p>確認用メニューです。パスワードを入力するとガチャ確認用のダイヤを追加できます。</p>
-          <div className="debugDiamondBox">
-            <input
-              type="password"
-              value={debugPassword}
-              onChange={(event) => setDebugPassword(event.target.value)}
-              placeholder="パスワード"
-            />
-            <button className="yellow" onClick={addDebugDiamonds}>ダイヤ100000</button>
-          </div>
-        </Panel>
-      )}
+      <MenuPanel
+        activePanel={activePanel}
+        game={game}
+        setGame={setGame}
+        setMessage={setMessage}
+        setActive={setActive}
+        debugPassword={debugPassword}
+        setDebugPassword={setDebugPassword}
+        addDebugDiamonds={addDebugDiamonds}
+      />
       <Panel className="menuAchievements">
         <div className="menuSectionTitle">
           <h2>実績</h2>
@@ -2468,16 +2461,16 @@ function Menu({ game, setGame, setMessage }) {
           <Task title="魚キャッチで100点" reward="称号" progress={`${game.achievements[achievementTab]} / 100`} />
         </div>
       </Panel>
-      <Panel className="noticePanel">
-        <h2>動作確認メニュー</h2>
-        <p>各ボタンは反応します。今後、詳細画面を追加する前提の入口です。</p>
-      </Panel>
     </Screen>
   );
 }
 
-function MenuPanel({ activePanel, game, setGame, setMessage }) {
+function MenuPanel({ activePanel, game, setGame, setMessage, setActive, debugPassword, setDebugPassword, addDebugDiamonds }) {
+  const [contactDraft, setContactDraft] = useState(game.supportMemo || "");
+  const [importText, setImportText] = useState("");
   const feedRows = Object.entries(feedItems).map(([key, item]) => ({ key, item, count: game.inventory[key] || 0 }));
+  const capacity = BASE_CAPACITY + game.capacityBonus;
+  const dataCode = JSON.stringify(game);
   const title = {
     bag: "持ち物",
     titles: "称号",
@@ -2492,6 +2485,32 @@ function MenuPanel({ activePanel, game, setGame, setMessage }) {
     setGame((current) => ({ ...current, noticeCount: 0 }));
     setMessage("通知を確認済みにしました。");
   };
+  const setActiveTitle = (titleName) => {
+    setGame((current) => ({ ...current, activeTitle: titleName }));
+    setMessage(`${titleName}を表示称号にしました。`);
+  };
+  const saveContactMemo = () => {
+    setGame((current) => ({ ...current, supportMemo: contactDraft.trim() }));
+    setMessage("問い合わせメモを保存しました。");
+  };
+  const copySaveData = async () => {
+    try {
+      await navigator.clipboard.writeText(dataCode);
+      setMessage("バックアップコードをコピーしました。");
+    } catch {
+      setMessage("コピーできませんでした。コードを長押ししてコピーしてください。");
+    }
+  };
+  const importSaveData = () => {
+    try {
+      const parsed = JSON.parse(importText);
+      setGame(normalizeGame({ ...createDefaultGame(), ...parsed }));
+      setImportText("");
+      setMessage("バックアップコードを読み込みました。");
+    } catch {
+      setMessage("バックアップコードを読み込めませんでした。");
+    }
+  };
 
   return (
     <Panel className={`menuDetailPanel menuDetail-${activePanel}`}>
@@ -2499,49 +2518,130 @@ function MenuPanel({ activePanel, game, setGame, setMessage }) {
         <h2>{title}</h2>
       </div>
       {activePanel === "bag" && (
-        <div className="menuInventoryGrid">
-          {feedRows.map(({ key, item, count }) => (
-            <div className="menuInventoryItem" key={key}>
-              <FeedIcon type={key} />
+        <>
+          <div className="menuSummaryGrid">
+            <div><b>{game.coins.toLocaleString()}</b><span>コイン</span></div>
+            <div><b>{game.diamonds.toLocaleString()}</b><span>ダイヤ</span></div>
+            <div><b>{game.penguins.length} / {capacity}</b><span>ペンギン</span></div>
+            <div><b>{game.eggs.length}</b><span>卵</span></div>
+          </div>
+          <div className="menuInventoryGrid">
+            {feedRows.map(({ key, item, count }) => (
+              <div className="menuInventoryItem" key={key}>
+                <FeedIcon type={key} />
+                <div>
+                  <b>{item.name}</b>
+                  <span>所持 {count}個 / 満腹度 +{item.hunger}</span>
+                </div>
+              </div>
+            ))}
+            <div className="menuInventoryItem">
+              <Egg type="rainbow" small />
               <div>
-                <b>{item.name}</b>
-                <span>所持 {count}個 / 満腹度 +{item.hunger}</span>
+                <b>ペンギン卵</b>
+                <span>保管中 {game.eggs.length}個</span>
               </div>
             </div>
-          ))}
-          <div className="menuInventoryItem">
-            <Egg type="rainbow" small />
-            <div>
-              <b>ペンギン卵</b>
-              <span>保管中 {game.eggs.length}個</span>
+            <div className="menuInventoryItem">
+              <Icon name="gift" />
+              <div>
+                <b>おみやげ</b>
+                <span>{game.souvenirs} / 150</span>
+              </div>
             </div>
           </div>
-          <div className="menuInventoryItem">
-            <Icon name="gift" />
-            <div>
-              <b>おみやげ</b>
-              <span>{game.souvenirs} / 150</span>
-            </div>
+          <div className="menuActionRow">
+            <button onClick={() => setActive("shop")} type="button">ショップへ</button>
+            <button className="whiteButton" onClick={() => setActive("list")} type="button">一覧へ</button>
+            <button className="whiteButton" onClick={() => setActive("book")} type="button">図鑑へ</button>
           </div>
-        </div>
+        </>
       )}
       {activePanel === "titles" && (
-        <div className="titleList">
-          {game.ownedTitles.map((ownedTitle) => <span key={ownedTitle}>{ownedTitle}</span>)}
-          {game.ownedTitles.length === 0 && <p>まだ称号を持っていません。</p>}
-        </div>
+        <>
+          <div className="activeTitleCard">
+            <Icon name="star" />
+            <div><span>表示中の称号</span><b>{game.activeTitle || game.ownedTitles[0] || "未設定"}</b></div>
+          </div>
+          <div className="titleList selectable">
+            {game.ownedTitles.map((ownedTitle) => (
+              <button
+                className={game.activeTitle === ownedTitle ? "active" : ""}
+                key={ownedTitle}
+                onClick={() => setActiveTitle(ownedTitle)}
+                type="button"
+              >
+                {ownedTitle}
+              </button>
+            ))}
+            {game.ownedTitles.length === 0 && <p>まだ称号を持っていません。</p>}
+          </div>
+          <div className="unlockHintGrid">
+            <span>Lv100達成で特別称号</span>
+            <span>魚キャッチ実績で称号</span>
+          </div>
+        </>
       )}
       {activePanel === "settings" && (
-        <div className="settingList">
-          <button className="whiteButton" onClick={resetNotice} type="button">通知バッジを消す</button>
-          <button className="whiteButton" onClick={() => setMessage("音量設定は今後追加予定です。")} type="button">音量 確認</button>
-          <button className="whiteButton" onClick={() => setMessage("セーブデータはこの端末に保存されています。")} type="button">保存状態を確認</button>
+        <>
+          <div className="settingStatusGrid">
+            <div><span>保存方式</span><b>端末保存</b></div>
+            <div><span>通知</span><b>{game.noticeCount > 0 ? `${game.noticeCount}件` : "なし"}</b></div>
+            <div><span>毎日更新</span><b>朝6時</b></div>
+            <div><span>写真</span><b>{game.photos.length} / 30</b></div>
+          </div>
+          <div className="settingList">
+            <button className="whiteButton" onClick={resetNotice} type="button">通知バッジを消す</button>
+            <button className="whiteButton" onClick={() => setMessage("セーブデータはこの端末に保存されています。")} type="button">保存状態を確認</button>
+            <button className="whiteButton" onClick={() => setActive("profile")} type="button">プロフィールへ</button>
+          </div>
+        </>
+      )}
+      {activePanel === "help" && (
+        <>
+          <div className="helpCardGrid">
+            <div><b>育成</b><span>餌・なでる・掃除・写真で状態を整えます。</span></div>
+            <div><b>ガチャ</b><span>SSR卵は2%。80連で確定です。</span></div>
+            <div><b>おでかけ</b><span>出発後は実時間で帰還を待ちます。</span></div>
+            <div><b>図鑑</b><span>発見したペンギンやおみやげを確認できます。</span></div>
+          </div>
+          <div className="debugDiamondBox">
+            <input
+              type="password"
+              value={debugPassword}
+              onChange={(event) => setDebugPassword(event.target.value)}
+              placeholder="確認用パスワード"
+            />
+            <button className="yellow" onClick={addDebugDiamonds}>ダイヤ100000</button>
+          </div>
+        </>
+      )}
+      {activePanel === "contact" && (
+        <>
+          <p>改善したい点や不具合メモをここに残せます。提出前の確認メモにも使えます。</p>
+          <textarea className="menuTextarea" value={contactDraft} onChange={(event) => setContactDraft(event.target.value)} placeholder="例: ガチャ結果の表示をもっと見やすくしたい" />
+          <button className="yellow" onClick={saveContactMemo} type="button">メモを保存</button>
+        </>
+      )}
+      {activePanel === "terms" && (
+        <div className="termsList">
+          <div><b>利用目的</b><span>ペンともは学習・制作課題用の育成ゲームです。</span></div>
+          <div><b>保存データ</b><span>ゲームデータはこの端末のブラウザに保存されます。</span></div>
+          <div><b>注意</b><span>ブラウザのデータを削除するとセーブも消えることがあります。</span></div>
         </div>
       )}
-      {activePanel === "help" && <p>分からない項目を押すと、ここに説明が表示されます。確認用ダイヤは下のヘルプ欄から追加できます。</p>}
-      {activePanel === "contact" && <p>困ったことや改善したいところは、制作者メモとして残しておきましょう。</p>}
-      {activePanel === "terms" && <p>この作品は学習・制作課題用のペンギン育成ゲームです。</p>}
-      {activePanel === "link" && <p>データは端末のブラウザに保存されます。別端末への連携は今後追加予定です。</p>}
+      {activePanel === "link" && (
+        <>
+          <p>バックアップコードを保存すると、別端末や再インストール時に復元できます。</p>
+          <textarea className="menuTextarea saveCode" readOnly value={dataCode} />
+          <div className="menuActionRow">
+            <button onClick={copySaveData} type="button">コピー</button>
+            <button className="whiteButton" onClick={() => setImportText(dataCode)} type="button">下に貼る</button>
+          </div>
+          <textarea className="menuTextarea importCode" value={importText} onChange={(event) => setImportText(event.target.value)} placeholder="バックアップコードを貼り付け" />
+          <button className="yellow" onClick={importSaveData} disabled={!importText.trim()} type="button">復元する</button>
+        </>
+      )}
     </Panel>
   );
 }
