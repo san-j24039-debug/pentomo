@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import "./App.css";
 import penguin from "./assets/penguin.png";
+import emperorAdult from "./assets/emperor-adult.png";
 
 const STORAGE_KEY = "pentomo-save-v4";
 const BASE_CAPACITY = 54;
@@ -54,6 +55,11 @@ const titleCatalog = [
   { id: "traveler", name: "南極おみやげ係", condition: "おみやげを50個集めると解放されます。" },
   { id: "master", name: "ペンギンマスター", condition: "ペンギンLv100を1匹達成すると解放されます。" },
 ];
+
+function penguinSprite(p) {
+  if (p?.speciesId === 0 && p?.stage === "adult") return emperorAdult;
+  return penguin;
+}
 
 const outfits = [
   { id: "none", name: "なし", price: 0 },
@@ -629,7 +635,7 @@ function Home({ game, homePenguin, message, setActive, setMessage, setGame }) {
 function HomeWalkingPenguin({ penguin: p }) {
   return (
     <div className="riggedPentomo" aria-label={`${p?.name || "ペンギン"}のアニメーション`}>
-      <img className="rigPart rigImage" src={penguin} alt={p?.name || ""} draggable="false" />
+      <img className="rigPart rigImage" src={penguinSprite(p)} alt={p?.name || ""} draggable="false" />
       <span className="rigShadow" />
       <span className="rigName">{p?.name || "ペンギン"}</span>
     </div>
@@ -737,7 +743,7 @@ function Care({ activePenguin, careAction, game, setOutfitOpen, setEditOpen }) {
       <div className={`careHero ${petMode ? "petMode" : ""} ${petting ? "petting" : ""} ${cleanMode ? "cleanMode" : ""} ${cleaning ? "cleaning" : ""} ${photoMode ? "photoMode" : ""} ${photoFlash ? "photoFlash" : ""}`}>
         <div className="careHeader">
           <div className="avatarBadge">
-            <img src={penguin} alt="" />
+            <img src={penguinSprite(activePenguin)} alt="" />
           </div>
           <div>
             <div className="careNameLine">
@@ -976,7 +982,7 @@ function PenguinList({ game, setGame, setHatchModal, setActive }) {
                 type="button"
               >
                 <Rarity index={p.speciesId} />
-                <img src={penguin} alt="" />
+                <img src={penguinSprite(p)} alt="" />
                 <b>{p.name}</b>
                 <span>{p.speciesName}<br />Lv.{p.level} / 愛情{p.loveLevel}</span>
               </button>
@@ -988,7 +994,7 @@ function PenguinList({ game, setGame, setHatchModal, setActive }) {
                 <button className="detailCloseButton" onClick={() => setSelectedPenguinId("")} aria-label="Close" type="button">×</button>
                 <div className="penguinDetailHero">
                   <Rarity index={selectedPenguin.speciesId} />
-                  <img src={penguin} alt="" />
+                  <img src={penguinSprite(selectedPenguin)} alt="" />
                   <div>
                     <h2>{selectedPenguin.name}</h2>
                     <p>{selectedPenguin.speciesName} / {selectedPenguin.stage === "adult" ? "大人" : "ヒナ"}</p>
@@ -2939,7 +2945,7 @@ function PenguinFigure({ penguin: p, size = "medium" }) {
   return (
     <div className={`penguinFigure ${size} outfit-${slug(p?.outfit || "なし")}`}>
       <div className="shadow" />
-      <img src={penguin} alt="ペンギン" draggable="false" />
+      <img src={penguinSprite(p)} alt="ペンギン" draggable="false" />
     </div>
   );
 }
